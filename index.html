@@ -1,28 +1,41 @@
 <html>
 <body>
+  <input type="text" name="function" placeholder="enter function here:" id="function"></textarea>
+  <button type="button" onclick="submit()">Click Me!</button>
   <canvas id="canvas"></canvas>
+
   <script src="js/three.min.js"></script>
   <script src="js/TrackballControls.js"></script>
   <script src="js/CanvasInput.js"></script>
   <script>
   var camera, controls, scene, renderer;
-
+  var theFunctionValue;
+  var functionArray;
+  function submit(){
+    //Being lazy for now, I'll change this later. Using eval()
+    var box = document.getElementById("function");
+    theFunctionValue = box.value.replace(/ /g,'');
+    functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
+    drawGraph(theFunctionValue);
+  }
   init();
   animate();
 
   function init(){
+    var canvas = document.getElementById("canvas");
     camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
     camera.position.z = 5;
     camera.position.y = 50;
     camera.position.x = 0;
 
-    controls = new THREE.TrackballControls( camera );
+    renderer = new THREE.WebGLRenderer({canvas: canvas});
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement);
+    //The second parameter is the container.
+    controls = new THREE.TrackballControls( camera, canvas);
     controls.addEventListener('change', render);
 
     scene = new THREE.Scene();
-
-    // var geometry = new THREE.IcosahedronGeometry(100);
-    // var material = new THREE.MeshNormalMaterial();
 
     var size = 14, step = 1;
     var geometry = new THREE.Geometry();
@@ -45,14 +58,25 @@
     var line = new THREE.Line(geometry, material, THREE.LinePieces);
     var lineaxes = new THREE.Line(axes, axismaterial, THREE.LinePieces);
 
+    scene.add(line);
+    scene.add(lineaxes);
 
+
+  }
+
+  function drawGraph(given){
+    var size = 14;
     //Curve test
     var x = -size;
     var func;
     var points = [];
-    for (var i = -size; i <= size; i+= step){
+    for (var i = -size; i <= size; i+= 1){
       //Somehow the plane is "backwards", the positive y-cordinate is negative
-      func = -(x*x*x);
+      if(given!=null){
+        func = -(eval(given));
+      } else {
+        func = -(x);
+      }
       points[i+size] = new THREE.Vector3(x,0,func);
       x++;
     }
@@ -62,24 +86,13 @@
       var splinePoints = spline.getPoints(100);
 
       var material2 = new THREE.LineBasicMaterial( { color: "white" } );
-      console.log(points.length);
       for(var i = 0; i < splinePoints.length; i++){
             geometry2.vertices.push(splinePoints[i]);
       }
 
       var line2 = new THREE.Line(geometry2, material2);
 
-    scene.add(line2);
-    scene.add(line);
-    scene.add(lineaxes);
-
-    var input = new CanvasInput({
-      canvas: document.getElementById("canvas")
-    });
-    var canvas = document.getElementById("canvas");
-    renderer = new THREE.WebGLRenderer({canvas: canvas});
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    document.body.appendChild(renderer.domElement);
+  scene.add(line2);
   }
 
   function animate(){
