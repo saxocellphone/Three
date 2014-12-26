@@ -9,56 +9,56 @@
 	<body>
 		<input type="text" name="function" placeholder="enter function here:" id="function"></textarea>
 		<button type="button" onclick="submit()">Graph Me</button>
-    	<a>If only a black screen appears, use your mouse to drag accross the screen to make it appear. I'll fix the problem later. Also make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>. I was too lazy to change it. Also when you graph a graph with lots of curves, it will look funny. I'm guessing it's because the computer rounds the decimal unevenly.</a>
+    		<a>If only a black screen appears, use your mouse to drag accross the screen to make it appear. I'll fix the problem later. Also make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>. I was too lazy to change it. Also when you graph a graph with lots of curves, it will look funny. I'm guessing it's because the computer rounds the decimal unevenly.</a>
 		<canvas id="canvas"></canvas>
 
 		<script src="js/three.min.js"></script>
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/CanvasInput.js"></script>
 		<script>
-			var camera, controls, scene, renderer;
-			var theFunctionValue;
+		var camera, controls, scene, renderer;
+		var theFunctionValue;
       		//The array will be used for future purposes
-			var functionArray;
-			function submit(){
-        		clearGraph();
-				//Being lazy for now, I'll change this later. Using eval()
-				var box = document.getElementById("function");
-				theFunctionValue = box.value.replace(/ /g,'');
-				functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
-				drawGraph(theFunctionValue);
-			}
-			init();
-			animate();
-			function init(){
-				var canvas = document.getElementById("canvas");
-				camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
-				camera.position.z = 5;
-				camera.position.y = 50;
-				camera.position.x = 0;
-				renderer = new THREE.WebGLRenderer({canvas: canvas});
-				renderer.setSize(window.innerWidth, window.innerHeight)
-				document.body.appendChild(renderer.domElement);
-				//The second parameter is the container.
-				controls = new THREE.TrackballControls( camera, canvas);
-				controls.addEventListener('change', render);
-				scene = new THREE.Scene();
-				var size = 14, step = 1;
-				var geometry = new THREE.Geometry();
-				var axes = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial({color: "green"});
-				var axismaterial = new THREE.LineBasicMaterial({color: "red"});
-				for (var i = -size; i <= size; i += step){
-					if(i == 0){
-						axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
-						axes.vertices.push(new THREE.Vector3(size, -0.04, i));
-						axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
-						axes.vertices.push(new THREE.Vector3(i, -0.04, size));
-					} else {
-						geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
-						geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
-						geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
-						geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
+		var functionArray;
+		function submit(){
+       			clearGraph();
+			//Being lazy for now, I'll change this later. Using eval()
+			var box = document.getElementById("function");
+			theFunctionValue = box.value.replace(/ /g,'');
+			functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
+			drawGraph(theFunctionValue);
+		}
+		init();
+		animate();
+		function init(){
+			var canvas = document.getElementById("canvas");
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
+			camera.position.z = 5;
+			camera.position.y = 50;
+			camera.position.x = 0;
+			renderer = new THREE.WebGLRenderer({canvas: canvas});
+			renderer.setSize(window.innerWidth, window.innerHeight)
+			document.body.appendChild(renderer.domElement);
+			//The second parameter is the container.
+			controls = new THREE.TrackballControls( camera, canvas);
+			controls.addEventListener('change', render);
+			scene = new THREE.Scene();
+			var size = 14, step = 1;
+			var geometry = new THREE.Geometry();
+			var axes = new THREE.Geometry();
+			var material = new THREE.LineBasicMaterial({color: "green"});
+			var axismaterial = new THREE.LineBasicMaterial({color: "red"});
+			for (var i = -size; i <= size; i += step){
+				if(i == 0){
+					axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
+					axes.vertices.push(new THREE.Vector3(size, -0.04, i));
+					axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
+					axes.vertices.push(new THREE.Vector3(i, -0.04, size));
+				} else {
+					geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
+					geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
+					geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
+					geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
 					}
 				}
 				var line = new THREE.Line(geometry, material, THREE.LinePieces);
@@ -67,35 +67,35 @@
 				scene.add(lineaxes);
 			}
 
-			function drawGraph(given){
-				var size = 14;
-				//Curve test
-				var x = -size;
-				var func;
-				var points = [];
+		function drawGraph(given){
+			var size = 14;
+			//Curve test
+			var x = -size;
+			var func;
+			var points = [];
         		var step = 0.01;
-				//I'll change this later, just using a counter variable for now
-				var counter = -size;
-				for (var i = -size; i <= size; i+= step){
-				//Somehow the plane is "backwards", the positive y-cordinate is negative
-					if(given!=null){
-						func = -(eval(given));
-					}
-					points[counter+size] = new THREE.Vector3(x,0,func);
-					x+=step;
-					counter++;
+			//I'll change this later, just using a counter variable for now
+			var counter = -size;
+			for (var i = -size; i <= size; i+= step){
+			//Somehow the plane is "backwards", the positive y-cordinate is negative
+				if(given!=null){
+					func = -(eval(given));
 				}
-				var spline = new THREE.SplineCurve3(points);
-				var geometry = new THREE.Geometry();
-				var splinePoints = spline.getPoints(points.length-1);
-				var material = new THREE.LineBasicMaterial( { color: "white" } );
-				for(var i = 0; i < splinePoints.length; i++){
-					geometry.vertices.push(spline.points[i]);
-				}
-				var graph = new THREE.Line(geometry, material);
-				graph.name = "graph";
-        		scene.add(graph);
+				points[counter+size] = new THREE.Vector3(x,0,func);
+				x+=step;
+				counter++;
 			}
+			var spline = new THREE.SplineCurve3(points);
+			var geometry = new THREE.Geometry();
+			var splinePoints = spline.getPoints(points.length-1);
+			var material = new THREE.LineBasicMaterial( { color: "white" } );
+			for(var i = 0; i < splinePoints.length; i++){
+				geometry.vertices.push(spline.points[i]);
+			}
+			var graph = new THREE.Line(geometry, material);
+			graph.name = "graph";
+        		scene.add(graph);
+		}
       		function clearGraph(){
         		var array = scene.children;
         		for(var i = 0; i < array.length; i++){
@@ -105,15 +105,14 @@
         		}
       		}
 
-			function animate(){
-				requestAnimationFrame( animate );
-				controls.update();
-			}
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+		}
 
-			function render(){
-				renderer.render( scene, camera );
-			}
-
+		function render(){
+			renderer.render( scene, camera );
+		}
 		</script>
 	</body>
 </html>
