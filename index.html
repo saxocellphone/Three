@@ -126,10 +126,15 @@
         	var array = scene.children;
 			console.log(array);
         	for(var i = 0; i < array.length; i++){
+<<<<<<< HEAD
           		if(array[i].name == "graph"){
             		scene.remove(array[i]);
 				} else if(array[i].name == "solid"){
 					scene.remove(array[i]);
+=======
+          		if(array[i].name == "graph" || array[i].name == "solid"){
+            		scene.remove(array[i]);
+>>>>>>> origin/gh-pages
 				}
         	}
       	}
