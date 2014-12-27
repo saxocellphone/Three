@@ -8,7 +8,7 @@
 
 	<body>
 		<input type="text" name="function" placeholder="enter function here:" id="function"></textarea>
-		<input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/>
+		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/> -->
 		<button type="button" onclick="submit()">Graph Me</button>
     	<a>Make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>. I was too lazy to change it. Also sometimes a black line may appear when you are trying to rotate the solid, I'll fix that problem later.</a>
 		<canvas id="canvas"></canvas>
@@ -120,17 +120,18 @@
 		Graph.prototype.drawShape = function(degree){
 			for(var i = this.step; i <= this.graphSize; i+=this.step){
 				if(this.getY(i) <= this.graphSize){
-					var geometry = new THREE.CircleGeometry(this.getY(i), 100, 0, degree);
+					var geometry = new THREE.CylinderGeometry(this.getY(i), this.getY(i+this.step), this.step, 100);
 					geometry.verticesNeedUpdate = true;
 					geometry.dynamic = true;
-					geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,i));
+					geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-i,0));
 					var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, vertexColors: "red"} );
 					var plane = new THREE.Mesh( geometry, material );
-					plane.rotation.set(0,Math.PI/2,0);
+					plane.rotation.set(0,0,Math.PI/2);
 					plane.name = "solid";
 					scene.add( plane );
 				}
 			}
+			console.log(scene.children.length);
 			render();
 		}
 
