@@ -81,7 +81,7 @@
 				scene.add(lineaxes);
 
 				render();
-				animate();  //Maybe we need to animate in order to get the graph to instantly show up?  I have no idea what I'm doing
+				animate();  //Get the graph to show up-apparently render() doesn't do this for us
 			}
 	
 			function Graph(given, graphSize, step){
@@ -95,9 +95,8 @@
 			Graph.prototype.draw = function(){
 				var x = -(this.graphSize);
 				var points = [];
-				//I'll change this later, just using a counter variable for now
-				var counter = -(this.graphSize);
-				for (var i = -(this.graphSize); i <= this.graphSize; i+= this.step){
+				var counter = x;  //I'll change this later, just using a counter variable for now
+				for (var i = x; i <= this.graphSize; i+= this.step){
 				//Somehow the plane is upside-down, the positive y-cordinate is negative
 					if(this.given!=null){
 						this.func = -(eval(this.given));
@@ -106,15 +105,17 @@
 					x+=this.step;
 					counter++;
 				}
-				var spline = new THREE.SplineCurve3(points);
+
 				var geometry = new THREE.Geometry();
 				geometry.verticesNeedUpdate = true;
 				geometry.dynamic = true;
+				var spline = new THREE.SplineCurve3(points);
 				var splinePoints = spline.getPoints(points.length-1);
-				var material = new THREE.LineBasicMaterial( { color: "white" } );
 				for(var i = 0; i < splinePoints.length; i++){
 					geometry.vertices.push(spline.points[i]);
 				}
+
+				var material = new THREE.LineBasicMaterial({color: "white"});
 				var graph = new THREE.Line(geometry, material);
 				graph.name = "graph";
 				scene.add(graph);
@@ -132,9 +133,10 @@
 						var geometry = new THREE.CylinderGeometry(this.getY(i), this.getY(i+0.5), 0.5, 100);
 						geometry.verticesNeedUpdate = true;
 						geometry.dynamic = true;
-						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-i,0));
+						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -i, 0));
+
 						var material = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide, vertexColors: "red"});
-						var plane = new THREE.Mesh( geometry, material );
+						var plane = new THREE.Mesh(geometry, material);
 						plane.rotation.set(0, 0, Math.PI/2);
 						plane.name = "solid";
 						scene.add(plane);
@@ -149,6 +151,7 @@
 				var bar = document.getElementById("rotate");
 				var value = bar.value;
 				clearGraph();
+
 				var graph = new Graph(theFunctionValue, 14, 0.01);
 				graph.drawShape(value*Math.PI/180);
 				render();
