@@ -3,14 +3,15 @@
 	<head>
 		<title>A nice little graphing calculator</title>
 		<link rel="shortcut icon" href="https://lh6.googleusercontent.com/-eJP7CsCRims/AAAAAAAAAAI/AAAAAAAAAOE/9fdQHCWUWQs/s32-c-k-no/photo.jpg"/>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<meta charset="UTF-8">
 	</head>
 
 	<body>
-		<input type="text" name="function" placeholder="enter function here:" id="function"></textarea>
+		<input type="text" name="function" placeholder="y=" class="functionInput" id="function"></textarea>
 		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/> -->
 		<button type="button" onclick="submit()">Graph Me</button>
-		<a>Make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>. I was too lazy to change it. Also sometimes a black line may appear when you are trying to rotate the solid, I'll fix that problem later.</a>
+		<a>Make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>. \u222b I was too lazy to change it. Also sometimes a black line may appear when you are trying to rotate the solid, I'll fix that problem later.</a>
 		<form id="quality">
     		<p>
         		<label>Quality Select</label>
@@ -38,6 +39,12 @@
 					id = "godlike"
 					value = "0.1" />
 				<label for = "godlike">How much did you pay for your computer???</label>
+
+				<input type = "radio"
+				name = "quality"
+				id = "off"
+				value = "0" />
+				<label for = "off">off</label>
         	</p>
     	</form>
 		<canvas id="canvas"></canvas>
@@ -56,9 +63,11 @@
 			var box = document.getElementById("function");
 			theFunctionValue = box.value.replace(/ /g,'');
 			functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
-			var func = new Graph(theFunctionValue, 14,0.01);
+			//Graph
+			var quality = qualitySelect([document.getElementById('poor'),document.getElementById('medium'),document.getElementById('good'),document.getElementById('godlike')]);
+			var func = new Graph(theFunctionValue, 28,0.01);
 			func.draw();
-			func.drawShape(2*Math.PI, qualitySelect([document.getElementById('poor'),document.getElementById('medium'),document.getElementById('good'),document.getElementById('godlike')]));
+			func.drawShape(2*Math.PI, quality);
 		}
 		init();
 		animate();
@@ -75,7 +84,7 @@
 			controls = new THREE.TrackballControls( camera, canvas);
 			controls.addEventListener('change', render);
 			scene = new THREE.Scene();
-			var size = 14, step = 1;
+			var size = 28, step = 1;
 			var geometry = new THREE.Geometry();
 			geometry.verticesNeedUpdate = true;
 			geometry.dynamic = true;
@@ -101,6 +110,9 @@
 				var lineaxes = new THREE.Line(axes, axismaterial, THREE.LinePieces);
 				scene.add(line);
 				scene.add(lineaxes);
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.1 );
+				directionalLight.position.set( 0, 1, 0 );
+				scene.add( directionalLight );
 				render();
 			}
 
@@ -133,7 +145,9 @@
 			var splinePoints = spline.getPoints(points.length-1);
 			var material = new THREE.LineBasicMaterial( { color: "white" } );
 			for(var i = 0; i < splinePoints.length; i++){
-				geometry.vertices.push(spline.points[i]);
+				if(Math.abs((spline.points[i]).z)<=this.graphSize){
+					geometry.vertices.push(spline.points[i]);
+				}
 			}
 			var graph = new THREE.Line(geometry, material);
 			graph.name = "graph";
@@ -148,6 +162,8 @@
 
 		Graph.prototype.drawShape = function(degree, value){
 			var quality = Number(value);
+			var group = new THREE.Object3D();
+			group.name="solid";
 			for(var i = 0; i < this.graphSize; i+=quality){
 				if(this.getY(i) <= this.graphSize){
 					var geometry = new THREE.CylinderGeometry(this.getY(i), this.getY(i+quality), quality, 100);
@@ -157,10 +173,12 @@
 					var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, vertexColors: "red"} );
 					var plane = new THREE.Mesh( geometry, material );
 					plane.rotation.set(0,0,Math.PI/2);
-					plane.name = "solid";
-					scene.add( plane );
+					plane.overdraw = true;
+					group.add(plane);
+					//
 				}
 			}
+			scene.add(group);
 			render();
 		}
 
