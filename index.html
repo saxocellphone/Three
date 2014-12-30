@@ -48,7 +48,7 @@
         	</p>
     	</form> -->
     	<p>Select graphing quality:</p>
-		<select id="quality">
+		<select id="quality" onchange="updateQuality()">
 			<option value="1">Low
 			<option value="0.5">Medium
 			<option value="0.25">High
@@ -75,6 +75,15 @@
 				//var quality = qualitySelect([document.getElementById('poor'), document.getElementById('medium'), document.getElementById('good'), document.getElementById('godlike')]);
 				var quality = document.getElementById("quality").value;
 				var func = new Graph(theFunctionValue, 28, 0.01);
+				func.draw();
+				func.drawShape(2*Math.PI, quality);
+			}
+
+			function updateQuality(){
+				console.log("hi");
+				clearGraph();
+				var quality = document.getElementById("quality").value;
+				var func = new Graph(document.getElementById("function").value, 28,0.01);
 				func.draw();
 				func.drawShape(2*Math.PI, quality);
 			}
@@ -212,7 +221,7 @@
 				scene.add(group);
 				render();
 			}
-	
+
 			//I want it to be a prototype function, but this will do the trick for now. I know it's messy
 			function rotate(){
 				var bar = document.getElementById("rotate");
@@ -222,7 +231,7 @@
 				graph.drawShape(value * (Math.PI/180));
 				render();
 			}
-	
+
 			function clearGraph(){
 				for(var i = scene.children.length; i>=0; i--){
 					if(scene.children[i] != null){
@@ -232,7 +241,7 @@
 					}
 				}
 			}
-	
+
 			/*function qualitySelect(array){
 				for(var i = 0; i < array.length; i++){
 					if(array[i].checked){
@@ -240,12 +249,12 @@
 					}
 				}
 			}*/
-	
+
 			function animate(){
 				requestAnimationFrame(animate);
 				controls.update();
 			}
-	
+
 			function render(){
 				renderer.render(scene, camera);
 			}
