@@ -110,9 +110,16 @@
 				var lineaxes = new THREE.Line(axes, axismaterial, THREE.LinePieces);
 				scene.add(line);
 				scene.add(lineaxes);
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.1 );
-				directionalLight.position.set( 0, 1, 0 );
-				scene.add( directionalLight );
+				hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6 );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.position.set( 0, 500, 0 );
+				scene.add( hemiLight );
+
+				var light1 = new THREE.PointLight( 0xffff00, 1, 5000 );
+				light1.position.set( 0, 100, 90 );
+				scene.add( light1 );
+
 				render();
 			}
 
@@ -170,8 +177,9 @@
 					geometry.verticesNeedUpdate = true;
 					geometry.dynamic = true;
 					geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
-					var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide, vertexColors: "red"} );
+					var material =new THREE.MeshPhongMaterial( { color: 0xffff00, shading: THREE.SmoothShading });
 					var plane = new THREE.Mesh( geometry, material );
+					plane.material.color.setHex(0xffff00);
 					plane.rotation.set(0,0,Math.PI/2);
 					plane.overdraw = true;
 					group.add(plane);
