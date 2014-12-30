@@ -177,7 +177,7 @@
 					geometry.verticesNeedUpdate = true;
 					geometry.dynamic = true;
 					geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
-					var material =new THREE.MeshPhongMaterial( { color: 0xffff00, shading: THREE.SmoothShading });
+					var material =new THREE.MeshPhongMaterial( { color: 0xffff00, shading: THREE.SmoothShading, transparent: true, opacity: 0.75 });
 					var plane = new THREE.Mesh( geometry, material );
 					plane.material.color.setHex(0xffff00);
 					plane.rotation.set(0,0,Math.PI/2);
