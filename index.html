@@ -12,42 +12,8 @@
 		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/> -->
 		<button type="button" onclick="submit()">Graph Me</button>
 		<a>Make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>.  A black line may occasionally appear when you are trying to rotate the solid-this is a known bug.</a>
-		<!-- <form id="quality">
-    		<p>
-        		<label>Quality Select</label>
-        			<input type = "radio"
-                		name = "quality"
-                		id = "poor"
-                		value = "1" />
-        		<label for = "fast">fast</label>
-
-        		<input type = "radio"
-            		name = "quality"
-                	id = "medium"
-                	value = "0.5"
-					checked = "checked" />
-        		<label for = "medium">medium</label>
-
-        		<input type = "radio"
-                	name = "quality"
-                	id = "good"
-                	value = "0.25" />
-    			<label for = "good">good</label>
-
-				<input type = "radio"
-					name = "quality"
-					id = "godlike"
-					value = "0.1" />
-				<label for = "godlike">How much did you pay for your computer???</label>
-
-				<input type = "radio"
-				name = "quality"
-				id = "off"
-				value = "0" />
-				<label for = "off">off</label>
-        	</p>
-    	</form> -->
-    	<p>Select graphing quality:</p>
+    		<br>
+    		<a>Select graphing quality:</a>
 		<select id="quality" onchange="updateQuality()">
 			<option value="1">Low
 			<option value="0.5">Medium
@@ -64,29 +30,6 @@
 			var camera, controls, scene, renderer;
 			var theFunctionValue;
 			//var functionArray;  //Will be used later
-			function submit(){
-				clearGraph();
-				//Being lazy for now, I'll change this later. Using eval()
-				var box = document.getElementById("function");
-				theFunctionValue = box.value.replace(/ /g,'');
-				functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
-
-				//Graph
-				//var quality = qualitySelect([document.getElementById('poor'), document.getElementById('medium'), document.getElementById('good'), document.getElementById('godlike')]);
-				var quality = document.getElementById("quality").value;
-				var func = new Graph(theFunctionValue, 28, 0.01);
-				func.draw();
-				func.drawShape(2*Math.PI, quality);
-			}
-
-			function updateQuality(){
-				console.log("hi");
-				clearGraph();
-				var quality = document.getElementById("quality").value;
-				var func = new Graph(document.getElementById("function").value, 28,0.01);
-				func.draw();
-				func.drawShape(2*Math.PI, quality);
-			}
 
 			init();
 			animate();
@@ -161,14 +104,13 @@
 			Graph.prototype.draw = function(){
 				var x = -this.graphSize;
 				var points = [];
-				//I'll change this later, just using a counter variable for now
-				var counter = x;
+				var counter = x;  //I'll change this later, just using a counter variable for now
 				for (var i = -this.graphSize; i <= this.graphSize; i+= this.step){
-				//Somehow the plane is "backwards", the positive y-cordinate is negative
 					if(this.given!=null){
-						this.func = -(eval(this.given));
+						this.func = -(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
 					}
-					points[counter+this.graphSize] = new THREE.Vector3(x.toFixed(2),0,this.func);
+
+					points[counter+this.graphSize] = new THREE.Vector3(x.toFixed(2), 0, this.func);
 					x+=this.step;
 					counter++;
 				}
@@ -186,7 +128,7 @@
 					}
 				}
 
-				var material = new THREE.LineBasicMaterial({ color: "white" });
+				var material = new THREE.LineBasicMaterial({color: "white"});
 				var graph = new THREE.Line(geometry, material);
 
 				graph.name = "graph";
@@ -199,7 +141,7 @@
 				return eval(this.given);
 			}
 
-			Graph.prototype.drawShape = function(degree, value){
+			Graph.prototype.drawShape = function(degree, value){  //Degree is unused
 				var quality = Number(value);
 				var group = new THREE.Object3D();
 				group.name="solid";
@@ -242,13 +184,27 @@
 				}
 			}
 
-			/*function qualitySelect(array){
-				for(var i = 0; i < array.length; i++){
-					if(array[i].checked){
-						return array[i].value;
-					}
-				}
-			}*/
+			function submit(){
+				clearGraph();
+				//Being lazy for now, I'll change this later. Using eval()
+				var box = document.getElementById("function");
+				theFunctionValue = box.value.replace(/ /g,'');
+				functionArray = theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
+
+				//Graph
+				var quality = document.getElementById("quality").value;
+				var func = new Graph(theFunctionValue, 28, 0.01);
+				func.draw();
+				func.drawShape(2*Math.PI, quality);
+			}
+
+			function updateQuality(){
+				clearGraph();
+				var quality = document.getElementById("quality").value;
+				var func = new Graph(document.getElementById("function").value, 28, 0.01);
+				func.draw();
+				func.drawShape(2*Math.PI, quality);
+			}
 
 			function animate(){
 				requestAnimationFrame(animate);
