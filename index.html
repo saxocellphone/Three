@@ -31,6 +31,11 @@
 
 		<canvas id="canvas"></canvas>
 
+		<noscript>
+			<p>Oh no!</p>
+			<p>Javascript needs to be enabled in order to view this calculator :(</p>
+		</noscript>
+
 		<script src="js/three.min.js"></script>
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/CanvasInput.js"></script>
@@ -44,6 +49,18 @@
 			animate();
 
 			function init(){
+				//Test for WebGL before doing anything
+				if(!window.WebGLRenderingContext){
+					var failure=document.createElement('p');
+					failure.innerHTML="This project requires WebGL.  Visit http://get.webgl.org to learn more";
+				}
+
+				//This...removes the black background if enabled.  Halp
+				/*if(!document.getElementById("canvas").getContext("webgl")){
+					var failure=document.createElement('p');
+					failure.innerHTML="WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more";
+				}*/
+
 				scene=new THREE.Scene();
 
 				camera=new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
@@ -111,7 +128,7 @@
 				return eval(this.given);
 			}
 
-			Graph.prototype.drawShape = function(value, bound1, bound2, axisOfRotation){
+			Graph.prototype.drawShape=function(value, bound1, bound2, axisOfRotation){
 				var quality=Number(value);
 				var group=new THREE.Object3D();
 				group.name="solid";
@@ -133,7 +150,7 @@
 							var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 							var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
 
-							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading, transparent: true, opacity: 0.75});
+							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading, transparent: true, opacity: 0.5});
 							var hollowCylinder=intersectionBSP.toMesh(material);
 							hollowCylinder.rotation.set(0, 0, Math.PI/2);
 							group.add(hollowCylinder);
