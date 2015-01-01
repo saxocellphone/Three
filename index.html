@@ -51,8 +51,7 @@
 			function init(){
 				//First, make sure that WebGL is supported
 				if(!window.WebGLRenderingContext){
-					var failure=document.createElement('p');
-					failure.innerHTML="This project requires WebGL.  Visit http://get.webgl.org to learn more";
+					document.write("This project requires WebGL.  Visit http://get.webgl.org to learn more");
 					return;
 				}
 
@@ -77,8 +76,7 @@
 
 				//Now that we've initalized everything, check to see if WebGL loaded
 				if(!document.getElementById("canvas").getContext("webgl")){
-					var failure=document.createElement('p');
-					failure.innerHTML="WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more";
+					document.write("WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more");
 					return;
 				}
 			}
