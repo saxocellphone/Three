@@ -49,10 +49,13 @@
 			animate();
 
 			function init(){
+				//First, make sure that WebGL is supported
 				if(!window.WebGLRenderingContext){
 					var failure=document.createElement('p');
 					failure.innerHTML="This project requires WebGL.  Visit http://get.webgl.org to learn more";
+					return;
 				}
+
 				scene=new THREE.Scene();
 
 				camera=new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
@@ -71,9 +74,12 @@
 				addAxis();
 				addLights();
 				render();
+
+				//Now that we've initalized everything, check to see if WebGL loaded
 				if(!document.getElementById("canvas").getContext("webgl")){
 					var failure=document.createElement('p');
 					failure.innerHTML="WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more";
+					return;
 				}
 			}
 
@@ -128,8 +134,14 @@
 				var quality=Number(value);
 				var group=new THREE.Object3D();
 				group.name="solid";
+
+				if(axisOfRotation>bound1 && axisOfRotation<bound2){  //Axis of rotation is within the bounds, so we can't possibly rotate it
+					alert("Axis of rotation cannot be within the bounds!");
+					return;
+				}
+
 				if(axisOfRotation){
-					for(var i=bound1; i<bound2; i+=1){
+					for(var i=bound1; i<bound2; i+=quality){
 						if(this.getY(i)<=size){
 							if(axisOfRotation>=bound2){
 								var smallCylinderGeom=new THREE.CylinderGeometry(i-axisOfRotation, i+1-axisOfRotation, 1, 50);
@@ -152,7 +164,7 @@
 							group.add(hollowCylinder);
 						}
 					}
-				} else {
+				} else {  //Axis of rotation is y=0
 					for(var i=bound1; i<bound2; i+=quality){
 						if(this.getY(i)<=size){
 							var geometry=new THREE.CylinderGeometry(this.getY(i), this.getY(i+quality), quality, 100);
@@ -160,7 +172,7 @@
 							geometry.dynamic=true;
 							geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
 
-							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading, transparent: true, opacity: 0.75});
+							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading, transparent: true, opacity: 0.5});
 							var plane=new THREE.Mesh(geometry, material);
 							plane.material.color.setHex(0xffff00);
 							plane.rotation.set(0, 0, Math.PI/2);
