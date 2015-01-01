@@ -133,9 +133,9 @@
 						if(this.getY(i)<=size){
 							if(axisOfRotation>=bound2){
 								var smallCylinderGeom=new THREE.CylinderGeometry(i-axisOfRotation, i+1-axisOfRotation, 1, 50);
-								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -2));
+								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 								var largeCylinderGeom=new THREE.CylinderGeometry(axisOfRotation, axisOfRotation, 1, 360);
-								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -2));
+								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 							} else {
 								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(0+axisOfRotation), Math.abs(0+axisOfRotation), 1, 50);
 								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
