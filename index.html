@@ -49,18 +49,10 @@
 			animate();
 
 			function init(){
-				//Test for WebGL before doing anything
 				if(!window.WebGLRenderingContext){
 					var failure=document.createElement('p');
 					failure.innerHTML="This project requires WebGL.  Visit http://get.webgl.org to learn more";
 				}
-
-				//This...removes the black background if enabled.  Halp
-				/*if(!document.getElementById("canvas").getContext("webgl")){
-					var failure=document.createElement('p');
-					failure.innerHTML="WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more";
-				}*/
-
 				scene=new THREE.Scene();
 
 				camera=new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
@@ -79,6 +71,10 @@
 				addAxis();
 				addLights();
 				render();
+				if(!document.getElementById("canvas").getContext("webgl")){
+					var failure=document.createElement('p');
+					failure.innerHTML="WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more";
+				}
 			}
 
 			function Graph(given){
