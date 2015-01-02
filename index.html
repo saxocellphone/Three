@@ -124,8 +124,7 @@
 				render();
 			}
 
-			Graph.prototype.getY=function(xCoord){
-				var x=xCoord;
+			Graph.prototype.getY=function(x){
 				return eval(this.given);
 			}
 
@@ -142,7 +141,7 @@
 				if(axisOfRotation){
 					if(axisOfRotation>=bound2){
 						console.log("axisOfRotation>=bound2");
-						for(var i=bound1; i<bound2; i+=quality){
+						for(var i=bound1; i<bound2; i+=1){
 							if(this.getY(i)<=size){
 								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(this.getY(i))-axisOfRotation, Math.abs(this.getY(i+1))-axisOfRotation, 1, 50);
 								console.log("Small cylinder " + Math.abs(this.getY(i))-axisOfRotation + " " + Math.abs(this.getY(i+1))-axisOfRotation);
