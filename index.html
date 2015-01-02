@@ -28,6 +28,7 @@
 			<option value="0.25">High
 			<option value="0.1">Ultra
 		</select>
+		<a>This calculator is a <b>work in progress</b> and things may not work as expected!</a>
 
 		<canvas id="canvas"></canvas>
 
@@ -139,28 +140,49 @@
 				}
 
 				if(axisOfRotation){
-					for(var i=bound1; i<bound2; i+=quality){
-						if(this.getY(i)<=size){
-							if(axisOfRotation>=bound2){
+					if(axisOfRotation>=bound2){
+						console.log("axisOfRotation>=bound2");
+						for(var i=bound1; i<bound2; i+=quality){
+							if(this.getY(i)<=size){
 								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(this.getY(i))-axisOfRotation, Math.abs(this.getY(i+1))-axisOfRotation, 1, 50);
+								console.log("Small cylinder " + Math.abs(this.getY(i))-axisOfRotation + " " + Math.abs(this.getY(i+1))-axisOfRotation);
 								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 								var largeCylinderGeom=new THREE.CylinderGeometry(axisOfRotation, axisOfRotation, 1, 360);
+								console.log("Large cylinder " + axisOfRotation);
 								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
-							} else {
+
+								var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
+								var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
+								var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
+
+								var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
+								var hollowCylinder=intersectionBSP.toMesh(material);
+
+								hollowCylinder.rotation.set(0, 0, Math.PI/2);
+								group.add(hollowCylinder);
+							}
+						}
+					} else {
+						console.log("axisOfRotation<bound2");
+						for(var i=bound1; i<bound2; i+=quality){
+							if(this.getY(i)<=size){
 								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(0+axisOfRotation), Math.abs(0+axisOfRotation), 1, 50);
+								console.log("Small cylinder " + Math.abs(0+axisOfRotation) + " " + Math.abs(0+axisOfRotation));
 								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 								var largeCylinderGeom=new THREE.CylinderGeometry(this.getY(i)-axisOfRotation, this.getY(i+1)-axisOfRotation, 1, 360);
+								console.log("Large cylinder " + this.getY(i)-axisOfRotation + " " + this.getY(i+1)-axisOfRotation);
 								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
+
+								var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
+								var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
+								var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
+
+								var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
+								var hollowCylinder=intersectionBSP.toMesh(material);
+
+								hollowCylinder.rotation.set(0, 0, Math.PI/2);
+								group.add(hollowCylinder);
 							}
-							var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
-							var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
-							var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-
-							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
-							var hollowCylinder=intersectionBSP.toMesh(material);
-
-							hollowCylinder.rotation.set(0, 0, Math.PI/2);
-							group.add(hollowCylinder);
 						}
 					}
 				} else {  //Axis of rotation is y=0
