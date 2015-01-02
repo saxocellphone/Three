@@ -166,10 +166,10 @@
 						for(var i=bound1; i<bound2; i+=quality){
 							if(this.getY(i)<=size){
 								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(0+axisOfRotation), Math.abs(0+axisOfRotation), 1, 50);
-								console.log("Small cylinder " + Math.abs(0+axisOfRotation) + " " + Math.abs(0+axisOfRotation));
+								console.log("Small cylinder " + Math.abs(0+axisOfRotation));
 								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 								var largeCylinderGeom=new THREE.CylinderGeometry(this.getY(i)-axisOfRotation, this.getY(i+1)-axisOfRotation, 1, 360);
-								console.log("Large cylinder " + this.getY(i)-axisOfRotation + " " + this.getY(i+1)-axisOfRotation);
+								console.log("Large cylinder " + (this.getY(i)-axisOfRotation) + " " + (this.getY(i+1)-axisOfRotation));
 								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 
 								var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
