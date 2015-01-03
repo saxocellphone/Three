@@ -10,8 +10,8 @@
 	<body>
 		<a>Rotate y=</a>
 		<input type="text" name="function" placeholder="function" class="functionInput" onchange="submit()" id="function">
-		<a>Second Function</a>
-		<input type="text" name="function" placeholder="function2" class="functionInput" onchange="submit()" id="function2">
+		<!-- <a>Second Function</a>
+		<input type="text" name="function" placeholder="function2" class="functionInput" onchange="submit()" id="function2"> -->
 		<a> bounded by x=</a>
 		<input type="text" name="bounds" placeholder="bound 1" class="functionInput" id="bound1">
 		<a> and x=</a>
@@ -30,7 +30,7 @@
 			<option value="0.25">High
 			<option value="0.1">Ultra
 		</select>
-		<a>This calculator is a <b>work in progress</b> and things may not work as expected!</a>
+		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extreamly</b> memory heavy, and it requires a lot of cpu, therefore use with caution.</a>
 
 		<canvas id="canvas"></canvas>
 
@@ -48,6 +48,7 @@
 			var theFunctionValue;
 			var bound1, bound2;
 			var size=28;
+			var graphArray = [];
 			init();
 			animate();
 
@@ -84,13 +85,14 @@
 				}
 			}
 
-			function Graph(given){
-				var func, group, bound1, bound2;
+			function Graph(given, graphID){
+				var func, group, bound1, bound2, graphID;
 				this.given=given;
 				this.func=func;
 				this.group = new THREE.Object3D();
 				this.bound1 = bound1;
 				this.bound2 = bound2;
+				this.graphID = graphID;
 			}
 
 			Graph.prototype.draw=function(){
@@ -159,7 +161,7 @@
 								this.addBSP("Math.abs(axisOfRotation-this.getY(i))+0.01", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 							}
 						} else {
-							console.log("invalid");
+							window.alert("invalid entry");
 						}
 					} else if (boundY1 - boundY2 > 0) {
 						if(axisOfRotation >= boundY1){
@@ -179,11 +181,15 @@
 								this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 							}
 						} else {
-							console.log("invalid");
+							window.alert("Invalid Entry");
 						}
 					} else if (boundY1 - boundY2 == 0){
-						if(axisOfRotation >= boundY1){
-							//When it's just a cylinder
+						if(axisOfRotation > boundY1){
+							console.log("cylinder1");
+							this.addBSP("Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
+						} else if (axisOfRotation < boundY2){
+							console.log("cylinder2");
+							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+ Math.abs(this.getY(bound1))", "Math.abs(axisOfRotation)+Math.abs(this.getY(bound1))", "50", "360", axisOfRotation);
 						}
 					}
 				} else {
@@ -213,8 +219,6 @@
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 1, smallSeg);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 1, bigSeg);
-						console.log("BGR1: " + eval(bigGeoR1) + " BGR2: " + eval(bigGeoR2) + " x: " + -(i) + "y: " + this.getY(i));
-						console.log("SGR1: " + eval(smallGeoR1) + " SGR2: " + eval(smallGeoR2));
 						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
@@ -243,11 +247,16 @@
 				var box=document.getElementById("function");
 				theFunctionValue=box.value.replace(/ /g,'');
 				//Graph
-				var func=new Graph(theFunctionValue);
-				if(document.getElementById("function2").value){
-					var value2 = document.getElementById("function2").value;
-					var func2 = new Graph(document.getElementById("function2").value);
-				}
+				var func=new Graph(theFunctionValue, 0);
+				// graphArray[func.graphID] = func;
+				// if(document.getElementById("function2").value){
+				// 	var value2 = document.getElementById("function2").value;
+				// 	var func2 = new Graph(document.getElementById("function2").value, 1);
+				// 	graphArray[func2.graphID] = func2;
+				// 	func2.draw();
+				// } else {
+				// 	var func2 = new Graph(0, 1);
+				// }
 				func.draw();
 
 				var quality=document.getElementById("quality").value;
