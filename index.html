@@ -10,6 +10,8 @@
 	<body>
 		<a>Rotate y=</a>
 		<input type="text" name="function" placeholder="function" class="functionInput" onchange="submit()" id="function">
+		<a>Second Function</a>
+		<input type="text" name="function" placeholder="function2" class="functionInput" onchange="submit()" id="function2">
 		<a> bounded by x=</a>
 		<input type="text" name="bounds" placeholder="bound 1" class="functionInput" id="bound1">
 		<a> and x=</a>
@@ -179,11 +181,15 @@
 						} else {
 							console.log("invalid");
 						}
+					} else if (boundY1 - boundY2 == 0){
+						if(axisOfRotation >= boundY1){
+							//When it's just a cylinder
+						}
 					}
 				} else {
 					for(var i=bound1; i<bound2; i+=quality){
 						if(this.getY(i)<=size){
-							var geometry=new THREE.CylinderGeometry(this.getY(i), this.getY(i+quality), quality, 100);
+							var geometry=new THREE.CylinderGeometry(Math.abs(this.getY(i)), Math.abs(this.getY(i+quality)), quality, 100);
 							geometry.verticesNeedUpdate=true;
 							geometry.dynamic=true;
 							geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
@@ -221,84 +227,6 @@
 				}
 			}
 
-
-			Graph.prototype.drawShape2=function(value, bound1, bound2, axisOfRotation){
-				var quality=Number(value);
-				var group=new THREE.Object3D();
-				group.name="solid";
-
-				if(axisOfRotation>bound1 && axisOfRotation<bound2){  //Axis of rotation is within the bounds, so we can't possibly rotate it
-					alert("Axis of rotation cannot be within the bounds!");
-					return;
-				}
-
-				if(axisOfRotation){
-					if(axisOfRotation>=bound2){
-						console.log("axisOfRotation>=bound2");
-						for(var i=bound1; i<bound2; i+=1){
-							if(this.getY(i)<=size){
-								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(Math.abs(this.getY(i))-axisOfRotation), Math.abs(Math.abs(this.getY(i+1))-axisOfRotation), 1, 50);
-								console.log("Small cylinder " + (Math.abs(Math.abs(this.getY(i))-axisOfRotation)) + " " + (Math.abs(Math.abs(this.getY(i+1))-axisOfRotation)));
-								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
-								var largeCylinderGeom=new THREE.CylinderGeometry(axisOfRotation, axisOfRotation, 1, 360);
-								console.log("Large cylinder " + axisOfRotation);
-								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
-
-								var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
-								var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
-								var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-
-								var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
-								var hollowCylinder=intersectionBSP.toMesh(material);
-
-								hollowCylinder.rotation.set(0, 0, Math.PI/2);
-								group.add(hollowCylinder);
-							}
-						}
-					} else {
-						console.log("axisOfRotation<bound2");
-						for(var i=bound1; i<bound2; i+=quality){
-							if(this.getY(i)<=size){
-								var smallCylinderGeom=new THREE.CylinderGeometry(Math.abs(0+axisOfRotation), Math.abs(0+axisOfRotation), 1, 50);
-								console.log("Small cylinder " + Math.abs(0+axisOfRotation));
-								smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
-								var largeCylinderGeom=new THREE.CylinderGeometry(Math.abs(Math.abs(this.getY(i))-axisOfRotation), Math.abs(Math.abs(this.getY(i+1))-axisOfRotation), 1, 360);
-								console.log("Large cylinder " + (Math.abs(Math.abs(this.getY(i))-axisOfRotation)) + " " + (Math.abs(Math.abs(this.getY(i+1))-axisOfRotation)));
-								largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
-
-								var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
-								var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
-								var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-
-								var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
-								var hollowCylinder=intersectionBSP.toMesh(material);
-
-								hollowCylinder.rotation.set(0, 0, Math.PI/2);
-								group.add(hollowCylinder);
-							}
-						}
-					}
-				} else {  //Axis of rotation is y=0
-					for(var i=bound1; i<bound2; i+=quality){
-						if(this.getY(i)<=size){
-							var geometry=new THREE.CylinderGeometry(this.getY(i), this.getY(i+quality), quality, 100);
-							geometry.verticesNeedUpdate=true;
-							geometry.dynamic=true;
-							geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
-
-							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
-							var plane=new THREE.Mesh(geometry, material);
-							plane.material.color.setHex(0xffff00);
-
-							plane.rotation.set(0, 0, Math.PI/2);
-							group.add(plane);
-						}
-					}
-				}
-				scene.add(group);
-				render();
-			}
-
 			function clearGraph(){
 				for(var i=scene.children.length; i>=0; i--){
 					if(scene.children[i]!=null){
@@ -314,10 +242,12 @@
 				//Being lazy for now, I'll change this later. Using eval()
 				var box=document.getElementById("function");
 				theFunctionValue=box.value.replace(/ /g,'');
-				//functionArray=theFunctionValue.split(/\+?("[^"]*"|[^\s+])+/g);
-
 				//Graph
 				var func=new Graph(theFunctionValue);
+				if(document.getElementById("function2").value){
+					var value2 = document.getElementById("function2").value;
+					var func2 = new Graph(document.getElementById("function2").value);
+				}
 				func.draw();
 
 				var quality=document.getElementById("quality").value;
