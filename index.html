@@ -190,40 +190,49 @@
 						/*} else {  //Pretty sure this can't happen unless I'm missing something obvious?
 							window.alert("Axis of rotation cannot be less than the smaller bound or greater than the larger bound");*/
 						}
-					} else if (boundY1===boundY2){
-						/*if(axisOfRotation > boundY1){
-							console.log("cylinder1");
-							this.addBSP("Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
+					} else if (boundY1===boundY2 && this.bound1 != this.bound2){
+						//Not complete yet
+						//This is not just for cylinders
+						if(axisOfRotation > boundY1){
+							this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 						} else if (axisOfRotation < boundY2){
-							console.log("cylinder2");
-							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+ Math.abs(this.getY(bound1))", "Math.abs(axisOfRotation)+Math.abs(this.getY(bound1))", "50", "360", axisOfRotation);
-						}*/
-					}
-				} else {
-					if(boundY1 - boundY2 > 0){  //Switch the bounds around so that the for loop works
-						var temp=bound2;
-						bound2=bound1;
-						bound1=temp;
-					}
-
-					for(var i=bound1; i<bound2; i+=quality){
-						if(this.getY(i)<=size){
-							var geometry=new THREE.CylinderGeometry(Math.abs(this.getY(i)), Math.abs(this.getY(i+quality)), quality, 100);
-							geometry.verticesNeedUpdate=true;
-							geometry.dynamic=true;
-							geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), 0));
-
-							var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
-							var plane=new THREE.Mesh(geometry, material);
-							plane.material.color.setHex(0xffff00);
-
-							plane.rotation.set(0, 0, Math.PI/2);
-							this.group.add(plane);
+							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation) + this.getY(i)", "Math.abs(axisOfRotation) + this.getY(i+1)", "50", "360", axisOfRotation);
+						} else if (axisOfRotation == boundY2){
+							this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+1))", axisOfRotation);
 						}
 					}
+				} else {
+					//I know this is duplicate, I'll find a way to fix it. But this seems to be the best way to do it for now.
+					this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+1))", axisOfRotation);
 				}
 				scene.add(this.group);
 				render();
+			}
+
+			Graph.prototype.addSolidWithoutHoles = function(quality, leftRadius, rightRadius, axisOfRotation){
+				var bound1 = this.bound1;
+				var bound2 = this.bound2;
+				if(this.getY(bound1) - this.getY(bound2) > 0){  //Switch the bounds around so that the for loop works
+					var temp=bound2;
+					bound2=bound1;
+					bound1=temp;
+				}
+
+				for(var i=bound1; i<bound2; i+=quality){
+					if(this.getY(i)<=size){
+						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), quality, 100);
+						geometry.verticesNeedUpdate=true;
+						geometry.dynamic=true;
+						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), -axisOfRotation));
+
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
+						var plane=new THREE.Mesh(geometry, material);
+						plane.material.color.setHex(0xffff00);
+
+						plane.rotation.set(0, 0, Math.PI/2);
+						this.group.add(plane);
+					}
+				}
 			}
 
 			Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation, moveDirection){
@@ -261,7 +270,7 @@
 				theFunctionValue=box.value.replace(/ /g,'');
 				//Graph
 				var func=new Graph(theFunctionValue, 0);
-				// graphArray[func.graphID] = func;
+				graphArray[func.graphID] = func;
 				// if(document.getElementById("function2").value){
 				// 	var value2 = document.getElementById("function2").value;
 				// 	var func2 = new Graph(document.getElementById("function2").value, 1);
