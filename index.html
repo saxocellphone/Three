@@ -9,7 +9,7 @@
 
 	<body>
 		<a>Rotate y=</a>
-		<input type="text" name="function" placeholder="function" class="functionInput" onchange="submit()" id="function">
+		<input type="text" name="function" placeholder="function" class="functionInput" id="function">
 		<!-- <a>Second Function</a>
 		<input type="text" name="function" placeholder="function2" class="functionInput" onchange="submit()" id="function2"> -->
 
@@ -18,7 +18,7 @@
 		<a> and x=</a>
 		<input type="text" name="bounds" placeholder="bound 2" class="functionInput" id="bound2">
 		<a> around y=</a>
-		<input type="text" name="rotation" placeholder="axis of rotation" class="functionInput" id="rotation">
+		<input type="text" name="rotation" placeholder="axis of rotation" class="functionInput" id="rotation" onchange="submit()">
 		<button type="button" onclick="submit()">Rotate!</button>
 		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/> -->
 
@@ -143,6 +143,12 @@
 				this.bound1 = bound1;
 				var boundY2 = this.getY(bound2);
 				this.bound2 = bound2;
+
+				if(bound1===bound2){
+					window.alert("We're still working on creating the solid when the bounds are equal.\nSorry about that :(");
+					return;
+				}
+
 				if(axisOfRotation){
 					if(boundY2 - boundY1 > 0){
 						if(axisOfRotation >= boundY2){
@@ -157,17 +163,17 @@
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,2");
 								this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+1)", "50", "360", axisOfRotation);
-							} else {
+							} else {  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
 								console.log("1,3"); //not working
 								this.addBSP("Math.abs(axisOfRotation-this.getY(i))+0.01", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 							}
 						} else {
-							window.alert("invalid entry");
+							window.alert("Axis of rotation cannot be between the bounds");
 						}
-					} else if (boundY1 - boundY2 > 0) {
+					} else if (boundY1 - boundY2 > 0){
 						if(axisOfRotation >= boundY1){
-							if(boundY1 >= 0 && boundY2 >=0){
-								console.log("2,3");//Not working
+							if(boundY1 >= 0 && boundY2 >= 0){  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
+								console.log("2,3");
 								this.addBSP("Math.abs(axisOfRotation)-this.getY(i)+0.01", "Math.abs(axisOfRotation)-this.getY(i+1)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 							} else {
 								console.log("2,1");
@@ -181,19 +187,25 @@
 								console.log("2,2");
 								this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 							}
-						} else {
-							window.alert("Invalid Entry");
+						/*} else {  //Pretty sure this can't happen unless I'm missing something obvious?
+							window.alert("Axis of rotation cannot be less than the smaller bound or greater than the larger bound");*/
 						}
-					} else if (boundY1 - boundY2 == 0){
-						if(axisOfRotation > boundY1){
+					} else if (boundY1===boundY2){
+						/*if(axisOfRotation > boundY1){
 							console.log("cylinder1");
 							this.addBSP("Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation-this.getY(bound1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 						} else if (axisOfRotation < boundY2){
 							console.log("cylinder2");
 							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+ Math.abs(this.getY(bound1))", "Math.abs(axisOfRotation)+Math.abs(this.getY(bound1))", "50", "360", axisOfRotation);
-						}
+						}*/
 					}
 				} else {
+					if(boundY1 - boundY2 > 0){  //Switch the bounds around so that the for loop works
+						var temp=bound2;
+						bound2=bound1;
+						bound1=temp;
+					}
+
 					for(var i=bound1; i<bound2; i+=quality){
 						if(this.getY(i)<=size){
 							var geometry=new THREE.CylinderGeometry(Math.abs(this.getY(i)), Math.abs(this.getY(i+quality)), quality, 100);
