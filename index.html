@@ -35,8 +35,11 @@
 		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extremely</b> memory heavy, and requires a lot of CPU.</a>
 
 		<noscript>
-			<p>Oh no!</p>
-			<p>Javascript needs to be enabled in order to view this calculator :(</p>
+			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">
+				<a>Your browser seems to have <a href="http://en.wikipedia.org/wiki/JavaScript">Javascript</a> turned off.</a>
+				<br>
+				<a>Find out how to enable it <a href="http://www.enable-javascript.com/">here</a>.</a>
+			</div>
 		</noscript>
 
 		<script src="js/three.min.js"></script>
@@ -53,7 +56,6 @@
 			var supportsWebGL = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
 
 			init();
-			animate();
 
 			function init(){
 				if(!supportsWebGL){  //No WebGL D:
@@ -77,6 +79,7 @@
 
 				addAxis();
 				addLights();
+				animate();
 				render();
 			}
 
