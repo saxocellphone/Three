@@ -31,9 +31,8 @@
 			<option value="0.25">High
 			<option value="0.1">Ultra
 		</select>
-		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extreamly</b> memory heavy, and it requires a lot of cpu, therefore use with caution.</a>
-
-		<canvas id="canvas"></canvas>
+		<br>
+		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extremely</b> memory heavy, and requires a lot of CPU.</a>
 
 		<noscript>
 			<p>Oh no!</p>
@@ -44,19 +43,21 @@
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/CanvasInput.js"></script>
 		<script src="js/ThreeCSG.js"></script>
+		<script src="js/Detector.js"></script>
 		<script>
 			var camera, controls, scene, renderer;
 			var theFunctionValue;
 			var bound1, bound2;
 			var size=28;
 			var graphArray = [];
+			var supportsWebGL = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
+
 			init();
 			animate();
 
 			function init(){
-				//First, make sure that WebGL is supported
-				if(!window.WebGLRenderingContext){
-					document.write("This project requires WebGL.  Visit http://get.webgl.org to learn more");
+				if(!supportsWebGL){  //No WebGL D:
+					Detector.addGetWebGLMessage();
 					return;
 				}
 
@@ -67,23 +68,16 @@
 				camera.position.y=50;
 				camera.position.z=5;
 
-				var canvas=document.getElementById("canvas");
-				renderer=new THREE.WebGLRenderer({canvas: canvas});
+				renderer=new THREE.WebGLRenderer();
 				renderer.setSize(window.innerWidth, window.innerHeight)
 				document.body.appendChild(renderer.domElement);
 
-				controls=new THREE.TrackballControls(camera, canvas);
+				controls=new THREE.TrackballControls(camera);
 				controls.addEventListener('change', render);
 
 				addAxis();
 				addLights();
 				render();
-
-				//Now that we've initalized everything, check to see if WebGL loaded
-				if(!document.getElementById("canvas").getContext("webgl")){
-					document.write("WebGL could not be initialized!  Visit http://get.webgl.org/troubleshooting to learn more");
-					return;
-				}
 			}
 
 			function Graph(given, graphID){
@@ -124,8 +118,7 @@
 					}
 				}
 
-				var material=new THREE.LineBasicMaterial({color: "white"});
-				var graph=new THREE.Line(geometry, material);
+				var graph=new THREE.Line(geometry, new THREE.LineBasicMaterial());
 
 				graph.name="graph";
 				scene.add(graph);
@@ -150,7 +143,7 @@
 				}
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 				if(axisOfRotation){
-					if(boundY2 - boundY1 > 0){
+					if(boundY2 > boundY1){
 						if(axisOfRotation >= boundY2){
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,1");
@@ -170,7 +163,7 @@
 						} else {
 							window.alert("Axis of rotation cannot be between the bounds");
 						}
-					} else if (boundY1 - boundY2 > 0){
+					} else if(boundY2 < boundY1){
 						if(axisOfRotation >= boundY1){
 							if(boundY1 >= 0 && boundY2 >= 0){  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
 								console.log("2,3");
@@ -211,7 +204,7 @@
 			Graph.prototype.addSolidWithoutHoles = function(quality, leftRadius, rightRadius, axisOfRotation){
 				var bound1 = this.bound1;
 				var bound2 = this.bound2;
-				if(this.getY(bound1) - this.getY(bound2) > 0){  //Switch the bounds around so that the for loop works
+				if(this.getY(bound1) > this.getY(bound2)){  //Switch the bounds around so that the for loop works
 					var temp=bound2;
 					bound2=bound1;
 					bound1=temp;
@@ -244,7 +237,7 @@
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
 						var hollowCylinder=intersectionBSP.toMesh(material);
 						hollowCylinder.rotation.set(0, 0, Math.PI/2);
 						this.group.add(hollowCylinder);
@@ -270,14 +263,14 @@
 				//Graph
 				var func=new Graph(theFunctionValue, 0);
 				graphArray[func.graphID] = func;
-				// if(document.getElementById("function2").value){
-				// 	var value2 = document.getElementById("function2").value;
-				// 	var func2 = new Graph(document.getElementById("function2").value, 1);
-				// 	graphArray[func2.graphID] = func2;
-				// 	func2.draw();
-				// } else {
-				// 	var func2 = new Graph(0, 1);
-				// }
+				/* if(document.getElementById("function2").value){
+					var value2 = document.getElementById("function2").value;
+					var func2 = new Graph(document.getElementById("function2").value, 1);
+					graphArray[func2.graphID] = func2;
+					func2.draw();
+				} else {
+					var func2 = new Graph(0, 1);
+				}*/
 				func.draw();
 
 				var quality=document.getElementById("quality").value;
