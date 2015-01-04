@@ -194,11 +194,11 @@
 						} else if (axisOfRotation < boundY2){
 							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation) + this.getY(i)", "Math.abs(axisOfRotation) + this.getY(i+1)", "50", "360", axisOfRotation);
 						} else if (axisOfRotation == boundY2){
-							this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+1))", axisOfRotation);
+							this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
 						}
 					}
 				} else {
-					this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+1))", axisOfRotation);
+					this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
 				}
 				scene.add(this.group);
 				render();
