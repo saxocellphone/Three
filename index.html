@@ -148,7 +148,7 @@
 					window.alert("We're still working on creating the solid when the bounds are equal.\nSorry about that :(");
 					return;
 				}
-
+				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 				if(axisOfRotation){
 					if(boundY2 - boundY1 > 0){
 						if(axisOfRotation >= boundY2){
@@ -202,7 +202,6 @@
 						}
 					}
 				} else {
-					//I know this is duplicate, I'll find a way to fix it. But this seems to be the best way to do it for now.
 					this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+1))", axisOfRotation);
 				}
 				scene.add(this.group);
