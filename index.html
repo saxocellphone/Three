@@ -54,12 +54,11 @@
 			var bound1, bound2;
 			var size=28;
 			var graphArray = [];
-			var supportsWebGL = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
 
 			init();
 
 			function init(){
-				if(!supportsWebGL){  //No WebGL D:
+				if(!Detector.webgl){  //No WebGL D:
 					Detector.addGetWebGLMessage();
 					return;
 				}
