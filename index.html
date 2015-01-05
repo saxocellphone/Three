@@ -10,8 +10,8 @@
 	<body>
 		<a>Rotate y=</a>
 		<input type="text" name="function" placeholder="function" class="functionInput" id="function">
-		<!-- <a>Second Function</a>
-		<input type="text" name="function" placeholder="function2" class="functionInput" onchange="submit()" id="function2"> -->
+		<a>Second Function</a>
+		<input type="text" name="function" placeholder="function2" class="functionInput" id="function2">
 
 		<a> bounded by x=</a>
 		<input type="text" name="bounds" placeholder="bound 1" class="functionInput" id="bound1">
@@ -35,11 +35,8 @@
 		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extremely</b> memory heavy, and requires a lot of CPU.</a>
 
 		<noscript>
-			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">
-				<a>Your browser seems to have <a href="http://en.wikipedia.org/wiki/JavaScript">Javascript</a> turned off.</a>
-				<br>
-				<a>Find out how to enable it <a href="http://www.enable-javascript.com/">here</a>.</a>
-			</div>
+			<p>Oh no!</p>
+			<p>Javascript needs to be enabled in order to view this calculator :(</p>
 		</noscript>
 
 		<script src="js/three.min.js"></script>
@@ -56,6 +53,7 @@
 			var supportsWebGL = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
 
 			init();
+			animate();
 
 			function init(){
 				if(!supportsWebGL){  //No WebGL D:
@@ -74,12 +72,11 @@
 				renderer.setSize(window.innerWidth, window.innerHeight)
 				document.body.appendChild(renderer.domElement);
 
-				controls=new THREE.TrackballControls(camera, renderer.domElement);
+				controls=new THREE.TrackballControls(camera);
 				controls.addEventListener('change', render);
 
 				addAxis();
 				addLights();
-				animate();
 				render();
 			}
 
@@ -139,18 +136,26 @@
 				this.bound1 = bound1;
 				var boundY2 = this.getY(bound2);
 				this.bound2 = bound2;
-
+				var graph2CompareingPoint1 = graphArray[1].getY(bound1+0.5);
+				var graph2CompareingPoint2 = graphArray[1].getY(bound2-0.5);
+				var graph1CompareingPoint1 = graphArray[0].getY(bound1+0.5);
+				var graph1CompareingPoint2 = graphArray[0].getY(bound2-0.5);
 				if(bound1===bound2){
 					window.alert("We're still working on creating the solid when the bounds are equal.\nSorry about that :(");
 					return;
 				}
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
+				//Hmm the flipping variable idea could work very well here... I'll work on that when I have time, or you can do it. -Victor
 				if(axisOfRotation){
 					if(boundY2 > boundY1){
 						if(axisOfRotation >= boundY2){
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,1");
-								this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation", "axisOfRotation", "50", "360", axisOfRotation);
+								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+									this.addBSP("axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i)", "50", "360", axisOfRotation);
+								} else {
+									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY[i]", "axisOfRotation-graphArray[1].getY[i]", "50", "360", axisOfRotation);
+								}
 							} else {
 								console.log("1,4");
 								this.addBSP("axisOfRotation", "axisOfRotation", "axisOfRotation+Math.abs(this.getY(i))", "axisOfRotation+Math.abs(this.getY(i+1))", "50", "360", axisOfRotation);
@@ -266,14 +271,14 @@
 				//Graph
 				var func=new Graph(theFunctionValue, 0);
 				graphArray[func.graphID] = func;
-				/* if(document.getElementById("function2").value){
+				if(document.getElementById("function2").value){
 					var value2 = document.getElementById("function2").value;
 					var func2 = new Graph(document.getElementById("function2").value, 1);
 					graphArray[func2.graphID] = func2;
 					func2.draw();
 				} else {
 					var func2 = new Graph(0, 1);
-				}*/
+				}
 				func.draw();
 
 				var quality=document.getElementById("quality").value;
