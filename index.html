@@ -20,7 +20,7 @@
 		<a> around y=</a>
 		<input type="text" name="rotation" placeholder="axis of rotation" class="functionInput" id="rotation">
 		<button type="button" onclick="submit()">Rotate!</button>
-		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step = "30" onchange="rotate()"/> -->
+		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step="30" onchange="rotate()"/> -->
 
 		<a>Make sure to type the function in a programming format, for example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>.</a>
 		<br>
@@ -53,7 +53,7 @@
 			var theFunctionValue;
 			var bound1, bound2;
 			var size=28;
-			var graphArray = [];
+			var graphArray=[];
 
 			init();
 
@@ -87,10 +87,10 @@
 				var func, group, bound1, bound2, graphID;
 				this.given=given;
 				this.func=func;
-				this.group = new THREE.Object3D();
-				this.bound1 = bound1;
-				this.bound2 = bound2;
-				this.graphID = graphID;
+				this.group=new THREE.Object3D();
+				this.bound1=bound1;
+				this.bound2=bound2;
+				this.graphID=graphID;
 			}
 
 			Graph.prototype.draw=function(){
@@ -132,16 +132,16 @@
 			}
 
 			Graph.prototype.drawShape=function(value, bound1, bound2, axisOfRotation){
-				var quality = Number(value);
-				this.group.name = "solid";
-				var boundY1 = this.getY(bound1);
-				this.bound1 = bound1;
-				var boundY2 = this.getY(bound2);
-				this.bound2 = bound2;
-				var graph2CompareingPoint1 = graphArray[1].getY(bound1+0.5);
-				var graph2CompareingPoint2 = graphArray[1].getY(bound2-0.5);
-				var graph1CompareingPoint1 = graphArray[0].getY(bound1+0.5);
-				var graph1CompareingPoint2 = graphArray[0].getY(bound2-0.5);
+				var quality=Number(value);
+				this.group.name="solid";
+				var boundY1=this.getY(bound1);
+				this.bound1=bound1;
+				var boundY2=this.getY(bound2);
+				this.bound2=bound2;
+				var graph2ComparingPoint1=graphArray[1].getY(bound1+0.5);
+				var graph2ComparingPoint2=graphArray[1].getY(bound2-0.5);
+				var graph1ComparingPoint1=graphArray[0].getY(bound1+0.5);
+				var graph1ComparingPoint2=graphArray[0].getY(bound2-0.5);
 				if(bound1===bound2){
 					window.alert("We're still working on creating the solid when the bounds are equal.\nSorry about that :(");
 					return;
@@ -149,18 +149,18 @@
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 				//Hmm the flipping variable idea could work very well here... I'll work on that when I have time, or you can do it. -Victor
 				if(axisOfRotation){
-					if(boundY2 - boundY1 != 0){
+					if(boundY2 - boundY1){
 						if(axisOfRotation >= boundY2){
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,1");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									this.addBSP("axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
 								} else {
 									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
 								}
 							} else {
 								console.log("1,4");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									this.addBSP("axisOfRotation+Math.abs(graphArray[1].getY(i))", "axisOfRotation+Math.abs(graphArray[1].getY(i+1))", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
 								} else {
 									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
@@ -169,14 +169,14 @@
 						} else if(axisOfRotation <= boundY1){
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,2");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									this.addBSP("Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+1)", "Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
 								} else {
 									this.addBSP("Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+1)", "Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+1)", "50", "360", axisOfRotation);
 								}
 							} else {  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
 								console.log("1,3"); //not working
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									this.addBSP("Math.abs(axisOfRotation-this.getY(i))+0.01", "Math.abs(axisOfRotation-this.getY(i+1))+0.01", "Math.abs(axisOfRotation-graphArray[1].getY(i))", "Math.abs(axisOfRotation-graphArray[1].getY(i+1))", "50", "360", axisOfRotation);
 								} else {
 									this.addBSP("Math.abs(axisOfRotation-graphArray[1].getY(i))+0.01", "Math.abs(axisOfRotation-graphArray[1].getY(i+1))+0.01", "Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "50", "360", axisOfRotation);
@@ -187,13 +187,12 @@
 						}
 
 					} else if (boundY1===boundY2 && this.bound1 != this.bound2){
-						//Not complete yet
-						//This is not just for cylinders
+						//Not complete yet (this is just for cylinders)
 						if(axisOfRotation > boundY1){
 							this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
 						} else if (axisOfRotation < boundY2){
 							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation) + this.getY(i)", "Math.abs(axisOfRotation) + this.getY(i+1)", "50", "360", axisOfRotation);
-						} else if (axisOfRotation == boundY2){
+						} else if (axisOfRotation == boundY2){  //TODO:  Logic flaw
 							this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
 						}
 					}
@@ -204,9 +203,9 @@
 				render();
 			}
 
-			Graph.prototype.addSolidWithoutHoles = function(quality, leftRadius, rightRadius, axisOfRotation){
-				var bound1 = this.bound1;
-				var bound2 = this.bound2;
+			Graph.prototype.addSolidWithoutHoles=function(quality, leftRadius, rightRadius, axisOfRotation){
+				var bound1=this.bound1;
+				var bound2=this.bound2;
 				if(this.getY(bound1) > this.getY(bound2)){  //Switch the bounds around so that the for loop works
 					var temp=bound2;
 					bound2=bound1;
@@ -219,7 +218,7 @@
 						geometry.verticesNeedUpdate=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), -axisOfRotation));
 
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
 						var plane=new THREE.Mesh(geometry, material);
 						plane.material.color.setHex(0xffff00);
 
@@ -229,12 +228,12 @@
 				}
 			}
 
-			Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
+			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
 				for(var i=this.bound1; i<this.bound2; i+=1){
 					if(this.getY(i)<=size){
-						if(eval(smallGeoR1) == 0 || eval(smallGeoR2) == 0){
-							smallGeoR1 = smallGeoR1 + "+0.01";
-							smallGeoR2 = smallGeoR2 + "+0.01";
+						if(eval(smallGeoR1) == 0 || eval(smallGeoR2) == 0){  //Hacky bugfix woo
+							smallGeoR1=smallGeoR1 + "+0.01";
+							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 1, smallSeg);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
@@ -268,17 +267,15 @@
 				theFunctionValue=box.value.replace(/ /g,'');
 				//Graph
 				var func=new Graph(theFunctionValue, 0);
-				graphArray[func.graphID] = func;
-				if(document.getElementById("function2").value){
-					var value2 = document.getElementById("function2").value;
-					var func2 = new Graph(document.getElementById("function2").value, 1);
-					graphArray[func2.graphID] = func2;
+				graphArray[func.graphID]=func;
+				var value2=document.getElementById("function2").value;
+				if(value2){
+					var func2=new Graph(value2, 1);
 					func2.draw();
 				} else {
-					var func2 = new Graph("0", 1);
-					graphArray[func2.graphID] = func2;
+					var func2=new Graph("0", 1);
 				}
-				func.draw();
+				graphArray[func2.graphID]=func2;
 
 				var quality=document.getElementById("quality").value;
 				var bound1=Number(document.getElementById("bound1").value);
@@ -312,7 +309,7 @@
 				var geometry=new THREE.Geometry();
 				geometry.verticesNeedUpdate=true;
 
-				var axes = new THREE.Geometry();
+				var axes=new THREE.Geometry();
 				axes.verticesNeedUpdate=true;
 
 				for(var i=-size; i<=size; i+=1){
