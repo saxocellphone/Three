@@ -149,7 +149,7 @@
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 				//Hmm the flipping variable idea could work very well here... I'll work on that when I have time, or you can do it. -Victor
 				if(axisOfRotation){
-					if(boundY2 > boundY1){
+					if(boundY2 - boundY1 != 0){
 						if(axisOfRotation >= boundY2){
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,1");
@@ -185,42 +185,7 @@
 						} else {
 							window.alert("Axis of rotation cannot be between the bounds");
 						}
-					} else if(boundY2 < boundY1){
-						if(axisOfRotation >= boundY1){
-							if(boundY1 >= 0 && boundY2 >= 0){  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
-								console.log("2,3");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
-									this.addBSP("axisOfRotation-graphArray[1].getY(i)+0.01", "axisOfRotation-graphArray[1].getY(i+1)+0.01", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
-								} else {
-									this.addBSP("axisOfRotation-this.getY(i)+0.01", "axisOfRotation-this.getY(i+1)+0.01", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
-								}
-							} else {
-								console.log("2,1");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
-									this.addBSP("axisOfRotation+Math.abs(graphArray[1].getY(i))", "axisOfRotation+Math.abs(graphArray[1].getY(i+1))", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
-								} else {
-									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
-								}
-							}
-						} else if(axisOfRotation <= boundY2){
-							if(boundY1 >= 0 && boundY2 >=0){
-								console.log("2,4");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
-									this.addBSP("Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+1)", "Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
-								} else {
-									this.addBSP("Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+1)", "Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+1)", "50", "360", axisOfRotation);
-								}
-							} else {
-								console.log("2,2");
-								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
-									this.addBSP("Math.abs(axisOfRotation-this.getY(i))+0.01", "Math.abs(axisOfRotation-this.getY(i+1))+0.01", "Math.abs(axisOfRotation-graphArray[1].getY(i))", "Math.abs(axisOfRotation-graphArray[1].getY(i+1))", "50", "360", axisOfRotation);
-								} else {
-									this.addBSP("Math.abs(axisOfRotation-graphArray[1].getY(i))+0.01", "Math.abs(axisOfRotation-graphArray[1].getY(i+1))+0.01", "Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+1))", "50", "360", axisOfRotation);
-								}
-							}
-						/*} else {  //Pretty sure this can't happen unless I'm missing something obvious?
-							window.alert("Axis of rotation cannot be less than the smaller bound or greater than the larger bound");*/
-						}
+
 					} else if (boundY1===boundY2 && this.bound1 != this.bound2){
 						//Not complete yet
 						//This is not just for cylinders
@@ -267,7 +232,10 @@
 			Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
 				for(var i=this.bound1; i<this.bound2; i+=1){
 					if(this.getY(i)<=size){
-						console.log("SG1: " + eval(smallGeoR1) + " SG2: " + eval(smallGeoR2) + " BG1: " + eval(bigGeoR1) + " BG2: " + eval(bigGeoR2));
+						if(eval(smallGeoR1) == 0 || eval(smallGeoR2) == 0){
+							smallGeoR1 = smallGeoR1 + "+0.01";
+							smallGeoR2 = smallGeoR2 + "+0.01";
+						}
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 1, smallSeg);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 1, bigSeg);
