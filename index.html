@@ -97,31 +97,22 @@
 				var x=-size;
 				var points=[];
 				var counter=x;  //I'll change this later, just using a counter variable for now
-				var step=0.01
-				for(var i=-size; i<=size; i+=step){
-					if(this.given!=null){
-						this.func=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
-					}
+				var step=0.01;
 
-					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, this.func);
-					x+=step;
-					counter++;
+				if(this.given!=null){
+					for(var i=-size; i<=size; i+=step){
+						this.func=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
+						points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, this.func);
+						x+=step;
+						counter++;
+					}
 				}
 
 				var geometry=new THREE.Geometry();
 				geometry.verticesNeedUpdate=true;
-
-				var spline=new THREE.SplineCurve3(points);
-				var splinePoints=spline.getPoints(points.length-1);
-
-				for(var i=0; i<splinePoints.length; i++){
-					if(Math.abs((spline.points[i]).z)<=size){
-						geometry.vertices.push(spline.points[i]);
-					}
-				}
+				geometry.vertices=new THREE.SplineCurve3(points).getPoints(2*size/step);
 
 				var graph=new THREE.Line(geometry, new THREE.LineBasicMaterial());
-
 				graph.name="graph";
 				scene.add(graph);
 				render();
