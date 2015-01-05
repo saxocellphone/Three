@@ -56,7 +56,6 @@
 			var supportsWebGL = ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )();
 
 			init();
-			animate();
 
 			function init(){
 				if(!supportsWebGL){  //No WebGL D:
@@ -80,6 +79,7 @@
 
 				addAxis();
 				addLights();
+				animate();
 				render();
 			}
 
@@ -110,7 +110,6 @@
 
 				var geometry=new THREE.Geometry();
 				geometry.verticesNeedUpdate=true;
-				geometry.dynamic=true;
 
 				var spline=new THREE.SplineCurve3(points);
 				var splinePoints=spline.getPoints(points.length-1);
@@ -234,7 +233,6 @@
 						}
 					}
 				} else {
-					if()
 					this.addSolidWithoutHoles(quality,"Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
 				}
 				scene.add(this.group);
@@ -254,7 +252,6 @@
 					if(this.getY(i)<=size){
 						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), quality, 100);
 						geometry.verticesNeedUpdate=true;
-						geometry.dynamic=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0,-(i+quality/2), -axisOfRotation));
 
 						var material=new THREE.MeshPhongMaterial({color: 0xffff00, shading: THREE.SmoothShading/*, transparent: true, opacity: 0.5*/});
@@ -346,11 +343,9 @@
 			function addAxis(){
 				var geometry=new THREE.Geometry();
 				geometry.verticesNeedUpdate=true;
-				geometry.dynamic=true;
 
 				var axes = new THREE.Geometry();
 				axes.verticesNeedUpdate=true;
-				axes.dynamic=true;
 
 				for(var i=-size; i<=size; i+=1){
 					if(i == 0){
