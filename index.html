@@ -35,8 +35,11 @@
 		<a>This calculator is a <b>work in progress</b> and things may not work as expected! Also beware that this calculator is <b>extremely</b> memory heavy, and requires a lot of CPU.</a>
 
 		<noscript>
-			<p>Oh no!</p>
-			<p>Javascript needs to be enabled in order to view this calculator :(</p>
+			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">
+				<a>Your browser seems to have <a href="http://en.wikipedia.org/wiki/JavaScript">Javascript</a> turned off.</a>
+				<br>
+				<a>Find out how to enable it <a href="http://www.enable-javascript.com/">here</a>.</a>
+			</div>
 		</noscript>
 
 		<script src="js/three.min.js"></script>
@@ -72,7 +75,7 @@
 				renderer.setSize(window.innerWidth, window.innerHeight)
 				document.body.appendChild(renderer.domElement);
 
-				controls=new THREE.TrackballControls(camera);
+				controls=new THREE.TrackballControls(camera, renderer.domElement);
 				controls.addEventListener('change', render);
 
 				addAxis();
@@ -94,7 +97,7 @@
 				var x=-size;
 				var points=[];
 				var counter=x;  //I'll change this later, just using a counter variable for now
-				var step=0.01
+				var step=0.01;
 				for(var i=-size; i<=size; i+=step){
 					if(this.given!=null){
 						this.func=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
@@ -152,12 +155,17 @@
 							if(boundY1 >= 0 && boundY2 >=0){
 								console.log("1,1");
 								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
-									this.addBSP("axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i)", "50", "360", axisOfRotation);
+									this.addBSP("axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
 								} else {
-									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY[i]", "axisOfRotation-graphArray[1].getY[i]", "50", "360", axisOfRotation);
+									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
 								}
 							} else {
 								console.log("1,4");
+								if(graph2CompareingPoint1>graph1CompareingPoint1 && graph2CompareingPoint2>graph1CompareingPoint2){
+									this.addBSP("axisOfRotation+Math.abs(graphArray[1].getY(i))", "axisOfRotation+Math.abs(graphArray[1].getY(i+1))", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "50", "360", axisOfRotation);
+								} else {
+									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+1)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+1)", "50", "360", axisOfRotation);
+								}
 								this.addBSP("axisOfRotation", "axisOfRotation", "axisOfRotation+Math.abs(this.getY(i))", "axisOfRotation+Math.abs(this.getY(i+1))", "50", "360", axisOfRotation);
 							}
 						} else if(axisOfRotation <= boundY1){
@@ -235,9 +243,10 @@
 				}
 			}
 
-			Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation, moveDirection){
+			Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
 				for(var i=this.bound1; i<this.bound2; i+=1){
 					if(this.getY(i)<=size){
+						console.log("SG1: " + eval(smallGeoR1) + " SG2: " + eval(smallGeoR2) + " BG1: " + eval(bigGeoR1) + " BG2: " + eval(bigGeoR2));
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 1, smallSeg);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+1/2), -axisOfRotation));
 						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 1, bigSeg);
@@ -277,7 +286,8 @@
 					graphArray[func2.graphID] = func2;
 					func2.draw();
 				} else {
-					var func2 = new Graph(0, 1);
+					var func2 = new Graph("0", 1);
+					graphArray[func2.graphID] = func2;
 				}
 				func.draw();
 
