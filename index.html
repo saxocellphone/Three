@@ -9,18 +9,17 @@
 
 	<body>
 		<a>Rotate y=</a>
-		<input type="text" name="function" placeholder="function" class="functionInput" id="function">
+		<input id="function" class="functionInput" type="text" autofocus="autofocus" placeholder="function" name="function">
 		<a> and y=</a>
-		<input type="text" name="function" placeholder="function2" class="functionInput" id="function2">
-
+		<input id="function2" class="functionInput" type="text" placeholder="function2" name="function">
 		<a> bounded by x=</a>
-		<input type="text" name="bounds" placeholder="bound 1" class="functionInput" id="bound1">
+		<input id="bound1" class="functionInput" type="text" placeholder="bound 1" name="bounds">
 		<a> and x=</a>
-		<input type="text" name="bounds" placeholder="bound 2" class="functionInput" id="bound2">
+		<input id="bound2" class="functionInput" type="text" placeholder="bound 2" name="bounds">
 		<a> around y=</a>
-		<input type="text" name="rotation" placeholder="axis of rotation" class="functionInput" id="rotation">
+		<input id="rotation" class="functionInput" type="text" onchange="submit()" placeholder="axis of rotation" name="rotation">
 		<button type="button" onclick="submit()">Rotate!</button>
-		<!-- <input type="range" id="rotate" min="0" max="360" value ="360" step="30" onchange="rotate()"/> -->
+		<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
 
 		<a>Make sure to type the function in a <a href="http://www.w3schools.com/jsref/jsref_obj_math.asp">programming format</a>.  For example, 2x+3 is <b>2*x+3</b>, and sin(2x) is <b>Math.sin(2*x)</b>.</a>
 		<br>
@@ -248,7 +247,15 @@
 			}
 
 			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
-				for(var i=this.bound1; i<this.bound2; i+=0.5){
+				var bound1=this.bound1;
+				var bound2=this.bound2;
+				if(this.getY(bound1) > this.getY(bound2)){  //Switch the bounds around so that the for loop works
+					var temp=bound2;
+					bound2=bound1;
+					bound1=temp;
+				}
+
+				for(var i=bound1; i<bound2; i+=0.5){
 					if(this.getY(i)<=size){
 						if(!eval(smallGeoR1) || !eval(smallGeoR2)){  //Hacky bugfix woo
 							smallGeoR1=smallGeoR1 + "+0.01";
