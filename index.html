@@ -50,7 +50,6 @@
 			"use strict";
 			var camera, controls, scene, renderer;
 			var theFunctionValue;
-			var bound1, bound2;
 			var size=28;
 			var graphArray=[];
 
@@ -297,12 +296,8 @@
 				func.draw();
 
 				var value2=document.getElementById("function2").value;
-				if(value2){
-					var func2=new Graph(value2, 1);
-					func2.draw();
-				} else {
-					var func2=new Graph("0", 1);
-				}
+				var func2 = new Graph(value2 ? value2: "0", 1);
+				func2.draw();
 				graphArray[func2.graphID]=func2;
 
 				var quality=document.getElementById("quality").value;
