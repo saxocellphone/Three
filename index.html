@@ -146,6 +146,7 @@
 				if(bound1===bound2){
 					sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
 					clearGraph();  //Remove the functions that we drew.  FIXME: Not working
+					render();
 					return;
 				}
 
@@ -209,6 +210,7 @@
 						} else {
 							sweetAlert("Oh noes!", "Axis of rotation cannot be between the bounds", "warning");
 							clearGraph();  //Remove the functions that we drew.  FIXME: Not working
+							render();
 							return;
 						}
 
