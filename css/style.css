@@ -1,5 +1,13 @@
 .functionInput{
-	width: 50px;
+	width: 67px;
+}
+
+.boundInput{
+	width: 55px;
+}
+
+.rotationInput{
+	width: 105px;
 }
 
 body{
