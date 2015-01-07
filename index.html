@@ -4,12 +4,13 @@
 		<title>A solids of revolution graphing calculator</title>
 		<link rel="shortcut icon" href="https://lh6.googleusercontent.com/-eJP7CsCRims/AAAAAAAAAAI/AAAAAAAAAOE/9fdQHCWUWQs/s32-c-k-no/photo.jpg"/>
 		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/sweet-alert.css">
 		<meta charset="UTF-8">
 	</head>
 
 	<body>
 		<a>Rotate y=</a>
-		<input id="function" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
+		<input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
 		<a> and y=</a>
 		<input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
 		<a> bounded by x=</a>
@@ -41,6 +42,7 @@
 			</div>
 		</noscript>
 
+		<script src="js/sweet-alert.min.js"></script>
 		<script src="js/three.min.js"></script>
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/CanvasInput.js"></script>
@@ -136,13 +138,14 @@
 				this.bound1=bound1;
 				var boundY2=this.getY(bound2);
 				this.bound2=bound2;
-				var graph1ComparingPoint1=graphArray[0].getY(bound1+0.5);
+				var graph1ComparingPoint1=graphArray[0].getY(bound1+0.5);  //FIXME: Don't assume that there's always two functions
 				var graph2ComparingPoint1=graphArray[1].getY(bound1+0.5);
 				var graph1ComparingPoint2=graphArray[0].getY(bound2-0.5);
 				var graph2ComparingPoint2=graphArray[1].getY(bound2-0.5);
 
 				if(bound1===bound2){
-					window.alert("We're still working on creating the solid when the bounds are equal.\nSorry about that :(");
+					sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
+					clearGraph();  //Remove the functions that we drew.  FIXME: Not working
 					return;
 				}
 
@@ -204,7 +207,8 @@
 								}
 							}
 						} else {
-							window.alert("Axis of rotation cannot be between the bounds");
+							sweetAlert("Oh noes!", "Axis of rotation cannot be between the bounds", "warning");
+							clearGraph();  //Remove the functions that we drew.  FIXME: Not working
 							return;
 						}
 
@@ -281,24 +285,30 @@
 
 			function submit(){
 				clearGraph();
-				//Being lazy for now, I'll change this later. Using eval()
-				var box=document.getElementById("function");
-				theFunctionValue=box.value.replace(/ /g,'');
-				//Graph
-				var func=new Graph(theFunctionValue, 0);
-				graphArray[func.graphID]=func;
-				func.draw();
 
-				var value2=document.getElementById("function2").value;
-				var func2 = new Graph(value2 ? value2: "0", 1);
-				func2.draw();
+				//TODO: Being lazy for now, I'll change this later. Using eval()
+				var func1=new Graph(document.getElementById("function1").value.replace(/ /g,''), 0);
+				graphArray[func1.graphID]=func1;
+				func1.draw();
+
+				var value2=document.getElementById("function2").value.replace(/ /g, '');
+				var func2;
+				if(value2)
+				{
+					func2=new Graph(value2, 1);
+					func2.draw();
+				}
+				else  //Create a fake graph because drawShape() assumes that there's always going to be two functions
+				{
+					func2=new Graph(0, 1);
+				}
 				graphArray[func2.graphID]=func2;
 
 				var quality=document.getElementById("quality").value;
 				var bound1=Number(document.getElementById("bound1").value);
 				var bound2=Number(document.getElementById("bound2").value);
 				var rotation=Number(document.getElementById("rotation").value);
-				func.drawShape(quality, bound1, bound2, rotation);
+				func1.drawShape(quality, bound1, bound2, rotation);
 			}
 
 			function animate(){
