@@ -70,7 +70,7 @@
 				//camera.position.z=5;
 
 				renderer=new THREE.WebGLRenderer();
-				renderer.setSize(window.innerWidth, window.innerHeight)
+				renderer.setSize(window.innerWidth, window.innerHeight);
 				document.body.appendChild(renderer.domElement);
 
 				controls=new THREE.TrackballControls(camera, renderer.domElement);
@@ -99,7 +99,7 @@
 				var step=0.01;
 				for(var i=-size; i<=size; i+=step){
 					if(this.given!=null){
-						this.func=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
+						this.func=(eval(this.given));
 					}
 
 					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, this.func);
@@ -238,9 +238,9 @@
 					if(this.getY(i)<=size){
 						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), quality, 100);
 						geometry.verticesNeedUpdate=true;
-						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+quality/2), -axisOfRotation));
+						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+quality/2, -axisOfRotation));
 
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
 						var plane=new THREE.Mesh(geometry, material);
 						plane.material.color.setHex(0xffff00);
 
@@ -258,13 +258,13 @@
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, smallSeg);
-						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -axisOfRotation));
+						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -axisOfRotation));
 						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, bigSeg);
-						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -axisOfRotation));
+						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -axisOfRotation));
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
 						var hollowCylinder=intersectionBSP.toMesh(material);
 						hollowCylinder.rotation.set(0, 0, Math.PI/2);
 						this.group.add(hollowCylinder);
