@@ -236,14 +236,14 @@
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 
-						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50);
+						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, true);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
-						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360);
+						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true);
 						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
 						var hollowCylinder=intersectionBSP.toMesh(material);
 						hollowCylinder.rotation.set(0, 0, Math.PI/2);
 						this.group.add(hollowCylinder);
@@ -254,11 +254,11 @@
 			Graph.prototype.addSolidWithoutHoles=function(leftRadius, rightRadius){
 				for(var i=this.bound1; i<this.bound2; i+=this.quality){
 					if(this.getY(i)<=size){
-						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100);
+						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true);
 						geometry.verticesNeedUpdate=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+this.quality/2), -this.axisOfRotation));
 
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
 						var plane=new THREE.Mesh(geometry, material);
 						plane.material.color.setHex(0xffff00);
 
