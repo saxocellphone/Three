@@ -100,6 +100,7 @@
 				for(var i=-size; i<=size; i+=step){
 					if(this.given!==null){
 						func=(eval(this.given));
+					}
 
 					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, func);
 					x+=step;
