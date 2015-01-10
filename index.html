@@ -52,7 +52,7 @@
 			"use strict";
 			var camera, controls, scene, renderer;
 			var theFunctionValue;
-			var size=28;
+			var size=280;
 			var graphArray=[];
 
 			init();
@@ -361,7 +361,7 @@
 				var axes=new THREE.Geometry();
 				axes.verticesNeedUpdate=true;
 
-				for(var i=-size; i<=size; i+=1){
+				for(var i=-size; i<=size; i+=10){
 					if(i == 0){
 						axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
 						axes.vertices.push(new THREE.Vector3(size, -0.04, i));
