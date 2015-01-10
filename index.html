@@ -51,7 +51,6 @@
 		<script>
 			"use strict";
 			var camera, controls, scene, renderer;
-			var theFunctionValue;
 			var size=280;
 			var graphArray=[];
 
@@ -82,13 +81,13 @@
 				render();
 			}
 
-			function Graph(given, graphID){
-				var func, group, bound1, bound2, graphID;
+			function Graph(given, bound1, bound2, axisOfRotation, quality, graphID){
 				this.given=given;
-				this.func=func;
 				this.group=new THREE.Object3D();
 				this.bound1=bound1;
 				this.bound2=bound2;
+				this.axisOfRotation=axisOfRotation;
+				this.quality=quality;
 				this.graphID=graphID;
 			}
 
@@ -97,12 +96,12 @@
 				var points=[];
 				var counter=x;  //I'll change this later, just using a counter variable for now
 				var step=0.01;
+				var func;  //Find a better name for this maybe?
 				for(var i=-size; i<=size; i+=step){
-					if(this.given!=null){
-						this.func=(eval(this.given));
-					}
+					if(this.given!==null){
+						func=(eval(this.given));
 
-					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, this.func);
+					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, func);
 					x+=step;
 					counter++;
 				}
@@ -113,44 +112,40 @@
 				var spline=new THREE.SplineCurve3(points);
 				var splinePoints=spline.getPoints(points.length-1);
 
-				for(var i=0; i<splinePoints.length; i++){
+				for(i=0; i<splinePoints.length; i++){
 					if(Math.abs((spline.points[i]).z)<=size){
 						geometry.vertices.push(spline.points[i]);
 					}
 				}
 
 				var graph=new THREE.Line(geometry, new THREE.LineBasicMaterial());
-
 				graph.name="graph";
 				scene.add(graph);
 				render();
-			}
+			};
 
 			Graph.prototype.getY=function(x){
 				return eval(this.given);
-			}
+			};
 
-			Graph.prototype.drawShape=function(value, bound1, bound2, axisOfRotation){
-				var quality=Number(value);
+			Graph.prototype.drawShape=function(){
 				this.group.name="solid";
-				var boundY1=this.getY(bound1);
-				this.bound1=bound1;
-				var boundY2=this.getY(bound2);
-				this.bound2=bound2;
-				var graph1ComparingPoint1=graphArray[0].getY(bound1+0.5);  //FIXME: Don't assume that there's always two functions
-				var graph2ComparingPoint1=graphArray[1].getY(bound1+0.5);
-				var graph1ComparingPoint2=graphArray[0].getY(bound2-0.5);
-				var graph2ComparingPoint2=graphArray[1].getY(bound2-0.5);
+				var boundY1=this.getY(this.bound1);
+				var boundY2=this.getY(this.bound2);
+				var graph1ComparingPoint1=graphArray[0].getY(this.bound1+0.5);  //FIXME: Don't assume that there's always two functions
+				var graph2ComparingPoint1=graphArray[1].getY(this.bound1+0.5);
+				var graph1ComparingPoint2=graphArray[0].getY(this.bound2-0.5);
+				var graph2ComparingPoint2=graphArray[1].getY(this.bound2-0.5);
 
-				if(bound1===bound2){
+				if(this.bound1===this.bound2){
 					sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
 					clearGraph();
 					return;
 				}
 
-				if(boundY1 > boundY2){  //Switch the bounds around so that the for loop works
+				if(boundY1>boundY2){  //Switch the bounds around so that the for loop works
 					var temp=this.bound2;
-					this.bound2=bound1;
+					this.bound2=this.bound1;
 					this.bound1=temp;
 
 					temp=boundY2;
@@ -159,50 +154,50 @@
 				}
 
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
-				if(axisOfRotation){
+				if(this.axisOfRotation){
 					console.log("Axis of rotation is not 0");
-					if(boundY2 - boundY1){
+					if(boundY2-boundY1){
 						console.log("	boundY2-boundY1 is not 0");
-						if(axisOfRotation >= boundY2 && axisOfRotation >= graphArray[1].getY(bound2)){
+						if(this.axisOfRotation>=boundY2 && this.axisOfRotation>=graphArray[1].getY(this.bound2)){
 							console.log("		Axis of rotation is greater than or equal to boundY2");
-							if(boundY1 >= 0 && boundY2 >=0){
+							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									console.log("					Graph2 is higher than graph1");
-									this.addBSP("axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+0.5)", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+0.5)", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+0.5)");
 								} else {
 									console.log("					Graph2 is lower than or equal to graph1");
-									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+0.5)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+0.5)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+0.5)");
 								}
 							} else {
 								console.log("			One of the bounds is less than 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									console.log("					Graph2 is higher than graph1");
-									this.addBSP("axisOfRotation+Math.abs(graphArray[1].getY(i))", "axisOfRotation+Math.abs(graphArray[1].getY(i+0.5))", "axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("this.axisOfRotation+Math.abs(graphArray[1].getY(i))", "this.axisOfRotation+Math.abs(graphArray[1].getY(i+0.5))", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+0.5)");
 								} else {
 									console.log("					Graph2 is lower than or equal to graph1");
-									this.addBSP("axisOfRotation-this.getY(i)", "axisOfRotation-this.getY(i+0.5)", "axisOfRotation-graphArray[1].getY(i)", "axisOfRotation-graphArray[1].getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+0.5)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+0.5)");
 								}
 							}
-						} else if(axisOfRotation <= boundY1 && axisOfRotation <= graphArray[1].getY(bound1)){
+						} else if(this.axisOfRotation<=boundY1 && this.axisOfRotation<=graphArray[1].getY(this.bound1)){
 							console.log("		Axis of rotation is less than or equal to boundY1");
-							if(boundY1 >= 0 && boundY2 >=0){
+							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									console.log("					Graph2 is higher than graph1");
-									this.addBSP("Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+0.5)", "Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+0.5)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+0.5)");
 								} else {
 									console.log("					Graph2 is lower than or equal to graph1");
-									this.addBSP("Math.abs(axisOfRotation)+graphArray[1].getY(i)", "Math.abs(axisOfRotation)+graphArray[1].getY(i+0.5)", "Math.abs(axisOfRotation)+this.getY(i)", "Math.abs(axisOfRotation)+this.getY(i+0.5)", "50", "360", axisOfRotation);
+									this.addBSP("Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+0.5)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+0.5)");
 								}
-							} else {  //Super hacky bugfix with the 0.01 (-x, -4, 0, 4)
+							} else {
 								console.log("			One of the bounds is less than 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
 									console.log("					Graph2 is higher than graph1");
-									this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+0.5))", "Math.abs(axisOfRotation-graphArray[1].getY(i))", "Math.abs(axisOfRotation-graphArray[1].getY(i+0.5))", "50", "360", axisOfRotation);
+									this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+0.5))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+0.5))");
 								} else {
 									console.log("					Graph2 is lower than or equal to graph1");
-									this.addBSP("Math.abs(axisOfRotation-graphArray[1].getY(i))", "Math.abs(axisOfRotation-graphArray[1].getY(i+0.5))", "Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+0.5))", "50", "360", axisOfRotation);
+									this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+0.5))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+0.5))");
 								}
 							}
 						} else {
@@ -210,47 +205,29 @@
 							clearGraph();
 							return;
 						}
-
 					} else if(boundY1===boundY2){
 						//Not complete yet (this is just for cylinders)
 						console.log("		BoundY1 is equal to boundY2 and bound1 does not equal bound2");
-						if(axisOfRotation > boundY1){
+						if(this.axisOfRotation>boundY1){
 							console.log("			Axis of rotation is greater than boundY1");
-							this.addBSP("Math.abs(axisOfRotation-this.getY(i))", "Math.abs(axisOfRotation-this.getY(i+0.5))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "50", "360", axisOfRotation);
-						} else if (axisOfRotation < boundY1){
+							this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+0.5))", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)");
+						} else if(this.axisOfRotation<boundY1){
 							console.log("			Axis of rotation is less than boundY1");
-							this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation) + this.getY(i)", "Math.abs(axisOfRotation) + this.getY(i+0.5)", "50", "360", axisOfRotation);
-						} else if (axisOfRotation===boundY1){
+							this.addBSP("Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+0.5)");
+						} else if(this.axisOfRotation===boundY1){
 							console.log("			Axis of rotation is equal to boundY1");
-							this.addSolidWithoutHoles(quality, "Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
+							this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+this.quality))");
 						}
 					}
 				} else {
 					console.log("Axis of rotation is 0");
-					this.addSolidWithoutHoles(quality, "Math.abs(this.getY(i))","Math.abs(this.getY(i+quality))", axisOfRotation);
+					this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+this.quality))");
 				}
 				scene.add(this.group);
 				render();
-			}
+			};
 
-			Graph.prototype.addSolidWithoutHoles=function(quality, leftRadius, rightRadius, axisOfRotation){
-				for(var i=this.bound1; i<this.bound2; i+=quality){
-					if(this.getY(i)<=size){
-						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), quality, 100);
-						geometry.verticesNeedUpdate=true;
-						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+quality/2, -axisOfRotation));
-
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
-						var plane=new THREE.Mesh(geometry, material);
-						plane.material.color.setHex(0xffff00);
-
-						plane.rotation.set(0, 0, Math.PI/2);
-						this.group.add(plane);
-					}
-				}
-			}
-
-			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2, smallSeg, bigSeg, axisOfRotation){
+			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2){
 				for(var i=this.bound1; i<this.bound2; i+=0.5){
 					if(this.getY(i)<=size){
 						if(!eval(smallGeoR1) || !eval(smallGeoR2)){  //Hacky bugfix woo
@@ -258,10 +235,10 @@
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 
-						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, smallSeg);
-						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -axisOfRotation));
-						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, bigSeg);
-						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -axisOfRotation));
+						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50);
+						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -this.axisOfRotation));
+						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360);
+						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, i+0.5/2, -this.axisOfRotation));
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
@@ -271,11 +248,28 @@
 						this.group.add(hollowCylinder);
 					}
 				}
-			}
+			};
+
+			Graph.prototype.addSolidWithoutHoles=function(leftRadius, rightRadius){
+				for(var i=this.bound1; i<this.bound2; i+=this.quality){
+					if(this.getY(i)<=size){
+						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100);
+						geometry.verticesNeedUpdate=true;
+						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+this.quality/2), -this.axisOfRotation));
+
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var plane=new THREE.Mesh(geometry, material);
+						plane.material.color.setHex(0xffff00);
+
+						plane.rotation.set(0, 0, Math.PI/2);
+						this.group.add(plane);
+					}
+				}
+			};
 
 			function clearGraph(){
 				for(var i=scene.children.length; i>=0; i--){
-					if(scene.children[i]!=null){
+					if(scene.children[i]!==undefined){
 						if(scene.children[i].name=="graph" || scene.children[i].name=="solid"){
 							scene.remove(scene.children[i]);
 						}
@@ -288,27 +282,12 @@
 				clearGraph();
 
 				//TODO: Being lazy for now, I'll change this later. Using eval()
-				var func1=new Graph(document.getElementById("function1").value.replace(/ /g,''), 0);
-				graphArray[func1.graphID]=func1;
-				func1.draw();
-
-				var value2=document.getElementById("function2").value.replace(/ /g, '');
-				var func2;
-				if(value2)
-				{
-					func2=new Graph(value2, 1);
-					func2.draw();
-				}
-				else  //Create a fake graph because drawShape() assumes that there's always going to be two functions
-				{
-					func2=new Graph(0, 1);
-				}
-				graphArray[func2.graphID]=func2;
-
-				var quality=document.getElementById("quality").value.replace(/ /g, '');
+				var function1=document.getElementById("function1").value.replace(/ /g,'');  //TODO: Check if this is valid
+				var quality=document.getElementById("quality").value;
 				var bound1=document.getElementById("bound1").value.replace(/ /g, '');
 				var bound2=document.getElementById("bound2").value.replace(/ /g, '');
 				var axisOfRotation=document.getElementById("rotation").value.replace(/ /g, '');
+
 				if(isNaN(bound1) || isNaN(bound2) || isNaN(axisOfRotation))  //Make sure the values are valid
 				{
 					var type=(isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
@@ -316,16 +295,33 @@
 					return;
 				}
 
+				var graph1=new Graph(function1, Number(bound1), Number(bound2), Number(axisOfRotation), Number(quality), 0);
+				graphArray[graph1.graphID]=graph1;
+				graph1.draw();
+
+				var function2=document.getElementById("function2").value.replace(/ /g, '');
+				var graph2;
+				if(function2)
+				{
+					graph2=new Graph(function2, Number(bound1), Number(bound2), Number(axisOfRotation), Number(quality), 1);
+					graph2.draw();
+				}
+				else  //Create a fake graph because drawShape() assumes that there's always going to be two functions
+				{
+					graph2=new Graph(0, Number(bound1), Number(bound2), Number(axisOfRotation), Number(quality), 1);
+				}
+				graphArray[graph2.graphID]=graph2;
+
 				if(bound1 && bound2 && axisOfRotation)  //Only create the solid if we have both of the bounds and the axis of rotation
 				{
-					func1.drawShape(quality, bound1, bound2, axisOfRotation);
+					graph1.drawShape();
 					return;
 				}
 				else if(!bound1 && !bound2 && !axisOfRotation)  //If everything was left blank we'll just draw the function and that's it
 				{
 					return;
 				}
-				else if(!bound1 || !bound2 || !axisOfRotation)  //Otherwise, warn the user
+				else  //Otherwise, warn the user
 				{
 					var type=(!bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation");
 					sweetAlert("Missing " + type, "Please specify the " + type, "warning");
@@ -362,16 +358,16 @@
 				axes.verticesNeedUpdate=true;
 
 				for(var i=-size; i<=size; i+=10){
-					if(i == 0){
-						axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
-						axes.vertices.push(new THREE.Vector3(size, -0.04, i));
-						axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
-						axes.vertices.push(new THREE.Vector3(i, -0.04, size));
-					} else {
+					if(i){
 						geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
 						geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
 						geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
 						geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
+					} else {
+						axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
+						axes.vertices.push(new THREE.Vector3(size, -0.04, i));
+						axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
+						axes.vertices.push(new THREE.Vector3(i, -0.04, size));
 					}
 				}
 

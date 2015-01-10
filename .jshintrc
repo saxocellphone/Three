@@ -1,0 +1,10 @@
+{
+	"globalstrict": true,
+	"undef": true,
+	"unused": true,
+	"browser": true,
+	"devel": true,
+	"evil": true,
+	"indent": 4,
+	"predef": ["THREE", "Detector", "sweetAlert", "ThreeBSP"]
+}
