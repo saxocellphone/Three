@@ -257,7 +257,6 @@
 							smallGeoR1=smallGeoR1 + "+0.01";
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
-
 						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, smallSeg);
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -axisOfRotation));
 						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, bigSeg);
@@ -305,32 +304,11 @@
 				}
 				graphArray[func2.graphID]=func2;
 
-				var quality=document.getElementById("quality").value.replace(/ /g, '');
-				var bound1=document.getElementById("bound1").value.replace(/ /g, '');
-				var bound2=document.getElementById("bound2").value.replace(/ /g, '');
-				var axisOfRotation=document.getElementById("rotation").value.replace(/ /g, '');
-				if(isNaN(bound1) || isNaN(bound2) || isNaN(axisOfRotation))  //Make sure the values are valid
-				{
-					var type=(isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
-					sweetAlert("Invalid " + type, "Please enter a valid number for the " + type, "warning");
-					return;
-				}
-
-				if(bound1 && bound2 && axisOfRotation)  //Only create the solid if we have both of the bounds and the axis of rotation
-				{
-					func1.drawShape(quality, bound1, bound2, axisOfRotation);
-					return;
-				}
-				else if(!bound1 && !bound2 && !axisOfRotation)  //If everything was left blank we'll just draw the function and that's it
-				{
-					return;
-				}
-				else if(!bound1 || !bound2 || !axisOfRotation)  //Otherwise, warn the user
-				{
-					var type=(!bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation");
-					sweetAlert("Missing " + type, "Please specify the " + type, "warning");
-					return;
-				}
+				var quality=document.getElementById("quality").value;
+				var bound1=Number(document.getElementById("bound1").value);
+				var bound2=Number(document.getElementById("bound2").value);
+				var rotation=Number(document.getElementById("rotation").value);
+				func1.drawShape(quality, bound1, bound2, rotation);
 			}
 
 			function animate(){
