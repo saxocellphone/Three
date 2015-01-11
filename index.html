@@ -240,21 +240,19 @@
 						if(i===this.bound1)
 						{
 							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, false, true);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, false, true);
 						}
-						else
+						else if(i+0.5>=this.bound2)
 						{
-							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, true);
-						}
-						smallCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
-
-						if(i+0.5>=this.bound2)
-						{
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, false);
 							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, false);
 						}
 						else
 						{
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, true);
 							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, true);
 						}
+						smallCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
 						largeCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
 
 						var hollowCylinder=new ThreeBSP(largeCylinder).subtract(new ThreeBSP(smallCylinder)).toMesh(new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5}));
