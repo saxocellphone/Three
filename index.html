@@ -228,40 +228,36 @@
 				render();
 			};
 
-			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2){
+			Graph.prototype.addBSP=function(innerCylinderSmallRadius, innerCylinderLargeRadius, outerCylinderSmallRadius, outerCylinderLargeRadius){
 				for(var i=this.bound1; i<this.bound2; i+=0.5){
 					if(this.getY(i)<=size){
-						if(!eval(smallGeoR1) || !eval(smallGeoR2)){  //Hacky bugfix woo
-							smallGeoR1=smallGeoR1 + "+0.01";
-							smallGeoR2=smallGeoR2 + "+0.01";
+						if(!eval(innerCylinderSmallRadius) || !eval(innerCylinderLargeRadius)){  //Hacky bugfix woo
+							innerCylinderSmallRadius=innerCylinderSmallRadius + "+0.01";
+							innerCylinderLargeRadius=innerCylinderLargeRadius + "+0.01";
 						}
 
-						var smallCylinderGeom, largeCylinderGeom;
+						var smallCylinder, largeCylinder;
 						if(i===this.bound1)
 						{
-							smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, false, true);
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, false, true);
 						}
 						else
 						{
-							smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, true, true);
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, true);
 						}
-						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
+						smallCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
 
 						if(i+0.5>=this.bound2)
 						{
-							largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true, false);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, false);
 						}
 						else
 						{
-							largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true, true);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, true);
 						}
-						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
+						largeCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
 
-						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
-						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
-						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
-						var hollowCylinder=intersectionBSP.toMesh(material);
+						var hollowCylinder=new ThreeBSP(largeCylinder).subtract(new ThreeBSP(smallCylinder)).toMesh(new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5}));
 						hollowCylinder.rotation.set(0, 0, Math.PI/2);
 						this.group.add(hollowCylinder);
 					}
