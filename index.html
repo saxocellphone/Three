@@ -236,10 +236,27 @@
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 
-						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, true);
+						var smallCylinderGeom, largeCylinderGeom;
+						if(i===this.bound1)
+						{
+							smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, false, true);
+						}
+						else
+						{
+							smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50, 1, true, true);
+						}
 						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
-						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true);
+
+						if(i+0.5>=this.bound2)
+						{
+							largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true, false);
+						}
+						else
+						{
+							largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360, 1, true, true);
+						}
 						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
+
 						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
 						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
 						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
