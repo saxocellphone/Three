@@ -254,7 +254,19 @@
 			Graph.prototype.addSolidWithoutHoles=function(leftRadius, rightRadius){
 				for(var i=this.bound1; i<this.bound2; i+=this.quality){
 					if(this.getY(i)<=size){
-						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true);
+						var geometry;
+						if(i===this.bound1)
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, false, true);
+						}
+						else if(i+this.quality>=this.bound2)
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true, false);
+						}
+						else
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true, true);
+						}
 						geometry.verticesNeedUpdate=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+this.quality/2), -this.axisOfRotation));
 
