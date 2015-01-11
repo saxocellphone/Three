@@ -228,23 +228,34 @@
 				render();
 			};
 
-			Graph.prototype.addBSP=function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2){
+			Graph.prototype.addBSP=function(innerCylinderSmallRadius, innerCylinderLargeRadius, outerCylinderSmallRadius, outerCylinderLargeRadius){
 				for(var i=this.bound1; i<this.bound2; i+=0.5){
 					if(this.getY(i)<=size){
-						if(!eval(smallGeoR1) || !eval(smallGeoR2)){  //Hacky bugfix woo
-							smallGeoR1=smallGeoR1 + "+0.01";
-							smallGeoR2=smallGeoR2 + "+0.01";
+						if(!eval(innerCylinderSmallRadius) || !eval(innerCylinderLargeRadius)){  //Hacky bugfix woo
+							innerCylinderSmallRadius=innerCylinderSmallRadius + "+0.01";
+							innerCylinderLargeRadius=innerCylinderLargeRadius + "+0.01";
 						}
 
-						var smallCylinderGeom=new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), 0.5, 50);
-						smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
-						var largeCylinderGeom=new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), 0.5, 360);
-						largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
-						var smallCylinderBSP=new ThreeBSP(smallCylinderGeom);
-						var largeCylinderBSP=new ThreeBSP(largeCylinderGeom);
-						var intersectionBSP=largeCylinderBSP.subtract(smallCylinderBSP);
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
-						var hollowCylinder=intersectionBSP.toMesh(material);
+						var smallCylinder, largeCylinder;
+						if(i===this.bound1)
+						{
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, false, true);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, false, true);
+						}
+						else if(i+0.5>=this.bound2)
+						{
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, false);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, false);
+						}
+						else
+						{
+							smallCylinder=new THREE.CylinderGeometry(eval(innerCylinderSmallRadius), eval(innerCylinderLargeRadius), 0.5, 50, 1, true, true);
+							largeCylinder=new THREE.CylinderGeometry(eval(outerCylinderSmallRadius), eval(outerCylinderLargeRadius), 0.5, 360, 1, true, true);
+						}
+						smallCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
+						largeCylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+0.5/2), -this.axisOfRotation));
+
+						var hollowCylinder=new ThreeBSP(largeCylinder).subtract(new ThreeBSP(smallCylinder)).toMesh(new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5}));
 						hollowCylinder.rotation.set(0, 0, Math.PI/2);
 						this.group.add(hollowCylinder);
 					}
@@ -254,11 +265,23 @@
 			Graph.prototype.addSolidWithoutHoles=function(leftRadius, rightRadius){
 				for(var i=this.bound1; i<this.bound2; i+=this.quality){
 					if(this.getY(i)<=size){
-						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100);
+						var geometry;
+						if(i===this.bound1)
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, false, true);
+						}
+						else if(i+this.quality>=this.bound2)
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true, false);
+						}
+						else
+						{
+							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100, 1, true, true);
+						}
 						geometry.verticesNeedUpdate=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+this.quality/2), -this.axisOfRotation));
 
-						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
+						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
 						var plane=new THREE.Mesh(geometry, material);
 						plane.material.color.setHex(0xffff00);
 
