@@ -211,18 +211,18 @@
 						console.log("		BoundY1 is equal to boundY2 and bound1 does not equal bound2");
 						if(this.axisOfRotation>boundY1){
 							console.log("			Axis of rotation is greater than boundY1");
-							this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+0.5))", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)");
+							this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)");
 						} else if(this.axisOfRotation<boundY1){
 							console.log("			Axis of rotation is less than boundY1");
-							this.addBSP("Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+0.5)");
+							this.addBSP("Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
 						} else if(this.axisOfRotation===boundY1){
 							console.log("			Axis of rotation is equal to boundY1");
-							this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+this.quality))");
+							this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
 						}
 					}
 				} else {
 					console.log("Axis of rotation is 0");
-					this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+this.quality))");
+					this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
 				}
 				scene.add(this.group);
 				render();
@@ -237,7 +237,7 @@
 							smallGeoR2=smallGeoR2 + "+0.01";
 						}
 
-						if(i+step>this.bound2)  //This prevents the solid from extending beyond the second bound if it's not cleanly divisible by the quality
+						if(i+step>this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 						{
 							step=this.bound2-i;
 						}
@@ -258,11 +258,17 @@
 			};
 
 			Graph.prototype.addSolidWithoutHoles=function(leftRadius, rightRadius){
-				for(var i=this.bound1; i<this.bound2; i+=this.quality){
+				var step=this.quality;
+				for(var i=this.bound1; i<this.bound2; i+=step){
 					if(this.getY(i)<=size){
-						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), this.quality, 100);
+						if(i+step>this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
+						{
+							step=this.bound2-i;
+						}
+
+						var geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
 						geometry.verticesNeedUpdate=true;
-						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+this.quality/2), -this.axisOfRotation));
+						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+step/2), -this.axisOfRotation));
 
 						var material=new THREE.MeshPhongMaterial({color: 0xffff00/*, transparent: true, opacity: 0.5*/});
 						var plane=new THREE.Mesh(geometry, material);
