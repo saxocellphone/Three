@@ -108,11 +108,8 @@
 				}
 
 				var geometry=new THREE.Geometry();
-				geometry.verticesNeedUpdate=true;
-
 				var spline=new THREE.SplineCurve3(points);
 				var splinePoints=spline.getPoints(points.length-1);
-
 				for(i=0; i<splinePoints.length; i++){
 					if(Math.abs((spline.points[i]).z)<=size){
 						geometry.vertices.push(spline.points[i]);
@@ -144,7 +141,7 @@
 					return;
 				}
 
-				if(boundY1>boundY2){  //Switch the bounds around so that the for loop works
+				if(this.bound1>this.bound2){  //Switch the bounds around so that the for loop works
 					var temp=this.bound2;
 					this.bound2=this.bound1;
 					this.bound1=temp;
@@ -290,7 +287,6 @@
 						{
 							geometry=new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100, 1, true, true);
 						}
-						geometry.verticesNeedUpdate=true;
 						geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i+step/2), -this.axisOfRotation));
 
 						var material=new THREE.MeshPhongMaterial({color: 0xffff00, transparent: true, opacity: 0.5});
@@ -388,10 +384,7 @@
 
 			function addAxis(){
 				var geometry=new THREE.Geometry();
-				geometry.verticesNeedUpdate=true;
-
 				var axes=new THREE.Geometry();
-				axes.verticesNeedUpdate=true;
 
 				for(var i=-size; i<=size; i+=1){
 					if(i){
