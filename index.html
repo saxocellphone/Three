@@ -352,7 +352,7 @@
 				hemiLight.color.setHSL(0.6, 1, 0.6);
 				hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 				scene.add(hemiLight);
-				scene.add(new THREE.PointLight(0xffff00).position.set(0, 100, 90));
+				scene.add(new THREE.PointLight(0xffff00, 1, 5000).position.set(0, 100, 90));
 			}
 
 			function addAxis(){
