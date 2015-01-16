@@ -91,18 +91,40 @@
 				this.graphID=graphID;
 			}
 
+			Graph.prototype.getY=function(x){  //jshint ignore:line
+				return eval(this.given);
+			};
+
+			Graph.prototype.getMin=function(){  //I'm 3000% sure that it's possible to combine these two functions, but I'm not sure how :(
+				var points=[];
+				for(var x=this.bound1; x<=this.bound2; x+=0.01)
+				{
+					points[x]=eval(this.given);
+				}
+				return Math.min.apply(null, points);
+			};
+
+			Graph.prototype.getMax=function(){
+				var points=[];
+				for(var x=this.bound1; x<=this.bound2; x+=0.01)
+				{
+					points[x]=eval(this.given);
+				}
+				return Math.max.apply(null, points);
+			};
+
 			Graph.prototype.draw=function(){
 				var x=-size;
 				var points=[];
 				var counter=x;  //I'll change this later, just using a counter variable for now
 				var step=0.01;
-				var func;  //Find a better name for this maybe?
+				var equation;  //Find a better name for this maybe?
 				for(var i=-size; i<=size; i+=step){
 					if(this.given!==null){
-						func=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
+						equation=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
 					}
 
-					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, func);
+					points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, equation);
 					x+=step;
 					counter++;
 				}
@@ -120,10 +142,6 @@
 				graph.name="graph";
 				scene.add(graph);
 				render();
-			};
-
-			Graph.prototype.getY=function(x){  //jshint ignore:line
-				return eval(this.given);
 			};
 
 			Graph.prototype.drawShape=function(){
@@ -156,8 +174,8 @@
 					console.log("Axis of rotation is not 0");
 					if(boundY2-boundY1){
 						console.log("	boundY2-boundY1 is not 0");
-						if(this.axisOfRotation>=boundY2 && this.axisOfRotation>=graphArray[1].getY(this.bound2)){
-							console.log("		Axis of rotation is greater than or equal to boundY2");
+						if(this.axisOfRotation>=this.getMax() && this.axisOfRotation>=graphArray[1].getMax()){
+							console.log("		Axis of rotation is greater than or equal to the max of the graph");
 							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
@@ -177,8 +195,8 @@
 									this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
 								}
 							}
-						} else if(this.axisOfRotation<=boundY1 && this.axisOfRotation<=graphArray[1].getY(this.bound1)){
-							console.log("		Axis of rotation is less than or equal to boundY1");
+						} else if(this.axisOfRotation<=this.getMin() && this.axisOfRotation<=graphArray[1].getMin()){
+							console.log("		Axis of rotation is less than or equal to the minimum of the graph");
 							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
 								if(graph2ComparingPoint1>graph1ComparingPoint1 && graph2ComparingPoint2>graph1ComparingPoint2){
