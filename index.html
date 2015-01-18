@@ -100,8 +100,9 @@
 				for(var x=this.bound1; x<=this.bound2; x+=0.01){
 					points[x]=eval(this.given);
 				}
-				return (Math.max.apply(null,points) ? this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 : Math.min(null,points));
-			}
+				return (Math.max.apply(null, points) ? this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 : Math.min.apply(null, points));
+			};
+
 			Graph.prototype.draw=function(){
 				var x=-size;
 				var points=[];
