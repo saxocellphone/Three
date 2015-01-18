@@ -95,24 +95,13 @@
 				return eval(this.given);
 			};
 
-			Graph.prototype.getMin=function(){  //I'm 3000% sure that it's possible to combine these two functions, but I'm not sure how :(
+			Graph.prototype.getVertex=function(){
 				var points=[];
-				for(var x=this.bound1; x<=this.bound2; x+=0.01)
-				{
+				for(var x=this.bound1; x<=this.bound2; x+=0.01){
 					points[x]=eval(this.given);
 				}
-				return Math.min.apply(null, points);
-			};
-
-			Graph.prototype.getMax=function(){
-				var points=[];
-				for(var x=this.bound1; x<=this.bound2; x+=0.01)
-				{
-					points[x]=eval(this.given);
-				}
-				return Math.max.apply(null, points);
-			};
-
+				return (Math.max.apply(null,points) ? this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 : Math.min(null,points));
+			}
 			Graph.prototype.draw=function(){
 				var x=-size;
 				var points=[];
@@ -168,13 +157,13 @@
 					boundY2=boundY1;
 					boundY1=temp;
 				}
-
+				console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
 				//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 				if(this.axisOfRotation){
 					console.log("Axis of rotation is not 0");
 					if(boundY2-boundY1){
 						console.log("	boundY2-boundY1 is not 0");
-						if(this.axisOfRotation>=this.getMax() && this.axisOfRotation>=graphArray[1].getMax()){
+						if(this.axisOfRotation>=this.getVertex() && this.axisOfRotation>=graphArray[1].getVertex()){
 							console.log("		Axis of rotation is greater than or equal to the max of the graph");
 							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
@@ -195,7 +184,7 @@
 									this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
 								}
 							}
-						} else if(this.axisOfRotation<=this.getMin() && this.axisOfRotation<=graphArray[1].getMin()){
+						} else if(this.axisOfRotation<=this.getVertex() && this.axisOfRotation<=graphArray[1].getVertex()){
 							console.log("		Axis of rotation is less than or equal to the minimum of the graph");
 							if(boundY1>=0 && boundY2>=0){
 								console.log("			Both boundY1 and boundY2 are greater than or equal to 0");
