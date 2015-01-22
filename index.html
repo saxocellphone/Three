@@ -100,7 +100,7 @@
 				for(var x=this.bound1; x<=this.bound2; x+=0.01){
 					points[x]=eval(this.given);
 				}
-				return (Math.max.apply(null, points) ? this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 : Math.min.apply(null, points));
+				return (this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 ? Math.max.apply(null, points) : Math.min.apply(null, points));
 			};
 
 			Graph.prototype.draw=function(){
@@ -108,7 +108,7 @@
 				var points=[];
 				var counter=x;  //I'll change this later, just using a counter variable for now
 				var step=0.01;
-				var equation;  //Find a better name for this maybe?
+				var equation;
 				for(var i=-size; i<=size; i+=step){
 					if(this.given!==null){
 						equation=-(eval(this.given));  //Somehow the plane is upside-down: the positive y-cordinate is negative
