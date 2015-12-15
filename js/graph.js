@@ -69,7 +69,7 @@ Graph.prototype.draw=function(){
 	}
 
 	var geometry=new THREE.Geometry();
-	var spline=new THREE.SplineCurve3(points);
+	var spline=new THREE.CatmullRomCurve3(points);
 	var splinePoints=spline.getPoints(points.length-1);
 	for(i=0; i<splinePoints.length; i++){
 		if(Math.abs((spline.points[i]).z)<=size){
