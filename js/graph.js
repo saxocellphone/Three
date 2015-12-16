@@ -41,13 +41,13 @@ function Graph(given, bound1, bound2, axisOfRotation, quality, graphID){
 }
 
 Graph.prototype.getY=function(x){  //jshint ignore:line
-	return eval(this.given);
+	return math.eval(this.given, {x: x});
 };
 
 Graph.prototype.getVertex=function(){
 	var points=[];
 	for(var x=this.bound1; x<=this.bound2; x+=0.01){
-		points[x]=eval(this.given);
+		points[x]=math.eval(this.given, {x: x});
 	}
 	return (this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 ? Math.max.apply(null, points) : Math.min.apply(null, points));
 };
@@ -60,7 +60,7 @@ Graph.prototype.draw=function(){
 	var equation;
 	for(var i=-size; i<=size; i+=step){
 		if(this.given!==null){
-			equation=-eval(this.given);  //Somehow the plane is upside-down: the positive y-cordinate is negative
+			equation=-math.eval(this.given, {x: i});  //Somehow the plane is upside-down: the positive y-cordinate is negative
 		}
 
 		points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, equation);
@@ -239,7 +239,7 @@ function clearGraph(){
 	render();
 }
 
-function submit(){  //jshint ignore:line
+function submit(){
 	clearGraph();
 
 	//TODO: Being lazy for now, I'll change this later. Using eval()
@@ -256,7 +256,7 @@ function submit(){  //jshint ignore:line
 	}
 	catch(error)
 	{
-		var type=(isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
+		const type=(isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
 		sweetAlert("Invalid " + type, "Please enter a valid number for the " + type, "warning");
 		return;
 	}
@@ -268,7 +268,7 @@ function submit(){  //jshint ignore:line
 	}
 	else if(bound1===undefined || bound2===undefined || axisOfRotation===undefined)
 	{
-		var type=(bound1===undefined ? "first bound" : bound2===undefined ? "second bound" : "axis of rotation");
+		const type=(bound1===undefined ? "first bound" : bound2===undefined ? "second bound" : "axis of rotation");
 		sweetAlert("Missing " + type, "Please specify the " + type, "warning");
 		return;
 	}
