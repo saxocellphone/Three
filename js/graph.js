@@ -299,7 +299,7 @@ function submit(){
 }
 
 function animate(){
-	requestAnimationFrame(animate);
+	window.requestAnimationFrame(animate);
 	controls.update();
 }
 
