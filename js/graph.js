@@ -47,7 +47,7 @@ Graph.prototype.getY=function(x){  //jshint ignore:line
 Graph.prototype.getVertex=function(){
 	var points=[];
 	for(var x=this.bound1; x<=this.bound2; x+=0.01){
-		points[x]=eval(this.given);
+		points[x]=math.eval(this.given, {x: x});
 	}
 	return (this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 ? Math.max.apply(null, points) : Math.min.apply(null, points));
 };
