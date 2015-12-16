@@ -41,13 +41,13 @@ function Graph(given, bound1, bound2, axisOfRotation, quality, graphID){
 }
 
 Graph.prototype.getY=function(x){
-	return math.eval(this.given, {x: x});
+	return math.eval(this.given, {x});
 };
 
 Graph.prototype.getVertex=function(){
 	var points=[];
 	for(var x=this.bound1; x<=this.bound2; x+=0.01){
-		points[x]=math.eval(this.given, {x: x});
+		points[x]=math.eval(this.given, {x});
 	}
 
 	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
