@@ -40,7 +40,7 @@ function Graph(given, bound1, bound2, axisOfRotation, quality, graphID){
 	this.graphID=graphID;
 }
 
-Graph.prototype.getY=function(x){  //jshint ignore:line
+Graph.prototype.getY=function(x){
 	return math.eval(this.given, {x: x});
 };
 
@@ -49,7 +49,15 @@ Graph.prototype.getVertex=function(){
 	for(var x=this.bound1; x<=this.bound2; x+=0.01){
 		points[x]=math.eval(this.given, {x: x});
 	}
-	return (this.getY(this.bound1+0.01) > 0 && this.getY(this.bound2-0.01) > 0 ? Math.max.apply(null, points) : Math.min.apply(null, points));
+
+	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
+	{
+		return math.max(...points);
+	}
+	else
+	{
+		return math.min(...points);
+	}
 };
 
 Graph.prototype.draw=function(){
