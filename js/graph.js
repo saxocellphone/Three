@@ -30,33 +30,42 @@ function init(){
 	render();
 }
 
-function Graph(given, bound1, bound2, axisOfRotation, quality, graphID){
-	this.given=given;
-	this.group=new THREE.Object3D();
-	this.bound1=bound1;
-	this.bound2=bound2;
-	this.axisOfRotation=axisOfRotation;
-	this.quality=quality;
-	this.graphID=graphID;
+function getPoints(equation)
+{
+	var points = [];
+	var index = 0;
+	var compiledEquation = math.compile(equation);
+	for(var x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
+	{
+		points.push(compiledEquation.eval({x}));
+		index++;
+	}
+	return points;
+}
+
+function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID){
+	this.given = given;
+	this.group = new THREE.Object3D();
+	this.bound1 = bound1;
+	this.bound2 = bound2;
+	this.axisOfRotation = axisOfRotation;
+	this.points = points;
+	this.quality = quality;
+	this.graphID = graphID;
 }
 
 Graph.prototype.getY=function(x){
-	return math.eval(this.given, {x});
+	return this.points[100 * (size + x)];  //getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
 };
 
 Graph.prototype.getVertex=function(){
-	var points=[];
-	for(var x=this.bound1; x<=this.bound2; x+=0.01){
-		points[x]=math.eval(this.given, {x});
-	}
-
 	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
 	{
-		return math.max(...points);
+		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2 + 1)));
 	}
 	else
 	{
-		return math.min(...points);
+		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2 + 1)));
 	}
 };
 
@@ -67,11 +76,7 @@ Graph.prototype.draw=function(){
 	var step=0.01;
 	var equation;
 	for(var i=-size; i<=size; i+=step){
-		if(this.given!==null){
-			equation=-math.eval(this.given, {x: i});  //Somehow the plane is upside-down: the positive y-cordinate is negative
-		}
-
-		points[counter+size]=new THREE.Vector3(x.toFixed(2), 0, equation);
+		points[counter + size]=new THREE.Vector3(x.toFixed(2), 0, -this.points[counter + size]);  //FIXME: Somehow the plane is upside-down: the positive y-cordinate is negative
 		x+=step;
 		counter++;
 	}
@@ -281,11 +286,15 @@ function submit(){
 		return;
 	}
 
-	var graph1=new Graph(function1, bound1, bound2, axisOfRotation, quality, 0);
+	var points = getPoints(function1);
+
+	var graph1=new Graph(function1, bound1, bound2, axisOfRotation, points, quality, 0);
 	graphArray[graph1.graphID]=graph1;
 	graph1.draw();
 
-	var graph2=new Graph(function2 ? function2 : 0, bound1, bound2, axisOfRotation, quality, 1);
+	points = getPoints(function2 ? function2 : 0);
+
+	var graph2=new Graph(function2 ? function2 : 0, bound1, bound2, axisOfRotation, points, quality, 1);
 	graphArray[graph2.graphID]=graph2;
 	if(function2)
 	{
