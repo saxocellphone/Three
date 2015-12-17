@@ -34,9 +34,10 @@ function getPoints(equation)
 {
 	var points = [];
 	var index = 0;
+	var compiledEquation = math.compile(equation);
 	for(var x = -size; x <= size; x += 0.01)
 	{
-		points.push(math.eval(equation, {x}));
+		points.push(compiledEquation.eval({x}));
 		index++;
 	}
 	return points;
