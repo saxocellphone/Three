@@ -35,7 +35,7 @@ function getPoints(equation)
 	var points = [];
 	var index = 0;
 	var compiledEquation = math.compile(equation);
-	for(var x = -size; x <= size; x += 0.01)
+	for(var x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
 	{
 		points.push(compiledEquation.eval({x}));
 		index++;
