@@ -255,26 +255,25 @@ function clearGraph(){
 function submit(){
 	clearGraph();
 
-	//TODO: Being lazy for now, I'll change this later. Using eval()
-	var function1=document.getElementById("function1").value.replace(/ /g, '');  //TODO: Check if this is valid
-	var function2=document.getElementById("function2").value.replace(/ /g, '');
+	var function1=document.getElementById("function1").value;
+	var function2=document.getElementById("function2").value;
 	var quality=Number(document.getElementById("quality").value);
+	var drawSolid = true;
 
 	var bound1, bound2, axisOfRotation;  //Prevents users from passing in undefined variables (eg 'x')
 	try
 	{
-		bound1=eval(document.getElementById("bound1").value.replace(/ /g, ''));
-		bound2=eval(document.getElementById("bound2").value.replace(/ /g, ''));
-		axisOfRotation=eval(document.getElementById("rotation").value.replace(/ /g, ''));
+		bound1 = math.eval(document.getElementById("bound1").value);
+		bound2 = math.eval(document.getElementById("bound2").value);
+		axisOfRotation = math.eval(document.getElementById("rotation").value);
 	}
 	catch(error)
 	{
-		const type=(isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
+		const type = (isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
 		sweetAlert("Invalid " + type, "Please enter a valid number for the " + type, "warning");
-		return;
+		drawSolid = false;
 	}
 
-	var drawSolid = true;
 	if(bound1===undefined && bound2===undefined && axisOfRotation===undefined)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
 		drawSolid = false;
