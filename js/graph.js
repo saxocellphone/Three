@@ -274,16 +274,26 @@ function submit(){
 		return;
 	}
 
-	var drawSolid=true;
+	var drawSolid = true;
 	if(bound1===undefined && bound2===undefined && axisOfRotation===undefined)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
-		drawSolid=false;
+		drawSolid = false;
 	}
 	else if(bound1===undefined || bound2===undefined || axisOfRotation===undefined)
 	{
 		const type=(bound1===undefined ? "first bound" : bound2===undefined ? "second bound" : "axis of rotation");
 		sweetAlert("Missing " + type, "Please specify the " + type, "warning");
-		return;
+		drawSolid = false;
+	}
+	else if(bound1 > size || bound1 < -size || bound2 > size || bound2 < -size)
+	{
+		sweetAlert("Invalid bounds", "Please make sure all bounds are within " + -size + " to " + size + ", inclusive", "warning");
+		drawSolid = false;
+	}
+	else if(axisOfRotation > size || axisOfRotation < -size)
+	{
+		sweetAlert("Invalid axis of rotation", "Please make sure the axis of rotation is within " + -size + " to " + size + ", inclusive", "warning");
+		drawSolid = false;
 	}
 
 	var points = getPoints(function1);
