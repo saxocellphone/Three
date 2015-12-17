@@ -55,7 +55,7 @@ function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID){
 }
 
 Graph.prototype.getY=function(x){
-	return this.points[100 * (size + x)];  //getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
+	return this.points[Math.round(100 * (size + x))];  //getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
 };
 
 Graph.prototype.getVertex=function(){
