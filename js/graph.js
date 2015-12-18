@@ -297,13 +297,14 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 
 function clearGraph()
 {
-	for(var i = 0; i <= scene.children.length; i++)
+	for(var i = 0; i < scene.children.length; i++)
 	{
 		if(scene.children[i] !== undefined)
 		{
 			if(scene.children[i].name === "graph" || scene.children[i].name === "solid")
 			{
 				scene.remove(scene.children[i]);
+				i--;
 			}
 		}
 	}
