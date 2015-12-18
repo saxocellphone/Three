@@ -93,7 +93,7 @@ Graph.prototype.draw = function()
 	var splinePoints = spline.getPoints(vector.length - 1);
 	for(i = 0; i < splinePoints.length; i++)
 	{
-		if(Math.abs(spline.points[i]).z <= size)
+		if(Math.abs(spline.points[i].z) <= size)
 		{
 			geometry.vertices.push(spline.points[i]);
 		}
