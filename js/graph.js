@@ -35,14 +35,25 @@ function init()
 function getPoints(equation)
 {
 	var points = [];
-	var index = 0;
 	var compiledEquation = math.compile(equation);
 	for(var x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
 	{
 		points.push(compiledEquation.eval({x}));
-		index++;
 	}
 	return points;
+}
+
+function getIntersections(points1, points2, bound1, bound2)
+{
+	var intersections = [];
+	for(var x = Math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)  //Add 1 to the ending size because of the origin
+	{
+		if(points1[x] - points2[x] < 0.001 && points1[x] - points2[x] > - 0.001)
+		{
+			intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+		}
+	}
+	return intersections;
 }
 
 function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID)
@@ -131,6 +142,17 @@ Graph.prototype.drawShape = function()
 		temp = boundY2;
 		boundY2 = boundY1;
 		boundY1 = temp;
+	}
+
+	var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	for(var i = 0; i < intersections.length; i++)
+	{
+		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
+		{
+			sweetAlert("Invalid bounds", "An intersection point was detected at " + intersections[i] + " which cannot be between the bounds", "warning");
+			clearGraph();
+			return;
+		}
 	}
 
 	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
