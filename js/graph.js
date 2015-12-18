@@ -24,7 +24,7 @@ function init()
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
-	controls.addEventListener('change', render);
+	controls.addEventListener("change", render);
 
 	addAxis();
 	addLights();
@@ -80,7 +80,6 @@ Graph.prototype.draw = function()
 	var vector = [];
 	var counter = x;  //I'll change this later, just using a counter variable for now
 	var step = 0.01;
-	var equation;
 	var i;
 	for(i = -size; i <= size; i += step)
 	{
@@ -94,7 +93,7 @@ Graph.prototype.draw = function()
 	var splinePoints = spline.getPoints(vector.length - 1);
 	for(i = 0; i < splinePoints.length; i++)
 	{
-		if(Math.abs((spline.points[i]).z) <= size)
+		if(Math.abs(spline.points[i]).z <= size)
 		{
 			geometry.vertices.push(spline.points[i]);
 		}
@@ -252,8 +251,8 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 		{
 			if(!eval(smallGeoR1) || !eval(smallGeoR2))  //Hacky bugfix woo
 			{
-				smallGeoR1 = smallGeoR1 + "+0.01";
-				smallGeoR2 = smallGeoR2 + "+0.01";
+				smallGeoR1 += "+0.01";
+				smallGeoR2 += "+0.01";
 			}
 
 			if(i + step > this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
@@ -302,7 +301,7 @@ function clearGraph()
 	{
 		if(scene.children[i] !== undefined)
 		{
-			if(scene.children[i].name == "graph" || scene.children[i].name == "solid")
+			if(scene.children[i].name === "graph" || scene.children[i].name === "solid")
 			{
 				scene.remove(scene.children[i]);
 			}
@@ -311,7 +310,7 @@ function clearGraph()
 	render();
 }
 
-function submit()
+function submit() // eslint-disable-line
 {
 	clearGraph();
 
@@ -329,7 +328,7 @@ function submit()
 	}
 	catch(error)
 	{
-		const type = (isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation");
+		const type = isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation";
 		sweetAlert("Invalid " + type, "Please enter a valid number for the " + type, "warning");
 		drawSolid = false;
 	}
@@ -340,7 +339,7 @@ function submit()
 	}
 	else if(bound1 === undefined || bound2 === undefined || axisOfRotation === undefined)
 	{
-		const type = (bound1 === undefined ? "first bound" : bound2 === undefined ? "second bound" : "axis of rotation");
+		const type = bound1 === undefined ? "first bound" : bound2 === undefined ? "second bound" : "axis of rotation";
 		sweetAlert("Missing " + type, "Please specify the " + type, "warning");
 		drawSolid = false;
 	}
