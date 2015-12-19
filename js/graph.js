@@ -66,11 +66,11 @@ Graph.prototype.getVertex = function()
 {
 	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
 	{
-		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2 + 1)));
+		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
 	}
 	else
 	{
-		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2 + 1)));
+		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
 	}
 };
 
