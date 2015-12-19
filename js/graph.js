@@ -48,7 +48,7 @@ function getIntersections(points1, points2, bound1, bound2)
 	var intersections = [];
 	for(var x = Math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)  //Add 1 to the ending size because of the origin
 	{
-		if(points1[x] - points2[x] < 0.001 && points1[x] - points2[x] > - 0.001)
+		if(points1[x] - points2[x] < 0.002 && points1[x] - points2[x] > - 0.002)  //Close enough(tm)
 		{
 			intersections.push(x / 100 - size);  //Convert back into actual x coordinates
 		}
@@ -149,7 +149,7 @@ Graph.prototype.drawShape = function()
 	{
 		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
 		{
-			sweetAlert("Invalid bounds", "An intersection point was detected at " + intersections[i] + " which cannot be between the bounds", "warning");
+			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
 			clearGraph();
 			return;
 		}
