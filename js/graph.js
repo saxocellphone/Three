@@ -46,11 +46,30 @@ function getPoints(equation)
 function getIntersections(points1, points2, bound1, bound2)
 {
 	var intersections = [];
-	for(var x = Math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)  //Add 1 to the ending size because of the origin
+	var larger;
+
+	for(var x = math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)
 	{
-		if(points1[x] - points2[x] < 0.002 && points1[x] - points2[x] > - 0.002)  //Close enough(tm)
+		if(points1[x] > points2[x])
+		{
+			if(larger === false)
+			{
+				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			}
+			larger = true;
+		}
+		else if(points1[x] < points2[x])
+		{
+			if(larger === true)
+			{
+				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			}
+			larger = false;
+		}
+		else  //Obviously intersecting when the two functions are equal
 		{
 			intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			larger = undefined;
 		}
 	}
 	return intersections;
