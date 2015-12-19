@@ -1,0 +1,14 @@
+language: ruby
+sudo: false
+dist: trusty
+
+install: gem install html-proofer
+
+script: htmlproof --check-html --check-favicon
+
+branches:
+  only:
+    - master
+
+notifications:
+    email: false
