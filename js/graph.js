@@ -244,15 +244,24 @@ Graph.prototype.drawShape = function()
 
 Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 {
+	var smallGeoR1Equation = math.compile(smallGeoR1);
+	var smallGeoR2Equation = math.compile(smallGeoR2);
+	var bigGeoR1Equation = math.compile(bigGeoR1);
+	var bigGeoR2Equation = math.compile(bigGeoR2);
 	var step = this.quality;
 	for(var i = this.bound1; i < this.bound2; i += step)
 	{
 		if(this.getY(i) <= size)
 		{
-			if(!math.eval(smallGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}) || !math.eval(smallGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}))  //Hacky bugfix woo
+			//Hacky bugfix woo
+			if(!smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)})
+			|| !smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}))
 			{
 				smallGeoR1 += "+0.01";
 				smallGeoR2 += "+0.01";
+
+				smallGeoR1Equation = math.compile(smallGeoR1 += "+ 0.01");
+				smallGeoR2Equation = math.compile(smallGeoR2 += "+ 0.01");
 			}
 
 			if(i + step > this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
@@ -260,9 +269,13 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 				step = this.bound2 - i;
 			}
 
-			var smallCylinderGeom = new THREE.CylinderGeometry(math.eval(smallGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), math.eval(smallGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), step, 50);
+			var smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
+			                                                   smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
+														       step, 50);
 			smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
-			var largeCylinderGeom = new THREE.CylinderGeometry(math.eval(bigGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), math.eval(bigGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), step, 360);
+			var largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
+			                                                   bigGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
+															   step, 360);
 			largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
@@ -276,6 +289,8 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 
 Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 {
+	var leftRadiusEquation = math.compile(leftRadius);
+	var rightRadiusEquation = math.compile(rightRadius);
 	var step = this.quality;
 	for(var i = this.bound1; i < this.bound2; i += step)
 	{
@@ -286,7 +301,9 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 				step = this.bound2 - i;
 			}
 
-			var geometry = new THREE.CylinderGeometry(math.eval(leftRadius, {y1: this.getY(i), y1step: this.getY(i + step)}), math.eval(rightRadius, {y1: this.getY(i), y1step: this.getY(i + step)}), step, 100);
+			var geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
+			                                          rightRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
+													  step, 100);
 			geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			plane.rotation.set(0, 0, Math.PI / 2);
