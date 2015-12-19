@@ -16,35 +16,30 @@
 	</head>
 
 	<body>
-		<a>Rotate y=</a>
-		<input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
-		<a> and y=</a>
-		<input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
-		<a> bounded by x=</a>
-		<input id="bound1" class="boundInput" type="text" placeholder="bound 1" name="bounds">
-		<a> and x=</a>
-		<input id="bound2" class="boundInput" type="text" placeholder="bound 2" name="bounds">
-		<a> around y=</a>
-		<input id="rotation" class="rotationInput" type="text" placeholder="axis of rotation" name="rotation">
-		<button type="button" onclick="submit()">Rotate!</button>
-		<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
+		<p>
+			Rotate y=<input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
+			and y=<input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
+			bounded by x=<input id="bound1" class="boundInput" type="text" placeholder="bound 1" name="bounds">
+			and x=<input id="bound2" class="boundInput" type="text" placeholder="bound 2" name="bounds">
+			around y=<input id="rotation" class="rotationInput" type="text" placeholder="axis of rotation" name="rotation">
+			<button type="button" onclick="submit()">Rotate!</button>
+			<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
 
-		<br>
-		<select id="quality" onchange="submit()">
-			<option value="0.5">Select Quality
-			<option value="1">Low
-			<option value="0.5">Medium
-			<option value="0.25">High
-			<option value="0.1">Ultra
-		</select>
-		<br>
-		<a>This calculator is a <a href="https://github.com/saxocellphone/Three" target="_blank"><b>work in progress</b></a> and things may not work as expected!  In addition, take notice that this calculator is currently very memory intensive.</a>
+			<select id="quality" onchange="submit()">
+				<option value="0.5">Select Quality
+				<option value="1">Low
+				<option value="0.5">Medium
+				<option value="0.25">High
+				<option value="0.1">Ultra
+			</select>
+		</p>
+
+		<p>This calculator is a <a href="https://github.com/saxocellphone/Three" target="_blank"><b>work in progress</b></a> and things may not work as expected!</p>
 
 		<noscript>
 			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">
-				<a>Your browser seems to have <a href="http://en.wikipedia.org/wiki/JavaScript">Javascript</a> turned off.</a>
-				<br>
-				<a>Find out how to enable it <a href="http://www.enable-javascript.com/" target="_blank">here</a>.</a>
+				<p>Your browser seems to have <a href="http://en.wikipedia.org/wiki/JavaScript">Javascript</a> turned off.</p>
+				<p>Find out how to enable it <a href="http://www.enable-javascript.com/" target="_blank">here</a>.</p>
 			</div>
 		</noscript>
 
