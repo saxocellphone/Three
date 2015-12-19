@@ -150,12 +150,12 @@ Graph.prototype.drawShape = function()
 					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
 					{
 						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
+						this.addBSP("axis - y2", "axis - y2step", "axis - y1", "axis - y1step");
 					}
 					else
 					{
 						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
+						this.addBSP("axis - y1", "axis - y1step", "axis - y2", "axis - y2step");
 					}
 				}
 				else
@@ -164,12 +164,12 @@ Graph.prototype.drawShape = function()
 					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
 					{
 						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("this.axisOfRotation+Math.abs(graphArray[1].getY(i))", "this.axisOfRotation+Math.abs(graphArray[1].getY(i+step))", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
+						this.addBSP("axis + abs(y2)", "axis + abs(y2step)", "axis - y1", "axis - y1step");
 					}
 					else
 					{
 						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
+						this.addBSP("axis - y1", "axis - y1step", "axis - y2", "axis - y2step");
 					}
 				}
 			}
@@ -182,12 +182,12 @@ Graph.prototype.drawShape = function()
 					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
 					{
 						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)");
+						this.addBSP("abs(axis) + y1", "abs(axis) + y1step", "abs(axis) + y2", "abs(axis) + y2step");
 					}
 					else
 					{
 						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
+						this.addBSP("abs(axis) + y2", "abs(axis) + y2step", "abs(axis) + y1", "abs(axis) + y1step");
 					}
 				}
 				else
@@ -196,12 +196,12 @@ Graph.prototype.drawShape = function()
 					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
 					{
 						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
+						this.addBSP("abs(axis - y1)", "abs(axis - y1step)", "abs(axis - y2)", "abs(axis - y2step)");
 					}
 					else
 					{
 						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
+						this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
 					}
 				}
 			}
@@ -219,24 +219,24 @@ Graph.prototype.drawShape = function()
 			if(this.axisOfRotation > boundY1)
 			{
 				console.log("\t\t\tAxis of rotation is greater than boundY1");
-				this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)");
+				this.addBSP("abs(axis - y1)", "abs(axis - y1step)", "abs(axis)", "abs(axis)");
 			}
 			else if(this.axisOfRotation < boundY1)
 			{
 				console.log("\t\t\tAxis of rotation is less than boundY1");
-				this.addBSP("Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
+				this.addBSP("abs(axis)", "abs(axis)", "abs(axis) + y1", "abs(axis) + y1step");
 			}
 			else if(this.axisOfRotation === boundY1)
 			{
 				console.log("\t\t\tAxis of rotation is equal to boundY1");
-				this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+				this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 			}
 		}
 	}
 	else
 	{
 		console.log("Axis of rotation is 0");
-		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+		this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 	}
 	scene.add(this.group);
 	render();
@@ -249,7 +249,7 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 	{
 		if(this.getY(i) <= size)
 		{
-			if(!eval(smallGeoR1) || !eval(smallGeoR2))  //Hacky bugfix woo
+			if(!math.eval(smallGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}) || !math.eval(smallGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}))  //Hacky bugfix woo
 			{
 				smallGeoR1 += "+0.01";
 				smallGeoR2 += "+0.01";
@@ -260,9 +260,9 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 				step = this.bound2 - i;
 			}
 
-			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
+			var smallCylinderGeom = new THREE.CylinderGeometry(math.eval(smallGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), math.eval(smallGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), step, 50);
 			smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
-			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
+			var largeCylinderGeom = new THREE.CylinderGeometry(math.eval(bigGeoR1, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), math.eval(bigGeoR2, {axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}), step, 360);
 			largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
@@ -286,7 +286,7 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 				step = this.bound2 - i;
 			}
 
-			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
+			var geometry = new THREE.CylinderGeometry(math.eval(leftRadius, {y1: this.getY(i), y1step: this.getY(i + step)}), math.eval(rightRadius, {y1: this.getY(i), y1step: this.getY(i + step)}), step, 100);
 			geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			plane.rotation.set(0, 0, Math.PI / 2);
