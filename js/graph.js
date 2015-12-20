@@ -461,3 +461,11 @@ function addAxis()
 	scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color: "green"}), THREE.LinePieces));
 	scene.add(new THREE.Line(axes, new THREE.LineBasicMaterial({color: "red"}), THREE.LinePieces));
 }
+
+window.onresize = function()
+{
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	render();
+};
