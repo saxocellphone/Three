@@ -18,15 +18,16 @@ function init()
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop) + parseInt(window.getComputedStyle(formID).marginBottom);
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
 	var totalHeight = formHeight + wipHeight;
+	var totalWidth = 2 * parseInt(window.getComputedStyle(document.getElementsByTagName("body")[0]).margin);
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.y = 75;
 	camera.position.z = 5;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -475,9 +476,10 @@ window.onresize = function()
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop) + parseInt(window.getComputedStyle(formID).marginBottom);
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
 	var totalHeight = formHeight + wipHeight;
+	var totalWidth = 2 * parseInt(window.getComputedStyle(document.getElementsByTagName("body")[0]).margin);
 
-	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
+	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
 	render();
 };
