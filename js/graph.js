@@ -13,14 +13,20 @@ function init()
 		return;
 	}
 
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop) + parseInt(window.getComputedStyle(formID).marginBottom);
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var totalHeight = formHeight + wipHeight;
+
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.y = 75;
 	camera.position.z = 5;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -464,8 +470,14 @@ function addAxis()
 
 window.onresize = function()
 {
-	camera.aspect = window.innerWidth / window.innerHeight;
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop) + parseInt(window.getComputedStyle(formID).marginBottom);
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var totalHeight = formHeight + wipHeight;
+
+	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	render();
 };
