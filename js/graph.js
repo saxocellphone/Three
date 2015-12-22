@@ -15,10 +15,12 @@ function init()
 
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop) + parseInt(window.getComputedStyle(formID).marginBottom);
+	var body = document.getElementsByTagName("body")[0];
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var totalHeight = formHeight + wipHeight;
-	var totalWidth = 2 * parseInt(window.getComputedStyle(document.getElementsByTagName("body")[0]).margin);
+	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
+	var totalHeight = formHeight + wipHeight + bodyMargin;
+	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
 
 	scene = new THREE.Scene();
 
