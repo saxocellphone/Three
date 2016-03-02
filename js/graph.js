@@ -445,16 +445,16 @@ function addAxis()
 		if(i)
 		{
 			lines.vertices.push(new THREE.Vector3(-size, 0, i),
-								new THREE.Vector3(size, 0, i),
-								new THREE.Vector3(i, 0, -size),
-								new THREE.Vector3(i, 0, size));
+			                    new THREE.Vector3(size, 0, i),
+			                    new THREE.Vector3(i, 0, -size),
+			                    new THREE.Vector3(i, 0, size));
 		}
 		else
 		{
 			axes.vertices.push(new THREE.Vector3(-size, 0, i),
-							   new THREE.Vector3(size, 0, i),
-							   new THREE.Vector3(i, 0, -size),
-							   new THREE.Vector3(i, 0, size));
+			                   new THREE.Vector3(size, 0, i),
+			                   new THREE.Vector3(i, 0, -size),
+			                   new THREE.Vector3(i, 0, size));
 		}
 	}
 
