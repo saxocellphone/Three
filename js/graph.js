@@ -438,16 +438,16 @@ function addLights()
 
 function addAxis()
 {
-	var geometry = new THREE.Geometry();
+	var lines = new THREE.Geometry();
 	var axes = new THREE.Geometry();
 	for(var i = -size; i <= size; i++)
 	{
 		if(i)
 		{
-			geometry.vertices.push(new THREE.Vector3(-size, 0, i),
-								   new THREE.Vector3(size, 0, i),
-								   new THREE.Vector3(i, 0, -size),
-								   new THREE.Vector3(i, 0, size));
+			lines.vertices.push(new THREE.Vector3(-size, 0, i),
+								new THREE.Vector3(size, 0, i),
+								new THREE.Vector3(i, 0, -size),
+								new THREE.Vector3(i, 0, size));
 		}
 		else
 		{
@@ -458,6 +458,6 @@ function addAxis()
 		}
 	}
 
-	scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color: "green"}), THREE.LinePieces));
-	scene.add(new THREE.Line(axes, new THREE.LineBasicMaterial({color: "red"}), THREE.LinePieces));
+	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
+	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
