@@ -444,17 +444,17 @@ function addAxis()
 	{
 		if(i)
 		{
-			geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
+			geometry.vertices.push(new THREE.Vector3(-size, 0, i),
+								   new THREE.Vector3(size, 0, i),
+								   new THREE.Vector3(i, 0, -size),
+								   new THREE.Vector3(i, 0, size));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, size));
+			axes.vertices.push(new THREE.Vector3(-size, 0, i),
+							   new THREE.Vector3(size, 0, i),
+							   new THREE.Vector3(i, 0, -size),
+							   new THREE.Vector3(i, 0, size));
 		}
 	}
 
