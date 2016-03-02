@@ -8,7 +8,7 @@ script: htmlproof --check-html --check-favicon
 
 branches:
   only:
-    - master
+    - gh-pages
 
 notifications:
     email: false
