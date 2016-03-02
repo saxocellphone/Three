@@ -1,10 +1,13 @@
-language: ruby
-sudo: false
+sudo: true
 dist: trusty
 
-install: gem install html-proofer
+install:
+    - gem install html-proofer
+    - npm install -g eslint
 
-script: htmlproof --check-html --check-favicon
+script:
+    - htmlproof --check-html --check-favicon
+    - eslint js/**
 
 branches:
   only:
