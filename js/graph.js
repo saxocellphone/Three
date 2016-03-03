@@ -72,7 +72,7 @@ function getIntersections(points1, points2, bound1, bound2)
 			larger = undefined;
 		}
 	}
-	return intersections;
+	return [intersections, larger];
 }
 
 function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID)
@@ -140,10 +140,6 @@ Graph.prototype.drawShape = function()
 	this.group.name = "solid";
 	var boundY1 = this.getY(this.bound1);
 	var boundY2 = this.getY(this.bound2);
-	var graph1ComparingPoint1 = graphArray[0].getY(this.bound1 + 0.5);  //FIXME: Don't assume that there's always two functions
-	var graph2ComparingPoint1 = graphArray[1].getY(this.bound1 + 0.5);
-	var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
-	var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
 
 	if(this.bound1 === this.bound2)
 	{
@@ -163,15 +159,12 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
-	var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
-	for(var i = 0; i < intersections.length; i++)
+	var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	if(intersections[0] !== undefined)
 	{
-		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
-		{
-			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
-			clearGraph();
-			return;
-		}
+		sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
+		clearGraph();
+		return;
 	}
 
 	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
@@ -188,29 +181,29 @@ Graph.prototype.drawShape = function()
 				if(boundY1 >= 0 && boundY2 >= 0)
 				{
 					console.log("\t\t\tBoth boundY1 and boundY2 are greater than or equal to 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
+					if(larger)
 					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
+						console.log("\t\t\t\tGraph2 is lower than graph1");
+						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
 					}
 					else
 					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
+						console.log("\t\t\t\tGraph2 is higher than graph1");
+						this.addBSP("this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
 					}
 				}
 				else
 				{
 					console.log("\t\t\tOne of the bounds is less than 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
+					if(larger)
 					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("this.axisOfRotation+Math.abs(graphArray[1].getY(i))", "this.axisOfRotation+Math.abs(graphArray[1].getY(i+step))", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
+						console.log("\t\t\t\tGraph2 is lower than graph1");
+						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
 					}
 					else
 					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
+						console.log("\t\t\t\tGraph2 is higher than graph1");
+						this.addBSP("this.axisOfRotation+Math.abs(graphArray[1].getY(i))", "this.axisOfRotation+Math.abs(graphArray[1].getY(i+step))", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
 					}
 				}
 			}
@@ -220,29 +213,30 @@ Graph.prototype.drawShape = function()
 				if(boundY1 >= 0 && boundY2 >= 0)
 				{
 					console.log("\t\t\tBoth boundY1 and boundY2 are greater than or equal to 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
+					if(larger)
 					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)");
+						console.log("\t\t\t\tGraph2 is lower than graph1");
+						this.addBSP("Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
 					}
 					else
 					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
+						console.log("\t\t\t\tGraph2 is higher than graph1");
+						this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)");
+						
 					}
 				}
 				else
 				{
 					console.log("\t\t\tOne of the bounds is less than 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
+					if(larger)
 					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
+						console.log("\t\t\t\tGraph2 is lower than graph1");
+						this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
 					}
 					else
 					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
+						console.log("\t\t\t\tGraph2 is higher than graph1");
+						this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
 					}
 				}
 			}
@@ -438,26 +432,26 @@ function addLights()
 
 function addAxis()
 {
-	var lines = new THREE.Geometry();
+	var geometry = new THREE.Geometry();
 	var axes = new THREE.Geometry();
 	for(var i = -size; i <= size; i++)
 	{
 		if(i)
 		{
-			lines.vertices.push(new THREE.Vector3(-size, 0, i),
-			                    new THREE.Vector3(size, 0, i),
-			                    new THREE.Vector3(i, 0, -size),
-			                    new THREE.Vector3(i, 0, size));
+			geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
+			geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
+			geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
+			geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, 0, i),
-			                   new THREE.Vector3(size, 0, i),
-			                   new THREE.Vector3(i, 0, -size),
-			                   new THREE.Vector3(i, 0, size));
+			axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
+			axes.vertices.push(new THREE.Vector3(size, -0.04, i));
+			axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
+			axes.vertices.push(new THREE.Vector3(i, -0.04, size));
 		}
 	}
 
-	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
-	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
+	scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color: "green"}), THREE.LinePieces));
+	scene.add(new THREE.Line(axes, new THREE.LineBasicMaterial({color: "red"}), THREE.LinePieces));
 }
