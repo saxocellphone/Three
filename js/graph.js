@@ -57,7 +57,7 @@ function getIntersections(points1, points2, bound1, bound2)
 	var intersections = [];
 	var larger;
 
-	for(var x = math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)
+	for(var x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
 	{
 		if(points1[x] > points2[x])
 		{
