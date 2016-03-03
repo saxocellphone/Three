@@ -159,7 +159,10 @@ Graph.prototype.drawShape = function()
 
 	if(this.bound1 > this.bound2)  //Switch the bounds around so that the for loop works
 	{
-		var temp = this.bound2;  //TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//[bound1, bound2] = [bound2, bound1];
+		//[boundY1, boundY2] = [boundY2, boundY1];
+		var temp = this.bound2;
 		this.bound2 = this.bound1;
 		this.bound1 = temp;
 
@@ -168,7 +171,12 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
-	var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+	// var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	var result = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	var intersections = result[0];
+	var larger = result[1];
+
 	if(intersections[0] !== undefined)
 	{
 		sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
