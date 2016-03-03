@@ -13,14 +13,23 @@ function init()
 		return;
 	}
 
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var body = document.getElementsByTagName("body")[0];
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
+	var totalHeight = formHeight + wipHeight + bodyMargin;
+	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.y = 75;
 	camera.position.z = 5;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -455,26 +464,43 @@ function addLights()
 
 function addAxis()
 {
-	var geometry = new THREE.Geometry();
+	var lines = new THREE.Geometry();
 	var axes = new THREE.Geometry();
 	for(var i = -size; i <= size; i++)
 	{
 		if(i)
 		{
-			geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
+			lines.vertices.push(new THREE.Vector3(-size, 0, i),
+			                    new THREE.Vector3(size, 0, i),
+			                    new THREE.Vector3(i, 0, -size),
+			                    new THREE.Vector3(i, 0, size));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, size));
+			axes.vertices.push(new THREE.Vector3(-size, 0, i),
+			                   new THREE.Vector3(size, 0, i),
+			                   new THREE.Vector3(i, 0, -size),
+			                   new THREE.Vector3(i, 0, size));
 		}
 	}
 
-	scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color: "green"}), THREE.LinePieces));
-	scene.add(new THREE.Line(axes, new THREE.LineBasicMaterial({color: "red"}), THREE.LinePieces));
+	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
+	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
+
+window.onresize = function()
+{
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var body = document.getElementsByTagName("body")[0];
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
+	var totalHeight = formHeight + wipHeight + bodyMargin;
+	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+
+	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	render();
+};
