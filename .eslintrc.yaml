@@ -22,19 +22,19 @@ rules:
     eqeqeq:
         - 1
         - smart
-    keyword-spacing: 
+    keyword-spacing:
         - 2
-        - 
+        -
             after: false
-            overrides: 
-                case: 
+            overrides:
+                case:
                     after: true
-                return: 
+                return:
                     after: true
-                throw: 
+                throw:
                     after: true
     no-caller: 2
-    no-confusing-arrow: 1
+    no-confusing-arrow: 2
     no-constant-condition: 1
     no-eq-null: 1
     no-extend-native: 2
@@ -47,6 +47,9 @@ rules:
     no-labels: 1
     no-lone-blocks: 2
     no-loop-func: 1
+    no-mixed-spaces-and-tabs:
+        - 2
+        - smart-tabs
     no-multi-spaces: 2
     no-multi-str: 1
     no-native-reassign: 2
