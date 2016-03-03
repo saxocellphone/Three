@@ -231,7 +231,6 @@ Graph.prototype.drawShape = function()
 					{
 						console.log("\t\t\t\tGraph2 is higher than graph1");
 						this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)");
-						
 					}
 				}
 				else
