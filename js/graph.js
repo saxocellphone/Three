@@ -351,7 +351,7 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			var geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          rightRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          step, 100);
-			geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			geometry.translate(0, -(i + step / 2), -this.axisOfRotation);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			plane.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(plane);
