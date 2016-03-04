@@ -307,9 +307,6 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			if(!smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)})
 			|| !smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}))
 			{
-				smallGeoR1 += "+0.01";
-				smallGeoR2 += "+0.01";
-
 				smallGeoR1Equation = math.compile(smallGeoR1 += "+ 0.01");
 				smallGeoR2Equation = math.compile(smallGeoR2 += "+ 0.01");
 			}
@@ -322,11 +319,11 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			var smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 50);
-			smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			smallCylinderGeom.translate(0, -(i + step / 2), -this.axisOfRotation);
 			var largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   bigGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 360);
-			largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			largeCylinderGeom.translate(0, -(i + step / 2), -this.axisOfRotation);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
