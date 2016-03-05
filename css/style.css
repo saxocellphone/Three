@@ -4,6 +4,11 @@ body
 	overflow: hidden;
 }
 
+a:hover, a:focus
+{
+	text-decoration: none;
+}
+
 hr
 {
 	margin-top: 0;
