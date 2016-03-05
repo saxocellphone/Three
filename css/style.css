@@ -4,6 +4,12 @@ body
 	overflow: hidden;
 }
 
+hr
+{
+	margin-top: 0;
+	margin-bottom: 15px;
+}
+
 #modal
 {
 	position: fixed;
@@ -27,6 +33,11 @@ body
 	padding: 15px;
 	border-radius: 10px;
 	background-color: white;
+}
+
+.tip
+{
+	padding-top: 10px;
 }
 
 .control-label
