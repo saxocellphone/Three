@@ -13,23 +13,16 @@ function init()
 		return;
 	}
 
-	var formID = document.getElementById("form");
-	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
-	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	window.addEventListener("keyup", onKeyUp, false);
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.y = 75;
 	camera.position.z = 5;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -158,6 +151,7 @@ Graph.prototype.drawShape = function()
 	{
 		sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
 		clearGraph();
+		toggleModal();
 		return;
 	}
 
@@ -179,6 +173,7 @@ Graph.prototype.drawShape = function()
 		{
 			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
 			clearGraph();
+			toggleModal();
 			return;
 		}
 	}
@@ -259,6 +254,7 @@ Graph.prototype.drawShape = function()
 			{
 				sweetAlert("Oh noes!", "Axis of rotation cannot be between the bounds", "warning");
 				clearGraph();
+				toggleModal();
 				return;
 			}
 		}
@@ -405,6 +401,8 @@ function submit() // eslint-disable-line
 		drawSolid = false;
 	}
 
+	toggleModal();
+
 	var points = getPoints(function1);
 
 	var graph1 = new Graph(function1, bound1, bound2, axisOfRotation, points, quality, 0);
@@ -471,19 +469,30 @@ function addAxis()
 	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
 
+function toggleModal()
+{
+	if(document.getElementById("modal").style.display === "none")
+	{
+		document.getElementById("modal").style.display = "block";
+	}
+	else
+	{
+		document.getElementById("modal").style.display = "none";
+	}
+}
+
+function onKeyUp(event)
+{
+	if(event.keyCode === 27)  //Escape
+	{
+		toggleModal();
+	}
+}
+
 window.onresize = function()
 {
-	var formID = document.getElementById("form");
-	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
-	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
-
-	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 	render();
 };

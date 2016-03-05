@@ -1,20 +1,39 @@
 body
 {
-	font-family: 'Helvetica Neue', 'Helvetica', 'Ubuntu', 'Verdana', 'Arial', 'Roboto', 'Open Sans', sans-serif;
-	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
 }
 
-.functionInput
+#modal
 {
-	width: 67px;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 10;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
-.boundInput
+#menu
 {
-	width: 55px;
+	width: 550px;
+	position: relative;
+	margin: 10% auto;
+	padding: 5px 15px;
+	border-radius: 10px;
+	background-color: white;
 }
 
-.rotationInput
+.control-label
 {
-	width: 100px;
+	padding-right: 3px;
+}
+
+.col-sm-9
+{
+	padding-left: 0px;
 }
