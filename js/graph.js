@@ -489,6 +489,17 @@ function onKeyUp(event)
 	}
 }
 
+function reset()  //eslint-disable-line
+{
+	controls.reset();
+	document.getElementById("function1").value = "";
+	document.getElementById("function2").value = "";
+	document.getElementById("bound1").value = "";
+	document.getElementById("bound2").value = "";
+	document.getElementById("rotation").value = "";
+	document.getElementById("quality").value = "0.5";
+}
+
 window.onresize = function()
 {
 	camera.aspect = window.innerWidth / window.innerHeight;
