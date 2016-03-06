@@ -310,14 +310,13 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			}
 
 			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation);
+			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation);
+			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
 			var hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			hollowCylinder.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(hollowCylinder);
 		}
 	}
@@ -336,9 +335,8 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			}
 
 			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-			geometry.translate(0, -(i + step / 2), this.axisOfRotation);
+			geometry.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			plane.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(plane);
 		}
 	}
