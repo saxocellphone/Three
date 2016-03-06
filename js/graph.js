@@ -15,20 +15,17 @@ function init()
 
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.z = 75;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -472,15 +469,12 @@ window.onresize = function()
 {
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
-	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	render();
 };
