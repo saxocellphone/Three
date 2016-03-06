@@ -1,16 +1,20 @@
-.functionInput{
+body
+{
+	font-family: 'Helvetica Neue', 'Helvetica', 'Ubuntu', 'Verdana', 'Arial', 'Roboto', 'Open Sans', sans-serif;
+	font-size: 14px;
+}
+
+.functionInput
+{
 	width: 67px;
 }
 
-.boundInput{
+.boundInput
+{
 	width: 55px;
 }
 
-.rotationInput{
-	width: 105px;
-}
-
-body{
-	font-family: 'Ubuntu', 'Verdana', 'Arial', 'Roboto', 'Open Sans', sans-serif;
-	font-size: 14px;
+.rotationInput
+{
+	width: 100px;
 }

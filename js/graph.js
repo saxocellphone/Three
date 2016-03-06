@@ -13,14 +13,23 @@ function init()
 		return;
 	}
 
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var body = document.getElementsByTagName("body")[0];
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
+	var totalHeight = formHeight + wipHeight + bodyMargin;
+	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.y = 75;
 	camera.position.z = 5;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -35,14 +44,44 @@ function init()
 function getPoints(equation)
 {
 	var points = [];
-	var index = 0;
 	var compiledEquation = math.compile(equation);
 	for(var x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
 	{
 		points.push(compiledEquation.eval({x}));
-		index++;
 	}
 	return points;
+}
+
+function getIntersections(points1, points2, bound1, bound2)
+{
+	var intersections = [];
+	var larger;
+
+	for(var x = math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)
+	{
+		if(points1[x] > points2[x])
+		{
+			if(larger === false)
+			{
+				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			}
+			larger = true;
+		}
+		else if(points1[x] < points2[x])
+		{
+			if(larger === true)
+			{
+				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			}
+			larger = false;
+		}
+		else  //Obviously intersecting when the two functions are equal
+		{
+			intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+			larger = undefined;
+		}
+	}
+	return intersections;
 }
 
 function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID)
@@ -131,6 +170,17 @@ Graph.prototype.drawShape = function()
 		temp = boundY2;
 		boundY2 = boundY1;
 		boundY1 = temp;
+	}
+
+	var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	for(var i = 0; i < intersections.length; i++)
+	{
+		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
+		{
+			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
+			clearGraph();
+			return;
+		}
 	}
 
 	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
@@ -397,26 +447,43 @@ function addLights()
 
 function addAxis()
 {
-	var geometry = new THREE.Geometry();
+	var lines = new THREE.Geometry();
 	var axes = new THREE.Geometry();
 	for(var i = -size; i <= size; i++)
 	{
 		if(i)
 		{
-			geometry.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(size, -0.04, i));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			geometry.vertices.push(new THREE.Vector3(i, -0.04, size));
+			lines.vertices.push(new THREE.Vector3(-size, 0, i),
+			                    new THREE.Vector3(size, 0, i),
+			                    new THREE.Vector3(i, 0, -size),
+			                    new THREE.Vector3(i, 0, size));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(size, -0.04, i));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, -size));
-			axes.vertices.push(new THREE.Vector3(i, -0.04, size));
+			axes.vertices.push(new THREE.Vector3(-size, 0, i),
+			                   new THREE.Vector3(size, 0, i),
+			                   new THREE.Vector3(i, 0, -size),
+			                   new THREE.Vector3(i, 0, size));
 		}
 	}
 
-	scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({color: "green"}), THREE.LinePieces));
-	scene.add(new THREE.Line(axes, new THREE.LineBasicMaterial({color: "red"}), THREE.LinePieces));
+	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
+	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
+
+window.onresize = function()
+{
+	var formID = document.getElementById("form");
+	var wipID = document.getElementById("wip");
+	var body = document.getElementsByTagName("body")[0];
+	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
+	var totalHeight = formHeight + wipHeight + bodyMargin;
+	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+
+	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	render();
+};
