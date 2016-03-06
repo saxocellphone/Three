@@ -2,14 +2,10 @@
 rules:
     block-closing-brace-newline-after: always
     block-closing-brace-newline-before: always
-    block-closing-brace-space-after: never
-    block-closing-brace-space-before: never
     block-no-empty: true
     # block-no-single-line: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
     block-opening-brace-newline-after: always
     block-opening-brace-newline-before: always
-    block-opening-brace-space-after: never
-    block-opening-brace-space-before: never
     color-hex-case: upper
     color-hex-length: long
     # color-named: always-where-possible # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
@@ -21,24 +17,23 @@ rules:
     declaration-block-no-single-line: true # TODO: Delete once linter-stylelint recognizes block-no-single-line
     # declaration-block-no-shorthand-property-overrides: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
     declaration-block-semicolon-newline-after: always
-    declaration-block-semicolon-newline-before: never
-    declaration-block-semicolon-space-after: never
+    declaration-block-semicolon-newline-before: never-multi-line
     declaration-block-semicolon-space-before: never
     declaration-block-single-line-max-declarations: 1
     # declaration-block-trailing-semicolon: always # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
     declaration-colon-space-after: always-single-line
     declaration-colon-space-before: never
-    font-family-name-quotes: double-unless-keyword
-    font-weight-notation: named-where-possible
+    font-family-name-quotes: single-unless-keyword
+    font-weight-notation: named # -where-possible # TODO: Add suffix once linter-stylelint is running a new-enough version of Stylelint
     function-comma-newline-after: always-multi-line
     function-comma-newline-before: never-multi-line
     function-comma-space-after: always-single-line
     function-comma-space-before: never-single-line
     function-linear-gradient-no-nonstandard-direction: true
     function-parentheses-space-inside: never
-    function-url-quotes: double
+    function-url-quotes: single
     function-whitespace-after: always
-    indentation: tabs
+    indentation: tab
     max-empty-lines: 1
     # no-descending-specificity: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
     no-duplicate-selectors: true
@@ -62,5 +57,5 @@ rules:
     selector-list-comma-space-after: always-single-line
     selector-list-comma-space-before: never
     # string-no-newline: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
-    string-quotes: double
+    string-quotes: single
     value-list-comma-space-after: always-single-line
