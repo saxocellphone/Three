@@ -4,10 +4,12 @@ dist: trusty
 install:
     - gem install html-proofer
     - npm install -g eslint
+    - npm install -g stylelint
 
 script:
     - htmlproof --check-html --check-favicon
     - eslint js/**
+    - stylelint css/**
 
 branches:
   only:
