@@ -15,21 +15,17 @@ function init()
 
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
-	camera.position.y = 75;
-	camera.position.z = 5;
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
+	camera.position.z = 75;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -122,7 +118,7 @@ Graph.prototype.draw = function()
 	var i;
 	for(i = -size; i <= size; i += step)
 	{
-		vector[counter + size] = new THREE.Vector3(x.toFixed(2), 0, -this.points[counter + size]);  //FIXME: Somehow the plane is upside-down: the positive y-cordinate is negative
+		vector[counter + size] = new THREE.Vector3(x.toFixed(2), this.points[counter + size], 0.05);
 		x += step;
 		counter++;
 	}
@@ -132,7 +128,7 @@ Graph.prototype.draw = function()
 	var splinePoints = spline.getPoints(vector.length - 1);
 	for(i = 0; i < splinePoints.length; i++)
 	{
-		if(Math.abs(spline.points[i].z) <= size)
+		if(Math.abs(spline.points[i].y) <= size)
 		{
 			geometry.vertices.push(spline.points[i]);
 		}
@@ -319,16 +315,17 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			var smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 50);
-			smallCylinderGeom.translate(0, -(i + step / 2), -this.axisOfRotation);
+			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   bigGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 360);
-			largeCylinderGeom.translate(0, -(i + step / 2), -this.axisOfRotation);
+			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
+			smallCylinderGeom.dispose();
+			largeCylinderGeom.dispose();
 			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
 			var hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			hollowCylinder.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(hollowCylinder);
 		}
 	}
@@ -351,9 +348,9 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			var geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          rightRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          step, 100);
-			geometry.translate(0, -(i + step / 2), -this.axisOfRotation);
+			geometry.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			plane.rotation.set(0, 0, Math.PI / 2);
+			geometry.dispose();
 			this.group.add(plane);
 		}
 	}
@@ -467,17 +464,17 @@ function addAxis()
 	{
 		if(i)
 		{
-			lines.vertices.push(new THREE.Vector3(-size, 0, i),
-			                    new THREE.Vector3(size, 0, i),
-			                    new THREE.Vector3(i, 0, -size),
-			                    new THREE.Vector3(i, 0, size));
+			lines.vertices.push(new THREE.Vector3(-size, i, 0),
+			                    new THREE.Vector3(size, i, 0),
+			                    new THREE.Vector3(i, -size, 0),
+			                    new THREE.Vector3(i, size, 0));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, 0, i),
-			                   new THREE.Vector3(size, 0, i),
-			                   new THREE.Vector3(i, 0, -size),
-			                   new THREE.Vector3(i, 0, size));
+			axes.vertices.push(new THREE.Vector3(-size, i, 0),
+			                   new THREE.Vector3(size, i, 0),
+			                   new THREE.Vector3(i, -size, 0),
+			                   new THREE.Vector3(i, size, 0));
 		}
 	}
 
@@ -489,15 +486,12 @@ window.onresize = function()
 {
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
-	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	render();
 };

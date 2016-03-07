@@ -1,0 +1,19 @@
+sudo: true
+dist: trusty
+
+install:
+    - gem install html-proofer
+    - npm install -g eslint
+    - npm install -g stylelint
+
+script:
+    - htmlproofer --check-html --check-favicon
+    - eslint js/**
+    - stylelint css/**
+
+branches:
+  only:
+    - gh-pages
+
+notifications:
+    email: false
