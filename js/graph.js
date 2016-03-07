@@ -18,8 +18,7 @@ function init()
 	scene = new THREE.Scene();
 
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-	camera.position.y = 75;
-	camera.position.z = 5;
+	camera.position.z = 75;
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -115,7 +114,7 @@ Graph.prototype.draw = function()
 	var i;
 	for(i = -size; i <= size; i += step)
 	{
-		vector[counter + size] = new THREE.Vector3(x.toFixed(2), 0, -this.points[counter + size]);  //FIXME: Somehow the plane is upside-down: the positive y-cordinate is negative
+		vector[counter + size] = new THREE.Vector3(x.toFixed(2), this.points[counter + size], 0.05);
 		x += step;
 		counter++;
 	}
@@ -125,7 +124,7 @@ Graph.prototype.draw = function()
 	var splinePoints = spline.getPoints(vector.length - 1);
 	for(i = 0; i < splinePoints.length; i++)
 	{
-		if(Math.abs(spline.points[i].z) <= size)
+		if(Math.abs(spline.points[i].y) <= size)
 		{
 			geometry.vertices.push(spline.points[i]);
 		}
@@ -307,14 +306,15 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			}
 
 			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-			smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-			largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
+			smallCylinderGeom.dispose();
+			largeCylinderGeom.dispose();
 			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
 			var hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			hollowCylinder.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(hollowCylinder);
 		}
 	}
@@ -333,9 +333,9 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			}
 
 			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-			geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			geometry.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			plane.rotation.set(0, 0, Math.PI / 2);
+			geometry.dispose();
 			this.group.add(plane);
 		}
 	}
@@ -451,17 +451,17 @@ function addAxis()
 	{
 		if(i)
 		{
-			lines.vertices.push(new THREE.Vector3(-size, 0, i),
-			                    new THREE.Vector3(size, 0, i),
-			                    new THREE.Vector3(i, 0, -size),
-			                    new THREE.Vector3(i, 0, size));
+			lines.vertices.push(new THREE.Vector3(-size, i, 0),
+			                    new THREE.Vector3(size, i, 0),
+			                    new THREE.Vector3(i, -size, 0),
+			                    new THREE.Vector3(i, size, 0));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, 0, i),
-			                   new THREE.Vector3(size, 0, i),
-			                   new THREE.Vector3(i, 0, -size),
-			                   new THREE.Vector3(i, 0, size));
+			axes.vertices.push(new THREE.Vector3(-size, i, 0),
+			                   new THREE.Vector3(size, i, 0),
+			                   new THREE.Vector3(i, -size, 0),
+			                   new THREE.Vector3(i, size, 0));
 		}
 	}
 
