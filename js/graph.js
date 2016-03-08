@@ -468,6 +468,19 @@ function addAxis()
 	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
 
+function reset()  //eslint-disable-line
+{
+	clearGraph();
+	controls.reset();
+
+	document.getElementById("function1").value = "";
+	document.getElementById("function2").value = "";
+	document.getElementById("bound1").value = "";
+	document.getElementById("bound2").value = "";
+	document.getElementById("rotation").value = "";
+	document.getElementById("quality").value = "0.5";
+}
+
 window.onresize = function()
 {
 	var formID = document.getElementById("form");
