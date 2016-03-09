@@ -164,6 +164,17 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
+	var intersections = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
+	for(var i = 0; i < intersections.length; i++)
+	{
+		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
+		{
+			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
+			clearGraph();
+			return;
+		}
+	}
+
 	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
 		console.log("No second function or second function is equal to the axis of rotation");
@@ -175,17 +186,6 @@ Graph.prototype.drawShape = function()
 		var graph2ComparingPoint1 = graphArray[1].getY(this.bound1 + 0.5);
 		var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
 		var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
-
-		var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
-		for(var i = 0; i < intersections.length; i++)
-		{
-			if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
-			{
-				sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
-				clearGraph();
-				return;
-			}
-		}
 
 		console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
 		//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
