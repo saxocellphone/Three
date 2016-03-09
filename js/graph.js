@@ -164,9 +164,9 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
-	if(graphArray[1] === undefined)
+	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
-		console.log("No second function");
+		console.log("No second function or second function is equal to the axis of rotation");
 		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
 	}
 	else
