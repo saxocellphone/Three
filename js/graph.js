@@ -307,9 +307,9 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			}
 
 			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 			smallCylinderGeom.dispose();
@@ -334,7 +334,7 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			}
 
 			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-			geometry.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			geometry.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			geometry.dispose();
 			this.group.add(plane);
@@ -466,6 +466,19 @@ function addAxis()
 
 	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
 	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
+}
+
+function reset()  //eslint-disable-line
+{
+	clearGraph();
+	controls.reset();
+
+	document.getElementById("function1").value = "";
+	document.getElementById("function2").value = "";
+	document.getElementById("bound1").value = "";
+	document.getElementById("bound2").value = "";
+	document.getElementById("rotation").value = "";
+	document.getElementById("quality").value = "0.5";
 }
 
 window.onresize = function()
