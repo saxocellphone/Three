@@ -491,7 +491,9 @@ function onKeyUp(event)
 
 function reset()  //eslint-disable-line
 {
+	clearGraph();
 	controls.reset();
+
 	document.getElementById("function1").value = "";
 	document.getElementById("function2").value = "";
 	document.getElementById("bound1").value = "";
