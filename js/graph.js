@@ -145,10 +145,6 @@ Graph.prototype.drawShape = function()
 	this.group.name = "solid";
 	var boundY1 = this.getY(this.bound1);
 	var boundY2 = this.getY(this.bound2);
-	var graph1ComparingPoint1 = graphArray[0].getY(this.bound1 + 0.5);  //FIXME: Don't assume that there's always two functions
-	var graph2ComparingPoint1 = graphArray[1].getY(this.bound1 + 0.5);
-	var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
-	var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
 
 	if(this.bound1 === this.bound2)
 	{
@@ -168,7 +164,7 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
-	var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	var intersections = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
 	for(var i = 0; i < intersections.length; i++)
 	{
 		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
@@ -179,14 +175,23 @@ Graph.prototype.drawShape = function()
 		}
 	}
 
-	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
-	//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
-	if(this.axisOfRotation)
+	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
-		console.log("Axis of rotation is not 0");
-		if(boundY2 - boundY1)
+		console.log("No second function or second function is equal to the axis of rotation");
+		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+	}
+	else
+	{
+		var graph1ComparingPoint1 = graphArray[0].getY(this.bound1 + 0.5);
+		var graph2ComparingPoint1 = graphArray[1].getY(this.bound1 + 0.5);
+		var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
+		var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
+
+		console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
+		//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
+		if(boundY1 !== boundY2)
 		{
-			console.log("\tboundY2-boundY1 is not 0");
+			console.log("\tboundY1 and boundY2 are not equal");
 			if(this.axisOfRotation >= this.getVertex() && this.axisOfRotation >= graphArray[1].getVertex())
 			{
 				console.log("\t\tAxis of rotation is greater than or equal to the max of the graph");
@@ -278,11 +283,6 @@ Graph.prototype.drawShape = function()
 				this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
 			}
 		}
-	}
-	else
-	{
-		console.log("Axis of rotation is 0");
-		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
 	}
 	scene.add(this.group);
 	render();
@@ -408,12 +408,12 @@ function submit() // eslint-disable-line
 	graphArray[graph1.graphID] = graph1;
 	graph1.draw();
 
-	points = getPoints(function2 ? function2 : 0);
-
-	var graph2 = new Graph(function2 ? function2 : 0, bound1, bound2, axisOfRotation, points, quality, 1);
-	graphArray[graph2.graphID] = graph2;
-	if(function2)
+	if(function2 !== "")  //We obviously don't want to graph an empty function
 	{
+		points = getPoints(function2);
+
+		var graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
+		graphArray[graph2.graphID] = graph2;
 		graph2.draw();
 	}
 
