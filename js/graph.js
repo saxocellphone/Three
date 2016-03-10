@@ -97,16 +97,14 @@ Graph.prototype.getY = function(x)
 	return this.points[Math.round(100 * (size + x))];  //getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
 };
 
-Graph.prototype.getVertex = function()
+Graph.prototype.getMax = function()
 {
-	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
-	{
-		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
-	}
-	else
-	{
-		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
-	}
+	return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
+};
+
+Graph.prototype.getMin = function()
+{
+	return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
 };
 
 Graph.prototype.draw = function()
@@ -187,12 +185,13 @@ Graph.prototype.drawShape = function()
 		var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
 		var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
 
-		console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
+		console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
+		console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
 		//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
 		if(boundY1 !== boundY2)
 		{
 			console.log("\tboundY1 and boundY2 are not equal");
-			if(this.axisOfRotation >= this.getVertex() && this.axisOfRotation >= graphArray[1].getVertex())
+			if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax())
 			{
 				console.log("\t\tAxis of rotation is greater than or equal to the max of the graph");
 				if(boundY1 >= 0 && boundY2 >= 0)
@@ -224,7 +223,7 @@ Graph.prototype.drawShape = function()
 					}
 				}
 			}
-			else if(this.axisOfRotation <= this.getVertex() && this.axisOfRotation <= graphArray[1].getVertex())
+			else if(this.axisOfRotation <= this.getMin() && this.axisOfRotation <= graphArray[1].getMin())
 			{
 				console.log("\t\tAxis of rotation is less than or equal to the minimum of the graph");
 				if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
@@ -240,7 +239,7 @@ Graph.prototype.drawShape = function()
 			}
 			else
 			{
-				sweetAlert("Oh noes!", "Axis of rotation cannot be between the bounds", "warning");
+				sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
 				clearGraph();
 				return;
 			}
