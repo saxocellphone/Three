@@ -227,33 +227,15 @@ Graph.prototype.drawShape = function()
 			else if(this.axisOfRotation <= this.getVertex() && this.axisOfRotation <= graphArray[1].getVertex())
 			{
 				console.log("\t\tAxis of rotation is less than or equal to the minimum of the graph");
-				if(boundY1 >= 0 && boundY2 >= 0)
+				if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
 				{
-					console.log("\t\t\tBoth boundY1 and boundY2 are greater than or equal to 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation)+graphArray[1].getY(i)", "Math.abs(this.axisOfRotation)+graphArray[1].getY(i+step)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
-					}
+					console.log("\t\t\tGraph2 is higher than graph1");
+					this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
 				}
 				else
 				{
-					console.log("\t\t\tOne of the bounds is less than 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
-					}
+					console.log("\t\t\tGraph2 is lower than or equal to graph1");
+					this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
 				}
 			}
 			else
