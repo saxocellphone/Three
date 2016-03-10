@@ -2,6 +2,13 @@ body
 {
 	font-family: 'Helvetica Neue', 'Helvetica', 'Ubuntu', 'Verdana', 'Arial', 'Roboto', 'Open Sans', sans-serif;
 	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
+}
+
+p
+{
+	margin-left: 8px;
 }
 
 .functionInput

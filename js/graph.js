@@ -15,21 +15,17 @@ function init()
 
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight), 1, 1000);
-	camera.position.y = 75;
-	camera.position.z = 5;
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
+	camera.position.z = 75;
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -122,7 +118,7 @@ Graph.prototype.draw = function()
 	var i;
 	for(i = -size; i <= size; i += step)
 	{
-		vector[counter + size] = new THREE.Vector3(x.toFixed(2), 0, -this.points[counter + size]);  //FIXME: Somehow the plane is upside-down: the positive y-cordinate is negative
+		vector[counter + size] = new THREE.Vector3(x.toFixed(2), this.points[counter + size], 0.05);
 		x += step;
 		counter++;
 	}
@@ -132,7 +128,7 @@ Graph.prototype.draw = function()
 	var splinePoints = spline.getPoints(vector.length - 1);
 	for(i = 0; i < splinePoints.length; i++)
 	{
-		if(Math.abs(spline.points[i].z) <= size)
+		if(Math.abs(spline.points[i].y) <= size)
 		{
 			geometry.vertices.push(spline.points[i]);
 		}
@@ -173,7 +169,7 @@ Graph.prototype.drawShape = function()
 
 	//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
 	// var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
-	var result = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	var result = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
 	var intersections = result[0];
 	var larger = result[1];
 
@@ -184,14 +180,18 @@ Graph.prototype.drawShape = function()
 		return;
 	}
 
-	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
-	//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
-	if(this.axisOfRotation)
+	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
-		console.log("Axis of rotation is not 0");
-		if(boundY2 - boundY1)
+		console.log("No second function or second function is equal to the axis of rotation");
+		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+	}
+	else
+	{
+		console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
+		//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
+		if(boundY1 !== boundY2)
 		{
-			console.log("\tboundY2-boundY1 is not 0");
+			console.log("\tboundY1 and boundY2 are not equal");
 			if(this.axisOfRotation >= this.getVertex() && this.axisOfRotation >= graphArray[1].getVertex())
 			{
 				console.log("\t\tAxis of rotation is greater than or equal to the max of the graph");
@@ -284,11 +284,6 @@ Graph.prototype.drawShape = function()
 			}
 		}
 	}
-	else
-	{
-		console.log("Axis of rotation is 0");
-		this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
-	}
 	scene.add(this.group);
 	render();
 };
@@ -312,14 +307,15 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			}
 
 			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-			smallCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-			largeCylinderGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
+			smallCylinderGeom.dispose();
+			largeCylinderGeom.dispose();
 			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
 			var hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			hollowCylinder.rotation.set(0, 0, Math.PI / 2);
 			this.group.add(hollowCylinder);
 		}
 	}
@@ -338,9 +334,9 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			}
 
 			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-			geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, -(i + step / 2), -this.axisOfRotation));
+			geometry.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
-			plane.rotation.set(0, 0, Math.PI / 2);
+			geometry.dispose();
 			this.group.add(plane);
 		}
 	}
@@ -412,12 +408,12 @@ function submit() // eslint-disable-line
 	graphArray[graph1.graphID] = graph1;
 	graph1.draw();
 
-	points = getPoints(function2 ? function2 : 0);
-
-	var graph2 = new Graph(function2 ? function2 : 0, bound1, bound2, axisOfRotation, points, quality, 1);
-	graphArray[graph2.graphID] = graph2;
-	if(function2)
+	if(function2 !== "")  //We obviously don't want to graph an empty function
 	{
+		points = getPoints(function2);
+
+		var graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
+		graphArray[graph2.graphID] = graph2;
 		graph2.draw();
 	}
 
@@ -454,17 +450,17 @@ function addAxis()
 	{
 		if(i)
 		{
-			lines.vertices.push(new THREE.Vector3(-size, 0, i),
-			                    new THREE.Vector3(size, 0, i),
-			                    new THREE.Vector3(i, 0, -size),
-			                    new THREE.Vector3(i, 0, size));
+			lines.vertices.push(new THREE.Vector3(-size, i, 0),
+			                    new THREE.Vector3(size, i, 0),
+			                    new THREE.Vector3(i, -size, 0),
+			                    new THREE.Vector3(i, size, 0));
 		}
 		else
 		{
-			axes.vertices.push(new THREE.Vector3(-size, 0, i),
-			                   new THREE.Vector3(size, 0, i),
-			                   new THREE.Vector3(i, 0, -size),
-			                   new THREE.Vector3(i, 0, size));
+			axes.vertices.push(new THREE.Vector3(-size, i, 0),
+			                   new THREE.Vector3(size, i, 0),
+			                   new THREE.Vector3(i, -size, 0),
+			                   new THREE.Vector3(i, size, 0));
 		}
 	}
 
@@ -472,19 +468,29 @@ function addAxis()
 	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
 }
 
+function reset()  //eslint-disable-line
+{
+	clearGraph();
+	controls.reset();
+
+	document.getElementById("function1").value = "";
+	document.getElementById("function2").value = "";
+	document.getElementById("bound1").value = "";
+	document.getElementById("bound2").value = "";
+	document.getElementById("rotation").value = "";
+	document.getElementById("quality").value = "0.5";
+}
+
 window.onresize = function()
 {
 	var formID = document.getElementById("form");
 	var wipID = document.getElementById("wip");
-	var body = document.getElementsByTagName("body")[0];
 	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
 	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var bodyMargin = parseInt(window.getComputedStyle(body).marginTop) + parseInt(window.getComputedStyle(body).marginBottom);
-	var totalHeight = formHeight + wipHeight + bodyMargin;
-	var totalWidth = parseInt(window.getComputedStyle(body).marginLeft) + parseInt(window.getComputedStyle(body).marginRight);
+	var totalHeight = formHeight + wipHeight;
 
-	camera.aspect = (window.innerWidth - totalWidth) / (window.innerHeight - totalHeight);
+	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth - totalWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	render();
 };
