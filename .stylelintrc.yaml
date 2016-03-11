@@ -3,28 +3,27 @@ rules:
     block-closing-brace-newline-after: always
     block-closing-brace-newline-before: always
     block-no-empty: true
-    # block-no-single-line: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    block-no-single-line: true
     block-opening-brace-newline-after: always
     block-opening-brace-newline-before: always
     color-hex-case: upper
     color-hex-length: long
-    # color-named: always-where-possible # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    color-named: always-where-possible
     color-no-invalid-hex: true
     custom-property-no-outside-root: true
     declaration-bang-space-after: never
     declaration-bang-space-before: always
-    # declaration-block-no-duplicate-properties: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
-    declaration-block-no-single-line: true # TODO: Delete once linter-stylelint recognizes block-no-single-line
-    # declaration-block-no-shorthand-property-overrides: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    declaration-block-no-duplicate-properties: true
+    declaration-block-no-shorthand-property-overrides: true
     declaration-block-semicolon-newline-after: always
     declaration-block-semicolon-newline-before: never-multi-line
     declaration-block-semicolon-space-before: never
     declaration-block-single-line-max-declarations: 1
-    # declaration-block-trailing-semicolon: always # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    declaration-block-trailing-semicolon: always
     declaration-colon-space-after: always-single-line
     declaration-colon-space-before: never
     font-family-name-quotes: single-unless-keyword
-    font-weight-notation: named # -where-possible # TODO: Add suffix once linter-stylelint is running a new-enough version of Stylelint
+    font-weight-notation: named-where-possible
     function-comma-newline-after: always-multi-line
     function-comma-newline-before: never-multi-line
     function-comma-space-after: always-single-line
@@ -35,7 +34,7 @@ rules:
     function-whitespace-after: always
     indentation: tab
     max-empty-lines: 1
-    # no-descending-specificity: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    no-descending-specificity: true
     no-duplicate-selectors: true
     no-eol-whitespace: true
     no-invalid-double-slash-comments: true
@@ -46,16 +45,13 @@ rules:
     number-zero-length-no-unit: true
     root-no-standard-properties: true
     rule-nested-empty-line-before: never
-    rule-no-duplicate-properties: true # TODO: Delete once linter-stylelint recognizes declaration-block-no-duplicate-properties
-    rule-no-shorthand-property-overrides: true # TODO: Delete once linter-stylelint recognizes declaration-block-no-shorthand-property-overrides
     rule-non-nested-empty-line-before: always
-    rule-trailing-semicolon: always # TODO: Delete once linter-stylelint recognizes declaration-block-trailing-semicolon
     selector-combinator-space-after: always
     selector-combinator-space-before: always
     selector-list-comma-newline-after: always-multi-line
     selector-list-comma-newline-before: never-multi-line
     selector-list-comma-space-after: always-single-line
     selector-list-comma-space-before: never
-    # string-no-newline: true # TODO: Re-enable once linter-stylelint is running a new-enough version of Stylelint
+    string-no-newline: true
     string-quotes: single
     value-list-comma-space-after: always-single-line
