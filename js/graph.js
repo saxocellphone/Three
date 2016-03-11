@@ -187,8 +187,7 @@ Graph.prototype.drawShape = function()
 	{
 		console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
 		console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
-		//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
-		if(boundY1 !== boundY2)
+		if(boundY1 !== boundY2)  //TODO: We have four scenarios here but really only two equations.  Combine them so we only have two scenarios.
 		{
 			console.log("\tboundY1 and boundY2 are not equal");
 			if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax())
