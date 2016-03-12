@@ -185,8 +185,8 @@ Graph.prototype.drawShape = function()
 	}
 	else
 	{
-		console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
-		console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
+		console.log("Maximums: " + this.getMax() + " and minimums: " + graphArray[1].getMax());
+		console.log("Minimums: " + this.getMin() + " and minimums: " + graphArray[1].getMin());
 		if(boundY1 !== boundY2)  //TODO: We have four scenarios here but really only two equations.  Combine them so we only have two scenarios.
 		{
 			console.log("\tboundY1 and boundY2 are not equal");
