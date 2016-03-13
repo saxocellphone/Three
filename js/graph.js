@@ -178,11 +178,11 @@ Graph.prototype.drawShape = function()
 		return;
 	}
 
-	if(!larger)
+	if(!larger)  //Switch the functions around so that the larger one is always first for consistency
 	{
 		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
 		//[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
-		//[this.points, graphArray[1].points], = [graphArray[1].points, this.points];
+		//[this.points, graphArray[1].points] = [graphArray[1].points, this.points];
 		var temp2 = graphArray[1].given;
 		graphArray[1].given = this.given;
 		this.given = temp2;
