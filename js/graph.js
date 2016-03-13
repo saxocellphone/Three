@@ -183,13 +183,13 @@ Graph.prototype.drawShape = function()
 		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
 		//[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
 		//[this.points, graphArray[1].points], = [graphArray[1].points, this.points];
-		var temp = graphArray[1].given;
+		var temp2 = graphArray[1].given;
 		graphArray[1].given = this.given;
-		this.given = temp;
+		this.given = temp2;
 
-		temp = graphArray[1].points;
+		temp2 = graphArray[1].points;
 		graphArray[1].points = this.points;
-		this.points = temp;
+		this.points = temp2;
 	}
 
 	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
