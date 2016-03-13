@@ -166,7 +166,7 @@ Graph.prototype.drawShape = function()
 	}
 
 	//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
-	// var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	//var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
 	var result = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
 	var intersections = result[0];
 	var larger = result[1];
@@ -178,6 +178,20 @@ Graph.prototype.drawShape = function()
 		return;
 	}
 
+	if(!larger)
+	{
+		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
+		//[this.points, graphArray[1].points], = [graphArray[1].points, this.points];
+		var temp = graphArray[1].given;
+		graphArray[1].given = this.given;
+		this.given = temp;
+
+		temp = graphArray[1].points;
+		graphArray[1].points = this.points;
+		this.points = temp;
+	}
+
 	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
 		console.log("No second function or second function is equal to the axis of rotation");
@@ -185,38 +199,18 @@ Graph.prototype.drawShape = function()
 	}
 	else
 	{
-		console.log("Maximums: " + this.getMax() + " and minimums: " + graphArray[1].getMax());
-		console.log("Minimums: " + this.getMin() + " and minimums: " + graphArray[1].getMin());
-		if(boundY1 !== boundY2)  //TODO: We have four scenarios here but really only two equations.  Combine them so we only have two scenarios.
+		console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
+		console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
+		if(boundY1 !== boundY2)
 		{
 			console.log("\tboundY1 and boundY2 are not equal");
-			if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax())
+			if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax()
+			|| this.axisOfRotation <= this.getMin() && this.axisOfRotation <= graphArray[1].getMin())
 			{
-				console.log("\t\tAxis of rotation is greater than or equal to the max of the graph");
-				if(larger)
-				{
-					console.log("\t\t\tGraph1 is higher than graph2");
-					this.addBSP("this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)", "this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)");
-				}
-				else
-				{
-					console.log("\t\t\tGraph1 is lower than graph2");
-					this.addBSP("this.axisOfRotation-graphArray[1].getY(i)", "this.axisOfRotation-graphArray[1].getY(i+step)", "this.axisOfRotation-this.getY(i)", "this.axisOfRotation-this.getY(i+step)");
-				}
-			}
-			else if(this.axisOfRotation <= this.getMin() && this.axisOfRotation <= graphArray[1].getMin())
-			{
-				console.log("\t\tAxis of rotation is less than or equal to the minimum of the graph");
-				if(larger)
-				{
-					console.log("\t\t\tGraph1 is higher than graph2");
-					this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))", "Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))");
-				}
-				else
-				{
-					console.log("\t\t\tGraph1 is lower than graph2");
-					this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i))", "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))");
-				}
+				this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))",
+				            "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))",
+							"Math.abs(this.axisOfRotation-this.getY(i))",
+							"Math.abs(this.axisOfRotation-this.getY(i+step))");
 			}
 			else
 			{
