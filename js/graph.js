@@ -318,6 +318,9 @@ function submit() // eslint-disable-line
 {
 	clearGraph();
 
+	graphArray[0] = undefined;
+	graphArray[1] = undefined;
+
 	var function1 = document.getElementById("function1").value;
 	var function2 = document.getElementById("function2").value;
 	var quality = Number(document.getElementById("quality").value);
@@ -428,6 +431,9 @@ function reset()  //eslint-disable-line
 {
 	clearGraph();
 	controls.reset();
+
+	graphArray[0] = undefined;
+	graphArray[1] = undefined;
 
 	document.getElementById("function1").value = "";
 	document.getElementById("function2").value = "";
