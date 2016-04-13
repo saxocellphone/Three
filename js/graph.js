@@ -195,7 +195,7 @@ Graph.prototype.drawShape = function()
 	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
 	{
 		console.log("No second function or second function is equal to the axis of rotation");
-		this.addSolidWithoutHoles("abs(y1)", "abs(y1 + y1step)");
+		this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 	}
 	else
 	{
