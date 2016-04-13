@@ -53,7 +53,7 @@ function getIntersections(points1, points2, bound1, bound2)
 	var intersections = [];
 	var larger;
 
-	for(var x = math.round(100 * (size + bound1)); x <= 100 * (size + bound2); x++)
+	for(var x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
 	{
 		if(points1[x] > points2[x])
 		{
@@ -77,7 +77,7 @@ function getIntersections(points1, points2, bound1, bound2)
 			larger = undefined;
 		}
 	}
-	return intersections;
+	return [intersections, larger];
 }
 
 function Graph(given, bound1, bound2, axisOfRotation, points, quality, graphID)
@@ -97,16 +97,14 @@ Graph.prototype.getY = function(x)
 	return this.points[Math.round(100 * (size + x))];  //getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
 };
 
-Graph.prototype.getVertex = function()
+Graph.prototype.getMax = function()
 {
-	if(this.getY(this.bound1 + 0.01) > 0 && this.getY(this.bound2 - 0.01) > 0)
-	{
-		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
-	}
-	else
-	{
-		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
-	}
+	return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
+};
+
+Graph.prototype.getMin = function()
+{
+	return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));  //Add 1 to the ending index because splice is exclusive
 };
 
 Graph.prototype.draw = function()
@@ -145,10 +143,6 @@ Graph.prototype.drawShape = function()
 	this.group.name = "solid";
 	var boundY1 = this.getY(this.bound1);
 	var boundY2 = this.getY(this.bound2);
-	var graph1ComparingPoint1 = graphArray[0].getY(this.bound1 + 0.5);  //FIXME: Don't assume that there's always two functions
-	var graph2ComparingPoint1 = graphArray[1].getY(this.bound1 + 0.5);
-	var graph1ComparingPoint2 = graphArray[0].getY(this.bound2 - 0.5);
-	var graph2ComparingPoint2 = graphArray[1].getY(this.bound2 - 0.5);
 
 	if(this.bound1 === this.bound2)
 	{
@@ -159,7 +153,10 @@ Graph.prototype.drawShape = function()
 
 	if(this.bound1 > this.bound2)  //Switch the bounds around so that the for loop works
 	{
-		var temp = this.bound2;  //TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//[bound1, bound2] = [bound2, bound1];
+		//[boundY1, boundY2] = [boundY2, boundY1];
+		var temp = this.bound2;
 		this.bound2 = this.bound1;
 		this.bound1 = temp;
 
@@ -168,92 +165,53 @@ Graph.prototype.drawShape = function()
 		boundY1 = temp;
 	}
 
-	var intersections = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
-	for(var i = 0; i < intersections.length; i++)
+	//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+	//var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
+	var result = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
+	var intersections = result[0];
+	var larger = result[1];
+
+	if(intersections[0] !== undefined)
 	{
-		if(this.bound1 < intersections[i] && this.bound2 > intersections[i])
-		{
-			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[i], 2) + " which cannot be between the bounds", "warning");
-			clearGraph();
-			return;
-		}
+		sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
+		clearGraph();
+		return;
 	}
 
-	console.log("1: " + this.getVertex() + " 2: " + graphArray[1].getVertex());
-	//I know this is a lot of if statements, I did it to ensure there wouldn't be any bugs. There are probably ways you can have an abridged version, but this will do for now.
-	if(this.axisOfRotation)
+	if(!larger)  //Switch the functions around so that the larger one is always first for consistency
 	{
-		console.log("Axis of rotation is not 0");
-		if(boundY2 - boundY1)
+		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
+		//[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
+		//[this.points, graphArray[1].points] = [graphArray[1].points, this.points];
+		var temp2 = graphArray[1].given;
+		graphArray[1].given = this.given;
+		this.given = temp2;
+
+		temp2 = graphArray[1].points;
+		graphArray[1].points = this.points;
+		this.points = temp2;
+	}
+
+	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
+	{
+		console.log("No second function or second function is equal to the axis of rotation");
+		this.addSolidWithoutHoles("abs(y1)", "abs(y1 + y1step)");
+	}
+	else
+	{
+		console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
+		console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
+		if(boundY1 !== boundY2)
 		{
-			console.log("\tboundY2-boundY1 is not 0");
-			if(this.axisOfRotation >= this.getVertex() && this.axisOfRotation >= graphArray[1].getVertex())
+			console.log("\tboundY1 and boundY2 are not equal");
+			if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax()
+			|| this.axisOfRotation <= this.getMin() && this.axisOfRotation <= graphArray[1].getMin())
 			{
-				console.log("\t\tAxis of rotation is greater than or equal to the max of the graph");
-				if(boundY1 >= 0 && boundY2 >= 0)
-				{
-					console.log("\t\t\tBoth boundY1 and boundY2 are greater than or equal to 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("axis - y2", "axis - y2step", "axis - y1", "axis - y1step");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("axis - y1", "axis - y1step", "axis - y2", "axis - y2step");
-					}
-				}
-				else
-				{
-					console.log("\t\t\tOne of the bounds is less than 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("axis + abs(y2)", "axis + abs(y2step)", "axis - y1", "axis - y1step");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("axis - y1", "axis - y1step", "axis - y2", "axis - y2step");
-					}
-				}
-			}
-			else if(this.axisOfRotation <= this.getVertex() && this.axisOfRotation <= graphArray[1].getVertex())
-			{
-				console.log("\t\tAxis of rotation is less than or equal to the minimum of the graph");
-				if(boundY1 >= 0 && boundY2 >= 0)
-				{
-					console.log("\t\t\tBoth boundY1 and boundY2 are greater than or equal to 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("abs(axis) + y1", "abs(axis) + y1step", "abs(axis) + y2", "abs(axis) + y2step");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("abs(axis) + y2", "abs(axis) + y2step", "abs(axis) + y1", "abs(axis) + y1step");
-					}
-				}
-				else
-				{
-					console.log("\t\t\tOne of the bounds is less than 0");
-					if(graph2ComparingPoint1 > graph1ComparingPoint1 && graph2ComparingPoint2 > graph1ComparingPoint2)
-					{
-						console.log("\t\t\t\tGraph2 is higher than graph1");
-						this.addBSP("abs(axis - y1)", "abs(axis - y1step)", "abs(axis - y2)", "abs(axis - y2step)");
-					}
-					else
-					{
-						console.log("\t\t\t\tGraph2 is lower than or equal to graph1");
-						this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
-					}
-				}
+				this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
 			}
 			else
 			{
-				sweetAlert("Oh noes!", "Axis of rotation cannot be between the bounds", "warning");
+				sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
 				clearGraph();
 				return;
 			}
@@ -278,11 +236,6 @@ Graph.prototype.drawShape = function()
 				this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 			}
 		}
-	}
-	else
-	{
-		console.log("Axis of rotation is 0");
-		this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 	}
 	scene.add(this.group);
 	render();
@@ -315,11 +268,11 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 			var smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   smallGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 50);
-			smallCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   bigGeoR2Equation.eval({axis: this.axisOfRotation, y1: this.getY(i), y1step: this.getY(i + step), y2: graphArray[1].getY(i), y2step: graphArray[1].getY(i + step)}),
 			                                                   step, 360);
-			largeCylinderGeom.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 			smallCylinderGeom.dispose();
@@ -348,7 +301,7 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 			var geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          rightRadiusEquation.eval({y1: this.getY(i), y1step: this.getY(i + step)}),
 			                                          step, 100);
-			geometry.translate(0, -(i + step / 2), this.axisOfRotation).rotateZ(Math.PI / 2);
+			geometry.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
 			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			geometry.dispose();
 			this.group.add(plane);
@@ -375,6 +328,9 @@ function clearGraph()
 function submit() // eslint-disable-line
 {
 	clearGraph();
+
+	graphArray[0] = undefined;
+	graphArray[1] = undefined;
 
 	var function1 = document.getElementById("function1").value;
 	var function2 = document.getElementById("function2").value;
@@ -422,12 +378,12 @@ function submit() // eslint-disable-line
 	graphArray[graph1.graphID] = graph1;
 	graph1.draw();
 
-	points = getPoints(function2 ? function2 : 0);
-
-	var graph2 = new Graph(function2 ? function2 : 0, bound1, bound2, axisOfRotation, points, quality, 1);
-	graphArray[graph2.graphID] = graph2;
-	if(function2)
+	if(function2 !== "")  //We obviously don't want to graph an empty function
 	{
+		points = getPoints(function2);
+
+		var graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
+		graphArray[graph2.graphID] = graph2;
 		graph2.draw();
 	}
 
@@ -480,6 +436,22 @@ function addAxis()
 
 	scene.add(new THREE.LineSegments(lines, new THREE.LineBasicMaterial({color: "green"})),
 	          new THREE.LineSegments(axes, new THREE.LineBasicMaterial({color: "red"})));
+}
+
+function reset()  //eslint-disable-line
+{
+	clearGraph();
+	controls.reset();
+
+	graphArray[0] = undefined;
+	graphArray[1] = undefined;
+
+	document.getElementById("function1").value = "";
+	document.getElementById("function2").value = "";
+	document.getElementById("bound1").value = "";
+	document.getElementById("bound2").value = "";
+	document.getElementById("rotation").value = "";
+	document.getElementById("quality").value = "0.5";
 }
 
 window.onresize = function()
