@@ -153,23 +153,11 @@ Graph.prototype.drawShape = function()
 
 	if(this.bound1 > this.bound2)  //Switch the bounds around so that the for loop works
 	{
-		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
-		//[bound1, bound2] = [bound2, bound1];
-		//[boundY1, boundY2] = [boundY2, boundY1];
-		var temp = this.bound2;
-		this.bound2 = this.bound1;
-		this.bound1 = temp;
-
-		temp = boundY2;
-		boundY2 = boundY1;
-		boundY1 = temp;
+		[this.bound1, this.bound2] = [this.bound2, this.bound1];
+		[boundY1, boundY2] = [boundY2, boundY1];
 	}
 
-	//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
-	//var [intersections, larger] = getIntersections(this.points, graphArray[1].points, this.bound1, this.bound2);
-	var result = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
-	var intersections = result[0];
-	var larger = result[1];
+	var [intersections, larger] = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
 
 	if(intersections[0] !== undefined)
 	{
@@ -181,16 +169,8 @@ Graph.prototype.drawShape = function()
 	//Switch the functions around so that the larger one is always first for consistency
 	if(!larger && graphArray[1] !== undefined && Number(graphArray[1].given) !== this.axisOfRotation)
 	{
-		//TODO: Use ES6 destructuring here when it becomes widely available among modern browsers
-		//[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
-		//[this.points, graphArray[1].points] = [graphArray[1].points, this.points];
-		var temp2 = graphArray[1].given;
-		graphArray[1].given = this.given;
-		this.given = temp2;
-
-		temp2 = graphArray[1].points;
-		graphArray[1].points = this.points;
-		this.points = temp2;
+		[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
+		[this.points, graphArray[1].points] = [graphArray[1].points, this.points];
 	}
 
 	if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants

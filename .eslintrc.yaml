@@ -46,6 +46,8 @@ rules:
                     after: true
                 throw:
                     after: true
+                var:
+                    after: true
     new-cap: 1
     new-parens: 2
     no-array-constructor: 2
