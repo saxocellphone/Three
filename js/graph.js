@@ -1,97 +1,25 @@
 "use strict";
 let camera, controls, scene, renderer;
+let bound1, bound2, axisOfRotation;
 const size = 28;
-let graphArray = [];
 
-init();
-
-function init()
+class Equation
 {
-	if(!Detector.webgl)  //No WebGL D:
+	constructor(equation)
 	{
-		Detector.addGetWebGLMessage();
-		return;
+		this.equation = equation;
+		this.points = this.getPoints();
 	}
 
-	const formID = document.getElementById("form");
-	const wipID = document.getElementById("wip");
-	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	const totalHeight = formHeight + wipHeight;
-
-	scene = new THREE.Scene();
-
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
-	camera.position.z = 75;
-
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
-	document.body.appendChild(renderer.domElement);
-
-	controls = new THREE.TrackballControls(camera, renderer.domElement);
-	controls.addEventListener("change", Graph.render);
-
-	Graph.addAxis();
-	Graph.addLights();
-	Graph.animate();
-	Graph.render();
-}
-
-function getPoints(equation)
-{
-	let points = [];
-	const compiledEquation = math.compile(equation);
-	for(let x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
+	getPoints()
 	{
-		points.push(compiledEquation.eval({x}));
-	}
-	return points;
-}
-
-function getIntersections(points1, points2, bound1, bound2)
-{
-	let intersections = [];
-	let larger;
-
-	for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
-	{
-		if(points1[x] > points2[x])
+		let points = [];
+		const compiledEquation = math.compile(this.equation);
+		for(let x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
 		{
-			if(larger === false)
-			{
-				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
-			}
-			larger = true;
+			points.push(compiledEquation.eval({x}));
 		}
-		else if(points1[x] < points2[x])
-		{
-			if(larger === true)
-			{
-				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
-			}
-			larger = false;
-		}
-		else  //Obviously intersecting when the two functions are equal
-		{
-			intersections.push(x / 100 - size);  //Convert back into actual x coordinates
-			larger = undefined;
-		}
-	}
-	return [intersections, larger];
-}
-
-class Graph
-{
-	constructor(given, bound1, bound2, axisOfRotation, points, quality, graphID)
-	{
-		this.given = given;
-		this.group = new THREE.Object3D();
-		this.bound1 = bound1;
-		this.bound2 = bound2;
-		this.axisOfRotation = axisOfRotation;
-		this.points = points;
-		this.quality = quality;
-		this.graphID = graphID;
+		return points;
 	}
 
 	getY(x)
@@ -103,24 +31,77 @@ class Graph
 	getMax()
 	{
 		//Add 1 to the ending index because splice is exclusive
-		return math.max(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));
+		return math.max(...this.points.slice(100 * (size + bound1), 100 * (size + bound2) + 1));
 	}
 
 	getMin()
 	{
 		//Add 1 to the ending index because splice is exclusive
-		return math.min(...this.points.slice(100 * (size + this.bound1), 100 * (size + this.bound2) + 1));
+		return math.min(...this.points.slice(100 * (size + bound1), 100 * (size + bound2) + 1));
 	}
 
-	draw()
+	getIntersections(otherEquation)
 	{
+		if(otherEquation.points.every((element) => element === undefined))
+		{
+			otherEquation.points.fill(axisOfRotation);
+		}
+
+		let intersections = [];
+		let larger;
+
+		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
+		{
+			if(this.points[x] > otherEquation.points[x])
+			{
+				if(larger === false)
+				{
+					intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+				}
+				larger = true;
+			}
+			else if(this.points[x] < otherEquation.points[x])
+			{
+				if(larger === true)
+				{
+					intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+				}
+				larger = false;
+			}
+			else  //Obviously intersecting when the two functions are equal
+			{
+				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+				larger = undefined;
+			}
+		}
+		return [intersections, larger];
+	}
+}
+
+class Graph
+{
+	constructor(equation1, equation2, quality)
+	{
+		this.group = new THREE.Object3D();
+		this.equation1 = equation1;
+		this.equation2 = equation2;
+		this.quality = quality;
+	}
+
+	draw(equation)
+	{
+		if(equation.points.every((element) => element === undefined))
+		{
+			return;
+		}
+
 		let x = -size;
 		let vector = [];
 		let counter = x;  //I'll change this later, just using a counter variable for now
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
-			vector[counter + size] = new THREE.Vector3(x.toFixed(2), this.points[counter + size], 0.05);
+			vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
 			x += step;
 			counter++;
 		}
@@ -145,23 +126,23 @@ class Graph
 	drawShape()
 	{
 		this.group.name = "solid";
-		let boundY1 = this.getY(this.bound1);
-		let boundY2 = this.getY(this.bound2);
+		let boundY1 = this.equation1.getY(bound1);
+		let boundY2 = this.equation1.getY(bound2);
 
-		if(this.bound1 === this.bound2)
+		if(bound1 === bound2)
 		{
 			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
 			Graph.clear();
 			return;
 		}
 
-		if(this.bound1 > this.bound2)  //Switch the bounds around so that the for loop works
+		if(bound1 > bound2)  //Switch the bounds around so that the for loop works
 		{
-			[this.bound1, this.bound2] = [this.bound2, this.bound1];
+			[bound1, bound2] = [bound2, bound1];
 			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
-		const [intersections, larger] = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
+		const [intersections, larger] = this.equation1.getIntersections(this.equation2);
 
 		if(intersections[0] !== undefined)
 		{
@@ -171,31 +152,31 @@ class Graph
 		}
 
 		//Switch the functions around so that the larger one is always first for consistency
-		if(!larger && graphArray[1] !== undefined && Number(graphArray[1].given) !== this.axisOfRotation)
+		if(!larger && this.equation2 !== undefined && Number(this.equation2.equation) !== axisOfRotation)
 		{
-			[this.given, graphArray[1].given] = [graphArray[1].given, this.given];
-			[this.points, graphArray[1].points] = [graphArray[1].points, this.points];
+			[this.equation1.equation, this.equation2.equation] = [this.equation2.equation, this.equation1.equation];
+			[this.equation1.points, this.equation2.points] = [this.equation2.points, this.equation1.points];
 		}
 
-		if(graphArray[1] === undefined || Number(graphArray[1].given) === this.axisOfRotation)  //FIXME: This doesn't catch constants
+		if(this.equation2 === undefined || Number(this.equation2.equation) === axisOfRotation)  //FIXME: This doesn't catch constants
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
-			this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+			this.addSolidWithoutHoles("Math.abs(this.equation1.getY(i))", "Math.abs(this.equation1.getY(i+step))");
 		}
 		else
 		{
-			console.log("Maximums: " + this.getMax() + " and " + graphArray[1].getMax());
-			console.log("Minimums: " + this.getMin() + " and " + graphArray[1].getMin());
+			console.log("Maximums: " + this.equation1.getMax() + " and " + this.equation2.getMax());
+			console.log("Minimums: " + this.equation1.getMin() + " and " + this.equation2.getMin());
 			if(boundY1 !== boundY2)
 			{
 				console.log("\tboundY1 and boundY2 are not equal");
-				if(this.axisOfRotation >= this.getMax() && this.axisOfRotation >= graphArray[1].getMax()
-				|| this.axisOfRotation <= this.getMin() && this.axisOfRotation <= graphArray[1].getMin())
+				if(axisOfRotation >= this.equation1.getMax() && axisOfRotation >= this.equation2.getMax()
+				|| axisOfRotation <= this.equation1.getMin() && axisOfRotation <= this.equation2.getMin())
 				{
-					this.addBSP("Math.abs(this.axisOfRotation-graphArray[1].getY(i))",
-					            "Math.abs(this.axisOfRotation-graphArray[1].getY(i+step))",
-					            "Math.abs(this.axisOfRotation-this.getY(i))",
-					            "Math.abs(this.axisOfRotation-this.getY(i+step))");
+					this.addBSP("Math.abs(axisOfRotation-this.equation2.getY(i))",
+					            "Math.abs(axisOfRotation-this.equation2.getY(i+step))",
+					            "Math.abs(axisOfRotation-this.equation1.getY(i))",
+					            "Math.abs(axisOfRotation-this.equation1.getY(i+step))");
 				}
 				else
 				{
@@ -208,20 +189,20 @@ class Graph
 			{
 				//Not complete yet (this is just for cylinders)
 				console.log("\t\tBoundY1 is equal to boundY2 and bound1 does not equal bound2");
-				if(this.axisOfRotation > boundY1)
+				if(axisOfRotation > boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is greater than boundY1");
-					this.addBSP("Math.abs(this.axisOfRotation-this.getY(i))", "Math.abs(this.axisOfRotation-this.getY(i+step))", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)");
+					this.addBSP("Math.abs(axisOfRotation-this.equation1.getY(i))", "Math.abs(axisOfRotation-this.equation1.getY(i+step))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)");
 				}
-				else if(this.axisOfRotation < boundY1)
+				else if(axisOfRotation < boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is less than boundY1");
-					this.addBSP("Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)", "Math.abs(this.axisOfRotation)+this.getY(i)", "Math.abs(this.axisOfRotation)+this.getY(i+step)");
+					this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+this.equation1.getY(i)", "Math.abs(axisOfRotation)+this.equation1.getY(i+step)");
 				}
-				else if(this.axisOfRotation === boundY1)
+				else if(axisOfRotation === boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is equal to boundY1");
-					this.addSolidWithoutHoles("Math.abs(this.getY(i))", "Math.abs(this.getY(i+step))");
+					this.addSolidWithoutHoles("Math.abs(this.equation1.getY(i))", "Math.abs(this.equation1.getY(i+step))");
 				}
 			}
 		}
@@ -232,9 +213,9 @@ class Graph
 	addBSP(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 	{
 		let step = this.quality;
-		for(let i = this.bound1; i < this.bound2; i += step)
+		for(let i = bound1; i < bound2; i += step)
 		{
-			if(this.getY(i) <= size)
+			if(this.equation1.getY(i) <= size)
 			{
 				if(!eval(smallGeoR1) || !eval(smallGeoR2))  //Hacky bugfix woo
 				{
@@ -242,15 +223,15 @@ class Graph
 					smallGeoR2 += "+0.01";
 				}
 
-				if(i + step > this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
+				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
-					step = this.bound2 - i;
+					step = bound2 - i;
 				}
 
 				const smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-				smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
+				smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
 				const largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-				largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
+				largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
 				const smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 				const largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 				smallCylinderGeom.dispose();
@@ -265,17 +246,17 @@ class Graph
 	addSolidWithoutHoles(leftRadius, rightRadius)
 	{
 		let step = this.quality;
-		for(let i = this.bound1; i < this.bound2; i += step)
+		for(let i = bound1; i < bound2; i += step)
 		{
-			if(this.getY(i) <= size)
+			if(this.equation1.getY(i) <= size)
 			{
-				if(i + step > this.bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
+				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
-					step = this.bound2 - i;
+					step = bound2 - i;
 				}
 
 				const geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-				geometry.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
+				geometry.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
 				const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 				geometry.dispose();
 				this.group.add(plane);
@@ -345,19 +326,49 @@ class Graph
 	}
 }
 
+init();
+
+function init()
+{
+	if(!Detector.webgl)  //No WebGL D:
+	{
+		Detector.addGetWebGLMessage();
+		return;
+	}
+
+	const formID = document.getElementById("form");
+	const wipID = document.getElementById("wip");
+	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	const totalHeight = formHeight + wipHeight;
+
+	scene = new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
+	camera.position.z = 75;
+
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	document.body.appendChild(renderer.domElement);
+
+	controls = new THREE.TrackballControls(camera, renderer.domElement);
+	controls.addEventListener("change", Graph.render);
+
+	Graph.addAxis();
+	Graph.addLights();
+	Graph.animate();
+	Graph.render();
+}
+
 function submit() // eslint-disable-line
 {
 	Graph.clear();
-
-	graphArray[0] = undefined;
-	graphArray[1] = undefined;
 
 	const function1 = document.getElementById("function1").value;
 	const function2 = document.getElementById("function2").value;
 	const quality = Number(document.getElementById("quality").value);
 	let drawSolid = true;
 
-	let bound1, bound2, axisOfRotation;  //Prevents users from passing in undefined variables (eg 'x')
 	try
 	{
 		bound1 = math.eval(document.getElementById("bound1").value);
@@ -392,24 +403,17 @@ function submit() // eslint-disable-line
 		drawSolid = false;
 	}
 
-	let points = getPoints(function1);
+	const equation1 = new Equation(function1);
+	const equation2 = new Equation(function2);
 
-	const graph1 = new Graph(function1, bound1, bound2, axisOfRotation, points, quality, 0);
-	graphArray[graph1.graphID] = graph1;
-	graph1.draw();
+	let graph = new Graph(equation1, equation2, quality);
 
-	if(function2 !== "")  //We obviously don't want to graph an empty function
-	{
-		points = getPoints(function2);
-
-		const graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
-		graphArray[graph2.graphID] = graph2;
-		graph2.draw();
-	}
+	graph.draw(equation1);
+	graph.draw(equation2);
 
 	if(drawSolid)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
-		graph1.drawShape();
+		graph.drawShape();
 	}
 }
 
@@ -417,9 +421,6 @@ function reset()  //eslint-disable-line
 {
 	Graph.clear();
 	controls.reset();
-
-	graphArray[0] = undefined;
-	graphArray[1] = undefined;
 
 	document.getElementById("function1").value = "";
 	document.getElementById("function2").value = "";
