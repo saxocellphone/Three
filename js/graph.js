@@ -1,7 +1,7 @@
 "use strict";
-var camera, controls, scene, renderer;
-var size = 28;
-var graphArray = [];
+let camera, controls, scene, renderer;
+const size = 28;
+let graphArray = [];
 
 init();
 
@@ -13,11 +13,11 @@ function init()
 		return;
 	}
 
-	var formID = document.getElementById("form");
-	var wipID = document.getElementById("wip");
-	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var totalHeight = formHeight + wipHeight;
+	const formID = document.getElementById("form");
+	const wipID = document.getElementById("wip");
+	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	const totalHeight = formHeight + wipHeight;
 
 	scene = new THREE.Scene();
 
@@ -39,9 +39,9 @@ function init()
 
 function getPoints(equation)
 {
-	var points = [];
-	var compiledEquation = math.compile(equation);
-	for(var x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
+	let points = [];
+	const compiledEquation = math.compile(equation);
+	for(let x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
 	{
 		points.push(compiledEquation.eval({x}));
 	}
@@ -50,10 +50,10 @@ function getPoints(equation)
 
 function getIntersections(points1, points2, bound1, bound2)
 {
-	var intersections = [];
-	var larger;
+	let intersections = [];
+	let larger;
 
-	for(var x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
+	for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
 	{
 		if(points1[x] > points2[x])
 		{
@@ -109,22 +109,21 @@ Graph.prototype.getMin = function()
 
 Graph.prototype.draw = function()
 {
-	var x = -size;
-	var vector = [];
-	var counter = x;  //I'll change this later, just using a counter variable for now
-	var step = 0.01;
-	var i;
-	for(i = -size; i <= size; i += step)
+	let x = -size;
+	let vector = [];
+	let counter = x;  //I'll change this later, just using a counter variable for now
+	const step = 0.01;
+	for(let i = -size; i <= size; i += step)
 	{
 		vector[counter + size] = new THREE.Vector3(x.toFixed(2), this.points[counter + size], 0.05);
 		x += step;
 		counter++;
 	}
 
-	var geometry = new THREE.Geometry();
-	var spline = new THREE.CatmullRomCurve3(vector);
-	var splinePoints = spline.getPoints(vector.length - 1);
-	for(i = 0; i < splinePoints.length; i++)
+	const geometry = new THREE.Geometry();
+	const spline = new THREE.CatmullRomCurve3(vector);
+	const splinePoints = spline.getPoints(vector.length - 1);
+	for(let i = 0; i < splinePoints.length; i++)
 	{
 		if(Math.abs(spline.points[i].y) <= size)
 		{
@@ -132,7 +131,7 @@ Graph.prototype.draw = function()
 		}
 	}
 
-	var graph = new THREE.Line(geometry, new THREE.LineBasicMaterial());
+	const graph = new THREE.Line(geometry, new THREE.LineBasicMaterial());
 	graph.name = "graph";
 	scene.add(graph);
 	render();
@@ -141,8 +140,8 @@ Graph.prototype.draw = function()
 Graph.prototype.drawShape = function()
 {
 	this.group.name = "solid";
-	var boundY1 = this.getY(this.bound1);
-	var boundY2 = this.getY(this.bound2);
+	let boundY1 = this.getY(this.bound1);
+	let boundY2 = this.getY(this.bound2);
 
 	if(this.bound1 === this.bound2)
 	{
@@ -157,7 +156,7 @@ Graph.prototype.drawShape = function()
 		[boundY1, boundY2] = [boundY2, boundY1];
 	}
 
-	var [intersections, larger] = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
+	const [intersections, larger] = getIntersections(this.points, graphArray[1] ? graphArray[1].points : Array(100 * size * 2 + 1).fill(this.axisOfRotation), this.bound1, this.bound2);
 
 	if(intersections[0] !== undefined)
 	{
@@ -227,8 +226,8 @@ Graph.prototype.drawShape = function()
 
 Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 {
-	var step = this.quality;
-	for(var i = this.bound1; i < this.bound2; i += step)
+	let step = this.quality;
+	for(let i = this.bound1; i < this.bound2; i += step)
 	{
 		if(this.getY(i) <= size)
 		{
@@ -243,16 +242,16 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 				step = this.bound2 - i;
 			}
 
-			var smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
+			const smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
 			smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
-			var largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
+			const largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
 			largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
-			var smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
-			var largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
+			const smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
+			const largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 			smallCylinderGeom.dispose();
 			largeCylinderGeom.dispose();
-			var intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
-			var hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
+			const intersectionBSP = largeCylinderBSP.subtract(smallCylinderBSP);
+			const hollowCylinder = intersectionBSP.toMesh(new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			this.group.add(hollowCylinder);
 		}
 	}
@@ -260,8 +259,8 @@ Graph.prototype.addBSP = function(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 
 Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 {
-	var step = this.quality;
-	for(var i = this.bound1; i < this.bound2; i += step)
+	let step = this.quality;
+	for(let i = this.bound1; i < this.bound2; i += step)
 	{
 		if(this.getY(i) <= size)
 		{
@@ -270,9 +269,9 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 				step = this.bound2 - i;
 			}
 
-			var geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
+			const geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
 			geometry.rotateZ(Math.PI / 2).translate(i + step / 2, this.axisOfRotation, 0);
-			var plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
+			const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 			geometry.dispose();
 			this.group.add(plane);
 		}
@@ -281,7 +280,7 @@ Graph.prototype.addSolidWithoutHoles = function(leftRadius, rightRadius)
 
 function clearGraph()
 {
-	for(var i = 0; i < scene.children.length; i++)
+	for(let i = 0; i < scene.children.length; i++)
 	{
 		if(scene.children[i] !== undefined)
 		{
@@ -302,12 +301,12 @@ function submit() // eslint-disable-line
 	graphArray[0] = undefined;
 	graphArray[1] = undefined;
 
-	var function1 = document.getElementById("function1").value;
-	var function2 = document.getElementById("function2").value;
-	var quality = Number(document.getElementById("quality").value);
-	var drawSolid = true;
+	const function1 = document.getElementById("function1").value;
+	const function2 = document.getElementById("function2").value;
+	const quality = Number(document.getElementById("quality").value);
+	let drawSolid = true;
 
-	var bound1, bound2, axisOfRotation;  //Prevents users from passing in undefined variables (eg 'x')
+	let bound1, bound2, axisOfRotation;  //Prevents users from passing in undefined variables (eg 'x')
 	try
 	{
 		bound1 = math.eval(document.getElementById("bound1").value);
@@ -342,9 +341,9 @@ function submit() // eslint-disable-line
 		drawSolid = false;
 	}
 
-	var points = getPoints(function1);
+	let points = getPoints(function1);
 
-	var graph1 = new Graph(function1, bound1, bound2, axisOfRotation, points, quality, 0);
+	const graph1 = new Graph(function1, bound1, bound2, axisOfRotation, points, quality, 0);
 	graphArray[graph1.graphID] = graph1;
 	graph1.draw();
 
@@ -352,7 +351,7 @@ function submit() // eslint-disable-line
 	{
 		points = getPoints(function2);
 
-		var graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
+		const graph2 = new Graph(function2, bound1, bound2, axisOfRotation, points, quality, 1);
 		graphArray[graph2.graphID] = graph2;
 		graph2.draw();
 	}
@@ -376,7 +375,7 @@ function render()
 
 function addLights()
 {
-	var pointLight = new THREE.PointLight(0xFFFF00, 1, 5000);
+	const pointLight = new THREE.PointLight(0xFFFF00, 1, 5000);
 	pointLight.position.set(0, 100, 90);
 	scene.add(pointLight);
 	scene.add(new THREE.HemisphereLight(0x3284FF, 0xFFC87F, 0.6));
@@ -384,9 +383,9 @@ function addLights()
 
 function addAxis()
 {
-	var lines = new THREE.Geometry();
-	var axes = new THREE.Geometry();
-	for(var i = -size; i <= size; i++)
+	const lines = new THREE.Geometry();
+	const axes = new THREE.Geometry();
+	for(let i = -size; i <= size; i++)
 	{
 		if(i)
 		{
@@ -426,11 +425,11 @@ function reset()  //eslint-disable-line
 
 window.onresize = function()
 {
-	var formID = document.getElementById("form");
-	var wipID = document.getElementById("wip");
-	var formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	var wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	var totalHeight = formHeight + wipHeight;
+	const formID = document.getElementById("form");
+	const wipID = document.getElementById("wip");
+	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
+	const totalHeight = formHeight + wipHeight;
 
 	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();

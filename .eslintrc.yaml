@@ -42,6 +42,8 @@ rules:
             overrides:
                 case:
                     after: true
+                const:
+                    after: true
                 return:
                     after: true
                 throw:
