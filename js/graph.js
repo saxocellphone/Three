@@ -117,9 +117,9 @@ class Graph
 			}
 		}
 
-		const graph = new THREE.Line(geometry, new THREE.LineBasicMaterial());
-		graph.name = "graph";
-		scene.add(graph);
+		const line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
+		line.name = "line";
+		scene.add(line);
 		Graph.render();
 	}
 
@@ -270,7 +270,7 @@ class Graph
 		{
 			if(scene.children[i] !== undefined)
 			{
-				if(scene.children[i].name === "graph" || scene.children[i].name === "solid")
+				if(scene.children[i].name === "line" || scene.children[i].name === "solid")
 				{
 					scene.remove(scene.children[i]);
 					i--;
