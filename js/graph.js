@@ -3,11 +3,30 @@ let camera, controls, scene, renderer;
 let bound1, bound2, axisOfRotation;
 const size = 28;
 
+const RotateEnum =
+{
+	ROTATE_UNKNOWN: 0,
+	ROTATE_X: 1,
+	ROTATE_Y: 2
+};
+
 class Equation
 {
 	constructor(equation)
 	{
-		this.equation = equation;
+		if(equation.match(/^\s*x\s*=/) !== null) // x = stuff
+		{
+			this.rotate = RotateEnum.ROTATE_Y;
+		}
+		else if(equation.trim().length)// y = stuff, or just stuff
+		{
+			this.rotate = RotateEnum.ROTATE_X;
+		}
+		else
+		{
+			this.rotate = RotateEnum.ROTATE_UNKNOWN;
+		}
+		this.equation = equation.split(/=\s*/).pop(); // Only retrieve the actual equation
 		this.points = this.getPoints();
 	}
 
@@ -15,17 +34,27 @@ class Equation
 	{
 		let points = [];
 		const compiledEquation = math.compile(this.equation);
-		for(let x = -size; x <= size + 1; x += 0.01)  //Add 1 to the ending size because of the origin
+		if(this.rotate === RotateEnum.ROTATE_X)
 		{
-			points.push(compiledEquation.eval({x}));
+			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(compiledEquation.eval({x}));
+			}
+		}
+		else
+		{
+			for(let y = -size; y <= size + 1; y += 0.01)
+			{
+				points.push(compiledEquation.eval({y})); // Add 1 to the ending size because of the origin
+			}
 		}
 		return points;
 	}
 
-	getY(x)
+	getCoord(point)
 	{
-		//getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted x coord by 100 to get actual indices
-		return this.points[Math.round(100 * (size + x))];
+		//getPoints iterates by 0.01 starting from 0, not -28, so multiply the converted coord by 100 to get actual indices
+		return this.points[Math.round(100 * (size + point))];
 	}
 
 	getMax()
@@ -76,6 +105,11 @@ class Equation
 		}
 		return [intersections, larger];
 	}
+
+	getRotation()
+	{
+		return this.rotate;
+	}
 }
 
 class Graph
@@ -86,6 +120,17 @@ class Graph
 		this.equation1 = equation1;
 		this.equation2 = equation2;
 		this.quality = quality;
+
+		if(this.equation1.getRotation() !== this.equation2.getRotation()
+		&& this.equation1.getRotation() !== RotateEnum.ROTATE_UNKNOWN
+		&& this.equation2.getRotation() !== RotateEnum.ROTATE_UNKNOWN)
+		{
+			sweetAlert("Conflicting rotations", "Both equations must be rotated around the same axis", "warning");
+		}
+		else
+		{
+			this.rotate = this.equation1.getRotation();
+		}
 	}
 
 	draw(equation)
@@ -101,7 +146,14 @@ class Graph
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
-			vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
+			if(this.rotate === RotateEnum.ROTATE_X)
+			{
+				vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
+			}
+			else
+			{
+				vector[counter + size] = new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05);
+			}
 			x += step;
 			counter++;
 		}
@@ -111,9 +163,19 @@ class Graph
 		const splinePoints = spline.getPoints(vector.length - 1);
 		for(let i = 0; i < splinePoints.length; i++)
 		{
-			if(Math.abs(spline.points[i].y) <= size)
+			if(this.rotate === RotateEnum.ROTATE_X)
 			{
-				geometry.vertices.push(spline.points[i]);
+				if(Math.abs(spline.points[i].y <= size))
+				{
+					geometry.vertices.push(spline.points[i]);
+				}
+			}
+			else
+			{
+				if(Math.abs(spline.points[i].x <= size))
+				{
+					geometry.vertices.push(spline.points[i]);
+				}
 			}
 		}
 
@@ -126,8 +188,9 @@ class Graph
 	drawShape()
 	{
 		this.group.name = "solid";
-		let boundY1 = this.equation1.getY(bound1);
-		let boundY2 = this.equation1.getY(bound2);
+
+		let boundY1 = this.equation1.getCoord(bound1);
+		let boundY2 = this.equation2.getCoord(bound2);
 
 		if(bound1 === bound2)
 		{
@@ -161,7 +224,7 @@ class Graph
 		if(this.equation2 === undefined || Number(this.equation2.equation) === axisOfRotation)  //FIXME: This doesn't catch constants
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
-			this.addSolidWithoutHoles("Math.abs(this.equation1.getY(i))", "Math.abs(this.equation1.getY(i+step))");
+			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
 		}
 		else
 		{
@@ -173,10 +236,10 @@ class Graph
 				if(axisOfRotation >= this.equation1.getMax() && axisOfRotation >= this.equation2.getMax()
 				|| axisOfRotation <= this.equation1.getMin() && axisOfRotation <= this.equation2.getMin())
 				{
-					this.addBSP("Math.abs(axisOfRotation-this.equation2.getY(i))",
-					            "Math.abs(axisOfRotation-this.equation2.getY(i+step))",
-					            "Math.abs(axisOfRotation-this.equation1.getY(i))",
-					            "Math.abs(axisOfRotation-this.equation1.getY(i+step))");
+					this.addBSP("Math.abs(axisOfRotation-this.equation2.getCoord(i))",
+					            "Math.abs(axisOfRotation-this.equation2.getCoord(i+step))",
+					            "Math.abs(axisOfRotation-this.equation1.getCoord(i))",
+					            "Math.abs(axisOfRotation-this.equation1.getCoord(i+step))");
 				}
 				else
 				{
@@ -192,17 +255,17 @@ class Graph
 				if(axisOfRotation > boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is greater than boundY1");
-					this.addBSP("Math.abs(axisOfRotation-this.equation1.getY(i))", "Math.abs(axisOfRotation-this.equation1.getY(i+step))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)");
+					this.addBSP("Math.abs(axisOfRotation-this.equation1.getCoord(i))", "Math.abs(axisOfRotation-this.equation1.getCoord(i+step))", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)");
 				}
 				else if(axisOfRotation < boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is less than boundY1");
-					this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+this.equation1.getY(i)", "Math.abs(axisOfRotation)+this.equation1.getY(i+step)");
+					this.addBSP("Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)", "Math.abs(axisOfRotation)+this.equation1.getCoord(i)", "Math.abs(axisOfRotation)+this.equation1.getCoord(i+step)");
 				}
 				else if(axisOfRotation === boundY1)
 				{
 					console.log("\t\t\tAxis of rotation is equal to boundY1");
-					this.addSolidWithoutHoles("Math.abs(this.equation1.getY(i))", "Math.abs(this.equation1.getY(i+step))");
+					this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
 				}
 			}
 		}
@@ -215,7 +278,7 @@ class Graph
 		let step = this.quality;
 		for(let i = bound1; i < bound2; i += step)
 		{
-			if(this.equation1.getY(i) <= size)
+			if(this.equation1.getCoord(i) <= size)
 			{
 				if(!eval(smallGeoR1) || !eval(smallGeoR2))  //Hacky bugfix woo
 				{
@@ -248,7 +311,7 @@ class Graph
 		let step = this.quality;
 		for(let i = bound1; i < bound2; i += step)
 		{
-			if(this.equation1.getY(i) <= size)
+			if(this.equation1.getCoord(i) <= size)
 			{
 				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
@@ -371,9 +434,9 @@ function submit() // eslint-disable-line
 
 	try
 	{
-		bound1 = math.eval(document.getElementById("bound1").value);
-		bound2 = math.eval(document.getElementById("bound2").value);
-		axisOfRotation = math.eval(document.getElementById("rotation").value);
+		bound1 = math.eval(document.getElementById("bound1").value.split(/=\s*/).pop()); // Only retrieve the actual equation
+		bound2 = math.eval(document.getElementById("bound2").value.split(/=\s*/).pop()); // Only retrieve the actual equation
+		axisOfRotation = math.eval(document.getElementById("rotation").value.split(/=\s*/).pop()); // Only retrieve the actual equation
 	}
 	catch(error)
 	{
@@ -442,4 +505,9 @@ window.onresize = function()
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	Graph.render();
+};
+
+window.onerror = function(message, source, line, column, error)
+{
+	sweetAlert("Error", "Message: " + message + " (line " + line + ", column " + column + ")", "error");
 };
