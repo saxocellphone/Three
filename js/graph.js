@@ -292,9 +292,25 @@ class Graph
 				}
 
 				const smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-				smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				if(this.rotate === RotateEnum.ROTATE_X)
+				{
+					smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				}
+				else
+				{
+					smallCylinderGeom.rotateZ(Math.PI).translate(axisOfRotation, i + step / 2, 0);
+				}
+
 				const largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-				largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				if(this.rotate === RotateEnum.ROTATE_X)
+				{
+					largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				}
+				else
+				{
+					largeCylinderGeom.rotateZ(Math.PI).translate(axisOfRotation, i + step / 2, 0);
+				}
+
 				const smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 				const largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
 				smallCylinderGeom.dispose();
@@ -319,7 +335,14 @@ class Graph
 				}
 
 				const geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-				geometry.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				if(this.rotate === RotateEnum.ROTATE_X)
+				{
+					geometry.rotateZ(Math.PI / 2).translate(i + step / 2, axisOfRotation, 0);
+				}
+				else
+				{
+					geometry.rotateZ(Math.PI).translate(axisOfRotation, i + step / 2, 0);
+				}
 				const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 				geometry.dispose();
 				this.group.add(plane);
