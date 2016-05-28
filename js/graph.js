@@ -529,8 +529,3 @@ window.onresize = function()
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	Graph.render();
 };
-
-window.onerror = function(message, source, line, column, error)
-{
-	sweetAlert("Error", "Message: " + message + " (line " + line + ", column " + column + ")", "error");
-};
