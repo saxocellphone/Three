@@ -42,9 +42,13 @@ rules:
             overrides:
                 case:
                     after: true
+                const:
+                    after: true
                 return:
                     after: true
                 throw:
+                    after: true
+                var:
                     after: true
     new-cap: 1
     new-parens: 2
