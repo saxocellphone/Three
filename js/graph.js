@@ -3,28 +3,26 @@ let camera, controls, scene, renderer;
 let bound1, bound2, rotationAxis;
 const size = 28;
 
-const AxisEnum = {
-	AXIS_UNKNOWN: 0,
-	AXIS_X: 1,
-	AXIS_Y: 2
+const EquationType = {
+	EQUATION_UNKNOWN: 0,
+	EQUATION_X: 1,
+	EQUATION_Y: 2
 };
 
 class Equation
 {
 	constructor(equation)
 	{
+		this.type = EquationType.EQUATION_UNKNOWN;
 		if(equation.match(/^\s*x\s*=/) !== null) // x = stuff
 		{
-			this.axis = AxisEnum.AXIS_Y;
+			this.type = EquationType.EQUATION_X;
 		}
 		else if(equation.trim().length) // y = stuff, or just stuff
 		{
-			this.axis = AxisEnum.AXIS_X;
+			this.type = EquationType.EQUATION_Y;
 		}
-		else
-		{
-			this.axis = AxisEnum.AXIS_UNKNOWN;
-		}
+
 		this.equation = equation.split(/=\s*/).pop(); // Only retrieve the actual equation
 		this.points = this.getPoints();
 	}
@@ -33,14 +31,14 @@ class Equation
 	{
 		let points = [];
 		const compiledEquation = math.compile(this.equation);
-		if(this.axis === AxisEnum.AXIS_X)
+		if(this.type === EquationType.EQUATION_Y)
 		{
 			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(compiledEquation.eval({x}));
 			}
 		}
-		else
+		else if(this.type === EquationType.EQUATION_X)
 		{
 			for(let y = -size; y <= size + 1; y += 0.01)
 			{
@@ -105,9 +103,9 @@ class Equation
 		return [intersections, larger];
 	}
 
-	getAxis()
+	getType()
 	{
-		return this.axis;
+		return this.type;
 	}
 }
 
@@ -120,16 +118,16 @@ class Graph
 		this.equation2 = equation2;
 		this.quality = quality;
 
-		this.equationAxis = AxisEnum.AXIS_UNKNOWN;
-		if(this.equation1.getAxis() !== this.equation2.getAxis()
-		&& this.equation1.getAxis() !== AxisEnum.AXIS_UNKNOWN
-		&& this.equation2.getAxis() !== AxisEnum.AXIS_UNKNOWN)
+		this.type = EquationType.EQUATION_UNKNOWN;
+		if(this.equation1.getType() !== this.equation2.getType()
+		&& this.equation1.getType() !== EquationType.EQUATION_UNKNOWN
+		&& this.equation2.getType() !== EquationType.EQUATION_UNKNOWN)
 		{
 			sweetAlert("Conflicting rotations", "Both equations must be rotated around the same axis", "warning");
 		}
 		else
 		{
-			this.equationAxis = this.equation1.getAxis();
+			this.type = this.equation1.getType();
 		}
 	}
 
@@ -146,11 +144,11 @@ class Graph
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
-			if(this.equationAxis === AxisEnum.AXIS_X)
+			if(this.type === EquationType.EQUATION_Y)
 			{
 				vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
 			}
-			else if(this.equationAxis === AxisEnum.AXIS_Y)
+			else if(this.type === EquationType.EQUATION_X)
 			{
 				vector[counter + size] = new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05);
 			}
@@ -163,14 +161,14 @@ class Graph
 		const splinePoints = spline.getPoints(vector.length - 1);
 		for(let i = 0; i < splinePoints.length; i++)
 		{
-			if(this.equationAxis === AxisEnum.AXIS_X)
+			if(this.type === EquationType.EQUATION_Y)
 			{
 				if(Math.abs(spline.points[i].y <= size))
 				{
 					geometry.vertices.push(spline.points[i]);
 				}
 			}
-			else if(this.equationAxis === AxisEnum.AXIS_Y)
+			else if(this.type === EquationType.EQUATION_X)
 			{
 				if(Math.abs(spline.points[i].x <= size))
 				{
@@ -292,21 +290,21 @@ class Graph
 				}
 
 				const smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
-				if(this.axis === AxisEnum.AXIS_X)
+				if(this.type === EquationType.EQUATION_Y)
 				{
 					smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
 				}
-				else
+				else if(this.type === EquationType.EQUATION_X)
 				{
 					smallCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
 
 				const largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
-				if(this.axis === AxisEnum.AXIS_X)
+				if(this.type === EquationType.EQUATION_Y)
 				{
 					largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
 				}
-				else
+				else if(this.type === EquationType.EQUATION_X)
 				{
 					largeCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
@@ -335,11 +333,11 @@ class Graph
 				}
 
 				const geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
-				if(this.axis === AxisEnum.AXIS_X)
+				if(this.type === EquationType.EQUATION_Y)
 				{
 					geometry.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
 				}
-				else
+				else if(this.type === EquationType.EQUATION_X)
 				{
 					geometry.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
