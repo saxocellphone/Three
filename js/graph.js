@@ -45,6 +45,13 @@ class Equation
 				points.push(compiledEquation.eval({y})); // Add 1 to the ending size because of the origin
 			}
 		}
+		else
+		{
+			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(undefined);
+			}
+		}
 		return points;
 	}
 
