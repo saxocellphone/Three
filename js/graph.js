@@ -460,17 +460,39 @@ function submit() // eslint-disable-line
 	const quality = Number(document.getElementById("quality").value);
 	let drawSolid = true;
 
-	try
+	const equation1 = new Equation(function1);
+	const equation2 = new Equation(function2);
+
+	let type;
+	if(equation1.getType() !== EquationType.EQUATION_UNKNOWN)
 	{
-		bound1 = math.eval(document.getElementById("bound1").value.split(/=\s*/).pop()); // Only retrieve the actual equation
-		bound2 = math.eval(document.getElementById("bound2").value.split(/=\s*/).pop()); // Only retrieve the actual equation
-		rotationAxis = math.eval(document.getElementById("rotation").value.split(/=\s*/).pop()); // Only retrieve the actual equation
+		type = equation1.getType();
 	}
-	catch(error)
+	else if(equation1.getType() === EquationType.EQUATION_UNKNOWN && equation2.getType() !== EquationType.EQUATION_UNKNOWN)
 	{
-		const type = isNaN(bound1) ? "first bound" : isNaN(bound2) ? "second bound" : "axis of rotation";
-		sweetAlert("Invalid " + type, "Please enter a valid number for the " + type, "warning");
-		drawSolid = false;
+		type = equation2.getType();
+	}
+	else
+	{
+		return;
+	}
+
+	bound1 = parseValue(document.getElementById("bound1").value, "first bound", type);
+	if(bound1 === false)
+	{
+		return;
+	}
+
+	bound2 = parseValue(document.getElementById("bound2").value, "second bound", type);
+	if(bound2 === false)
+	{
+		return;
+	}
+
+	rotationAxis = parseValue(document.getElementById("rotation").value, "axis of rotation", type);
+	if(rotationAxis === false)
+	{
+		return;
 	}
 
 	if(bound1 === undefined && bound2 === undefined && rotationAxis === undefined)  //Only create the solid if we have both of the bounds and the axis of rotation
@@ -494,9 +516,6 @@ function submit() // eslint-disable-line
 		drawSolid = false;
 	}
 
-	const equation1 = new Equation(function1);
-	const equation2 = new Equation(function2);
-
 	let graph = new Graph(equation1, equation2, quality);
 
 	graph.draw(equation1);
@@ -505,6 +524,57 @@ function submit() // eslint-disable-line
 	if(drawSolid)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
 		graph.drawShape();
+	}
+}
+
+function parseValue(equation, name, equationType)
+{
+	equation = equation.split(/=\s*/);
+	if(equation.length > 2)
+	{
+		sweetAlert("Malformed equation", name + " cannot have more than one equals sign", "error");
+		return undefined;
+	}
+
+	let type;
+	if(equation.length === 2 && equation.shift().trim() === "x")
+	{
+		type = EquationType.EQUATION_X;
+	}
+	else if(equation.length === 1 || equation.shift().trim().length)
+	{
+		type = EquationType.EQUATION_Y;
+	}
+	else
+	{
+		type = EquationType.EQUATION_UNKNOWN;
+	}
+
+	if(type !== equationType && name.includes("rotation"))
+	{
+		let temp = type === EquationType.EQUATION_X ? "y" : "x";
+		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
+		return false; // Return false and not undefined so that we don't trigger another alert
+	}
+	else if(type === equationType && !name.includes("rotation"))
+	{
+		let temp = type === EquationType.EQUATION_X ? "y" : "x";
+		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
+		return false; // Return false and not undefined so that we don't trigger another alert
+	}
+	else if(type === EquationType.EQUATION_UNKNOWN)
+	{
+		return undefined;
+	}
+
+	try
+	{
+		return math.eval(math.number(equation.toString()));
+	}
+	catch(error)
+	{
+		sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
+		return false; // Return false and not undefined so that we don't trigger another alert
 	}
 }
 
@@ -533,4 +603,9 @@ window.onresize = function()
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	Graph.render();
+};
+
+window.onerror = function(a, b, c, d)
+{
+	alert(a + " (" + c + ":" + d + ")");
 };
