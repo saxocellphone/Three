@@ -604,8 +604,3 @@ window.onresize = function()
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
 	Graph.render();
 };
-
-window.onerror = function(a, b, c, d)
-{
-	alert(a + " (" + c + ":" + d + ")");
-};
