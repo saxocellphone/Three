@@ -501,8 +501,8 @@ function submit() // eslint-disable-line
 	}
 	else if(bound1 === undefined || bound2 === undefined || rotationAxis === undefined)
 	{
-		const type = bound1 === undefined ? "first bound" : bound2 === undefined ? "second bound" : "axis of rotation";
-		sweetAlert("Missing " + type, "Please specify the " + type, "warning");
+		const name = bound1 === undefined ? "first bound" : bound2 === undefined ? "second bound" : "axis of rotation";
+		sweetAlert("Missing " + name, "Please specify the " + name, "warning");
 		drawSolid = false;
 	}
 	else if(bound1 > size || bound1 < -size || bound2 > size || bound2 < -size)
