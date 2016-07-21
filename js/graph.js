@@ -497,21 +497,21 @@ function submit() // eslint-disable-line
 	{
 		// FIXME: I am NOT proud of this nested if chain AT ALL
 		bound1 = parseValue(document.getElementById("bound1").value, "first bound", type);
-		if(bound1 === false)
+		if(bound1 === undefined)
 		{
 			drawSolid = false;
 		}
 		else
 		{
 			bound2 = parseValue(document.getElementById("bound2").value, "second bound", type);
-			if(bound2 === false)
+			if(bound2 === undefined)
 			{
 				drawSolid = false;
 			}
 			else
 			{
 				rotationAxis = parseValue(document.getElementById("rotation").value, "axis of rotation", type);
-				if(rotationAxis === false)
+				if(rotationAxis === undefined)
 				{
 					drawSolid = false;
 				}
@@ -536,7 +536,7 @@ function parseValue(equation, name, equationType)
 	if(equation.length > 2)
 	{
 		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
-		return false;
+		return;
 	}
 
 	let type;
@@ -553,13 +553,13 @@ function parseValue(equation, name, equationType)
 	{
 		let temp = type === EquationType.EQUATION_X ? "y" : "x";
 		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
-		return false;
+		return;
 	}
 	else if(type === equationType && !name.includes("rotation"))
 	{
 		let temp = type === EquationType.EQUATION_X ? "y" : "x";
 		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
-		return false;
+		return;
 	}
 
 	try
@@ -568,14 +568,14 @@ function parseValue(equation, name, equationType)
 		if(math.abs(value) > size)
 		{
 			sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
-			return false;
+			return;
 		}
 		return value;
 	}
 	catch(error)
 	{
 		sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
-		return false;
+		return;
 	}
 }
 
