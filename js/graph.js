@@ -477,43 +477,46 @@ function submit() // eslint-disable-line
 		return;
 	}
 
-	bound1 = parseValue(document.getElementById("bound1").value, "first bound", type);
-	if(bound1 === false)
-	{
-		return;
-	}
+	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
+	bound1 = document.getElementById("bound1").value.trim().length;
+	bound2 = document.getElementById("bound2").value.trim().length;
+	rotationAxis = document.getElementById("rotation").value.trim().length;
 
-	bound2 = parseValue(document.getElementById("bound2").value, "second bound", type);
-	if(bound2 === false)
-	{
-		return;
-	}
-
-	rotationAxis = parseValue(document.getElementById("rotation").value, "axis of rotation", type);
-	if(rotationAxis === false)
-	{
-		return;
-	}
-
-	if(bound1 === undefined && bound2 === undefined && rotationAxis === undefined)  //Only create the solid if we have both of the bounds and the axis of rotation
+	// Only create the solid if we have both of the bounds and the axis of rotation
+	if(!bound1 && !bound2 && !rotationAxis)
 	{
 		drawSolid = false;
 	}
-	else if(bound1 === undefined || bound2 === undefined || rotationAxis === undefined)
+	else if(!bound1 || !bound2 || !rotationAxis)
 	{
-		const name = bound1 === undefined ? "first bound" : bound2 === undefined ? "second bound" : "axis of rotation";
+		const name = !bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation"; // eslint-disable-line no-negated-condition
 		sweetAlert("Missing " + name, "Please specify the " + name, "warning");
 		drawSolid = false;
 	}
-	else if(bound1 > size || bound1 < -size || bound2 > size || bound2 < -size)
+	else
 	{
-		sweetAlert("Invalid bounds", "Please make sure all bounds are within " + -size + " to " + size + ", inclusive", "warning");
-		drawSolid = false;
-	}
-	else if(rotationAxis > size || rotationAxis < -size)
-	{
-		sweetAlert("Invalid axis of rotation", "Please make sure the axis of rotation is within " + -size + " to " + size + ", inclusive", "warning");
-		drawSolid = false;
+		// FIXME: I am NOT proud of this nested if chain AT ALL
+		bound1 = parseValue(document.getElementById("bound1").value, "first bound", type);
+		if(bound1 === false)
+		{
+			drawSolid = false;
+		}
+		else
+		{
+			bound2 = parseValue(document.getElementById("bound2").value, "second bound", type);
+			if(bound2 === false)
+			{
+				drawSolid = false;
+			}
+			else
+			{
+				rotationAxis = parseValue(document.getElementById("rotation").value, "axis of rotation", type);
+				if(rotationAxis === false)
+				{
+					drawSolid = false;
+				}
+			}
+		}
 	}
 
 	let graph = new Graph(equation1, equation2, quality);
@@ -532,8 +535,8 @@ function parseValue(equation, name, equationType)
 	equation = equation.split(/=\s*/);
 	if(equation.length > 2)
 	{
-		sweetAlert("Malformed equation", name + " cannot have more than one equals sign", "error");
-		return undefined;
+		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
+		return false;
 	}
 
 	let type;
@@ -569,7 +572,13 @@ function parseValue(equation, name, equationType)
 
 	try
 	{
-		return math.eval(math.number(equation.toString()));
+		var value = math.eval(math.number(equation.toString()));
+		if(math.abs(value) > size)
+		{
+			sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
+			return false; // Return false and not undefined so that we don't trigger another alert
+		}
+		return value;
 	}
 	catch(error)
 	{
