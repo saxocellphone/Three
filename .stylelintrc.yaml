@@ -33,6 +33,7 @@ rules:
     function-url-quotes: single
     function-whitespace-after: always
     indentation: tab
+    length-zero-no-unit: true
     max-empty-lines: 1
     no-descending-specificity: true
     no-duplicate-selectors: true
@@ -54,4 +55,3 @@ rules:
     string-no-newline: true
     string-quotes: single
     value-list-comma-space-after: always-single-line
-    zero-length-no-unit: true
