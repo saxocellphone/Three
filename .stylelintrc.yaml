@@ -22,7 +22,7 @@ rules:
     declaration-block-trailing-semicolon: always
     declaration-colon-space-after: always-single-line
     declaration-colon-space-before: never
-    font-family-name-quotes: single-unless-keyword
+    font-family-name-quotes: always-unless-keyword
     font-weight-notation: named-where-possible
     function-comma-newline-after: always-multi-line
     function-comma-newline-before: never-multi-line
