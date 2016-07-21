@@ -548,26 +548,18 @@ function parseValue(equation, name, equationType)
 	{
 		type = EquationType.EQUATION_Y;
 	}
-	else
-	{
-		type = EquationType.EQUATION_UNKNOWN;
-	}
 
 	if(type !== equationType && name.includes("rotation"))
 	{
 		let temp = type === EquationType.EQUATION_X ? "y" : "x";
 		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
-		return false; // Return false and not undefined so that we don't trigger another alert
+		return false;
 	}
 	else if(type === equationType && !name.includes("rotation"))
 	{
 		let temp = type === EquationType.EQUATION_X ? "y" : "x";
 		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
-		return false; // Return false and not undefined so that we don't trigger another alert
-	}
-	else if(type === EquationType.EQUATION_UNKNOWN)
-	{
-		return undefined;
+		return false;
 	}
 
 	try
@@ -576,14 +568,14 @@ function parseValue(equation, name, equationType)
 		if(math.abs(value) > size)
 		{
 			sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
-			return false; // Return false and not undefined so that we don't trigger another alert
+			return false;
 		}
 		return value;
 	}
 	catch(error)
 	{
 		sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
-		return false; // Return false and not undefined so that we don't trigger another alert
+		return false;
 	}
 }
 
