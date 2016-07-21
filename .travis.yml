@@ -1,9 +1,8 @@
-sudo: false
-language: node_js
-node_js:
-    - node
+sudo: true
+dist: trusty
 
 install:
+    - nvm install node
     - gem install html-proofer
     - npm install -g eslint
     - npm install -g stylelint
