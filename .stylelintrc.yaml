@@ -42,7 +42,6 @@ rules:
     no-unknown-animations: true
     number-leading-zero: always
     number-no-trailing-zeros: true
-    number-zero-length-no-unit: true
     root-no-standard-properties: true
     rule-nested-empty-line-before: never
     rule-non-nested-empty-line-before: always
@@ -55,3 +54,4 @@ rules:
     string-no-newline: true
     string-quotes: single
     value-list-comma-space-after: always-single-line
+    zero-length-no-unit: true
