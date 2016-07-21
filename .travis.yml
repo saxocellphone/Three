@@ -1,5 +1,7 @@
-sudo: true
-dist: trusty
+sudo: false
+language: node_js
+node_js:
+    - node
 
 install:
     - gem install html-proofer
