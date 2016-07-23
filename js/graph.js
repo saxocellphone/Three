@@ -120,18 +120,7 @@ class Graph
 		this.equation1 = equation1;
 		this.equation2 = equation2;
 		this.quality = quality;
-
-		this.type = EquationType.EQUATION_UNKNOWN;
-		if(this.equation1.getType() !== this.equation2.getType()
-		&& this.equation1.getType() !== EquationType.EQUATION_UNKNOWN
-		&& this.equation2.getType() !== EquationType.EQUATION_UNKNOWN)
-		{
-			sweetAlert("Conflicting rotations", "Both equations must be rotated around the same axis", "warning");
-		}
-		else
-		{
-			this.type = this.equation1.getType();
-		}
+		this.type = this.equation1.getType() !== EquationType.EQUATION_UNKNOWN ? this.equation1.getType() : this.equation2.getType();
 	}
 
 	draw(equation)
@@ -569,12 +558,13 @@ function getEquationType(equation, name)
 function parseEquation(equation, name, equationType, constant = true)
 {
 	let type = getEquationType(equation, name);
-	if(type === EquationType.EQUATION_UNKNOWN || type === EquationType.EQUATION_INVALID)
-	{
-		return "";
-	}
 
 	equation = equation.split(/=\s*/);
+	if(type === EquationType.EQUATION_UNKNOWN || type === EquationType.EQUATION_INVALID)
+	{
+		return equation.pop();
+	}
+
 	if(constant)
 	{
 		if(type !== equationType && name.includes("rotation"))
