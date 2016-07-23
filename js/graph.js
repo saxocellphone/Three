@@ -67,7 +67,11 @@ class Equation
 
 	getIntersections(otherEquation)
 	{
-		if(otherEquation.points.every((element) => element === undefined))
+		if(this.points.every((element) => element === undefined))
+		{
+			this.points.fill(rotationAxis);
+		}
+		else if(otherEquation.points.every((element) => element === undefined))
 		{
 			otherEquation.points.fill(rotationAxis);
 		}
@@ -567,7 +571,7 @@ function parseEquation(equation, name, equationType, constant = true)
 	let type = getEquationType(equation, name);
 	if(type === EquationType.EQUATION_UNKNOWN || type === EquationType.EQUATION_INVALID)
 	{
-		return;
+		return "";
 	}
 
 	equation = equation.split(/=\s*/);
