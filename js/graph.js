@@ -567,12 +567,7 @@ function parseEquation(equation, name, equationType, constant = true)
 
 	if(constant)
 	{
-		if(type !== equationType && name.includes("rotation"))
-		{
-			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
-			return;
-		}
-		else if(type === equationType && !name.includes("rotation"))
+		if(type !== equationType && name.includes("rotation") || type === equationType && !name.includes("rotation"))
 		{
 			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
 			return;
