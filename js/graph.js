@@ -562,7 +562,14 @@ function parseEquation(equation, name, equationType, constant = true)
 	equation = equation.split(/=\s*/);
 	if(type === EquationType.EQUATION_NONE || type === EquationType.EQUATION_INVALID)
 	{
-		return equation.pop();
+		if(constant)
+		{
+			return;
+		}
+		else
+		{
+			return equation.pop();
+		}
 	}
 
 	if(constant)
