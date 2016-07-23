@@ -6,24 +6,16 @@ const size = 28;
 const EquationType = {
 	EQUATION_UNKNOWN: 0,
 	EQUATION_X: 1,
-	EQUATION_Y: 2
+	EQUATION_Y: 2,
+	EQUATION_INVALID: 3
 };
 
 class Equation
 {
-	constructor(equation)
+	constructor(equation, type)
 	{
-		this.type = EquationType.EQUATION_UNKNOWN;
-		if(equation.match(/^\s*x\s*=/) !== null) // x = stuff
-		{
-			this.type = EquationType.EQUATION_X;
-		}
-		else if(equation.trim().length) // y = stuff, or just stuff
-		{
-			this.type = EquationType.EQUATION_Y;
-		}
-
-		this.equation = equation.split(/=\s*/).pop(); // Only retrieve the actual equation
+		this.equation = equation;
+		this.type = type;
 		this.points = this.getPoints();
 	}
 
@@ -455,27 +447,43 @@ function submit() // eslint-disable-line
 {
 	Graph.clear();
 
-	const function1 = document.getElementById("function1").value;
-	const function2 = document.getElementById("function2").value;
+	let function1 = document.getElementById("function1").value;
+	let function2 = document.getElementById("function2").value;
 	const quality = Number(document.getElementById("quality").value);
 	let drawSolid = true;
 
-	const equation1 = new Equation(function1);
-	const equation2 = new Equation(function2);
-
-	let type;
-	if(equation1.getType() !== EquationType.EQUATION_UNKNOWN)
+	let type1 = getEquationType(function1, "first function");
+	let type2;
+	if(type1 !== EquationType.EQUATION_INVALID)
 	{
-		type = equation1.getType();
-	}
-	else if(equation1.getType() === EquationType.EQUATION_UNKNOWN && equation2.getType() !== EquationType.EQUATION_UNKNOWN)
-	{
-		type = equation2.getType();
+		type2 = getEquationType(function2, "second function");
+		if(type2 === EquationType.EQUATION_INVALID)
+		{
+			return;
+		}
 	}
 	else
 	{
 		return;
 	}
+
+	if(type1 === EquationType.EQUATION_UNKNOWN && type2 === EquationType.EQUATION_UNKNOWN)
+	{
+		return;
+	}
+
+	let type = type1 !== EquationType.EQUATION_UNKNOWN ? type1 : type2;
+	if(type1 !== type2 && type1 !== EquationType.EQUATION_UNKNOWN && type2 !== EquationType.EQUATION_UNKNOWN)
+	{
+		sweetAlert("Invalid equation type", "The second function should be a function of " + (type === EquationType.EQUATION_X ? "x" : "y"), "error");
+		return;
+	}
+
+	function1 = parseEquation(function1, "first function", type, false);
+	const equation1 = new Equation(function1, type);
+
+	function2 = parseEquation(function2, "second function", type, false);
+	const equation2 = new Equation(function2, type);
 
 	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
 	bound1 = document.getElementById("bound1").value.trim().length;
@@ -489,28 +497,28 @@ function submit() // eslint-disable-line
 	}
 	else if(!bound1 || !bound2 || !rotationAxis)
 	{
-		const name = !bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation"; // eslint-disable-line no-negated-condition
+		const name = !bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation";
 		sweetAlert("Missing " + name, "Please specify the " + name, "warning");
 		drawSolid = false;
 	}
 	else
 	{
 		// FIXME: I am NOT proud of this nested if chain AT ALL
-		bound1 = parseValue(document.getElementById("bound1").value, "first bound", type);
+		bound1 = parseEquation(document.getElementById("bound1").value, "first bound", type);
 		if(bound1 === undefined)
 		{
 			drawSolid = false;
 		}
 		else
 		{
-			bound2 = parseValue(document.getElementById("bound2").value, "second bound", type);
+			bound2 = parseEquation(document.getElementById("bound2").value, "second bound", type);
 			if(bound2 === undefined)
 			{
 				drawSolid = false;
 			}
 			else
 			{
-				rotationAxis = parseValue(document.getElementById("rotation").value, "axis of rotation", type);
+				rotationAxis = parseEquation(document.getElementById("rotation").value, "axis of rotation", type);
 				if(rotationAxis === undefined)
 				{
 					drawSolid = false;
@@ -530,52 +538,81 @@ function submit() // eslint-disable-line
 	}
 }
 
-function parseValue(equation, name, equationType)
+function getEquationType(equation, name)
 {
+	equation = equation.split(/=\s*/);
+	if(equation.length === 2 && equation[0].trim() === "x")
+	{
+		return EquationType.EQUATION_X;
+	}
+	else if(equation.length === 1 && equation[0].trim() !== "" || equation[0].trim() === "y")
+	{
+		return EquationType.EQUATION_Y;
+	}
+	else if(equation.length > 2)
+	{
+		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
+		return EquationType.EQUATION_INVALID;
+	}
+	else if(equation[0].trim() !== "")
+	{
+		sweetAlert("Invalid equation type", "The " + name + " should be a function of x or y", "error");
+		return EquationType.EQUATION_INVALID;
+	}
+	return EquationType.EQUATION_UNKNOWN;
+}
+
+function parseEquation(equation, name, equationType, constant = true)
+{
+	let type = getEquationType(equation, name);
+
 	equation = equation.split(/=\s*/);
 	if(equation.length > 2)
 	{
 		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
 		return;
 	}
-
-	let type;
-	if(equation.length === 2 && equation.shift().trim() === "x")
+	else if(type === EquationType.EQUATION_INVALID)
 	{
-		type = EquationType.EQUATION_X;
-	}
-	else if(equation.length === 1 || equation.shift().trim().length)
-	{
-		type = EquationType.EQUATION_Y;
-	}
-
-	if(type !== equationType && name.includes("rotation"))
-	{
-		let temp = type === EquationType.EQUATION_X ? "y" : "x";
-		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
-		return;
-	}
-	else if(type === equationType && !name.includes("rotation"))
-	{
-		let temp = type === EquationType.EQUATION_X ? "y" : "x";
-		sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + temp, "error");
+		sweetAlert("Invalid equation type", "The " + name + " should be a function of x or y", "error");
 		return;
 	}
 
-	try
+	if(type !== EquationType.EQUATION_UNKNOWN && constant)
 	{
-		var value = math.eval(math.number(equation.toString()));
-		if(math.abs(value) > size)
+		if(type !== equationType && name.includes("rotation"))
 		{
-			sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
+			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
 			return;
 		}
-		return value;
+		else if(type === equationType && !name.includes("rotation"))
+		{
+			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
+			return;
+		}
 	}
-	catch(error)
+
+	if(constant)
 	{
-		sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
-		return;
+		try
+		{
+			let value = math.eval(math.number(equation.pop().toString()));
+			if(math.abs(value) > size)
+			{
+				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
+				return;
+			}
+			return value;
+		}
+		catch(error)
+		{
+			sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
+			return;
+		}
+	}
+	else
+	{
+		return equation.pop();
 	}
 }
 
