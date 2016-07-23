@@ -565,20 +565,13 @@ function getEquationType(equation, name)
 function parseEquation(equation, name, equationType, constant = true)
 {
 	let type = getEquationType(equation, name);
+	if(type === EquationType.EQUATION_UNKNOWN || type === EquationType.EQUATION_INVALID)
+	{
+		return;
+	}
 
 	equation = equation.split(/=\s*/);
-	if(equation.length > 2)
-	{
-		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
-		return;
-	}
-	else if(type === EquationType.EQUATION_INVALID)
-	{
-		sweetAlert("Invalid equation type", "The " + name + " should be a function of x or y", "error");
-		return;
-	}
-
-	if(type !== EquationType.EQUATION_UNKNOWN && constant)
+	if(constant)
 	{
 		if(type !== equationType && name.includes("rotation"))
 		{
@@ -590,10 +583,7 @@ function parseEquation(equation, name, equationType, constant = true)
 			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
 			return;
 		}
-	}
 
-	if(constant)
-	{
 		try
 		{
 			let value = math.eval(math.number(equation.pop().toString()));
