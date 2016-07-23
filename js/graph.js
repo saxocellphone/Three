@@ -114,13 +114,13 @@ class Equation
 
 class Graph
 {
-	constructor(equation1, equation2, quality)
+	constructor(equation1, equation2, quality, type)
 	{
 		this.group = new THREE.Object3D();
 		this.equation1 = equation1;
 		this.equation2 = equation2;
 		this.quality = quality;
-		this.type = this.equation1.getType() !== EquationType.EQUATION_UNKNOWN ? this.equation1.getType() : this.equation2.getType();
+		this.type = type;
 	}
 
 	draw(equation)
@@ -520,7 +520,7 @@ function submit() // eslint-disable-line
 		}
 	}
 
-	let graph = new Graph(equation1, equation2, quality);
+	let graph = new Graph(equation1, equation2, quality, type);
 
 	graph.draw(equation1);
 	graph.draw(equation2);
