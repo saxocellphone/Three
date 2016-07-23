@@ -4,7 +4,7 @@ let bound1, bound2, rotationAxis;
 const size = 28;
 
 const EquationType = {
-	EQUATION_UNKNOWN: 0,
+	EQUATION_NONE: 0,
 	EQUATION_X: 1,
 	EQUATION_Y: 2,
 	EQUATION_INVALID: 3
@@ -460,13 +460,13 @@ function submit() // eslint-disable-line
 		return;
 	}
 
-	if(type1 === EquationType.EQUATION_UNKNOWN && type2 === EquationType.EQUATION_UNKNOWN)
+	if(type1 === EquationType.EQUATION_NONE && type2 === EquationType.EQUATION_NONE)
 	{
 		return;
 	}
 
-	let type = type1 !== EquationType.EQUATION_UNKNOWN ? type1 : type2;
-	if(type1 !== type2 && type1 !== EquationType.EQUATION_UNKNOWN && type2 !== EquationType.EQUATION_UNKNOWN)
+	let type = type1 !== EquationType.EQUATION_NONE ? type1 : type2;
+	if(type1 !== type2 && type1 !== EquationType.EQUATION_NONE && type2 !== EquationType.EQUATION_NONE)
 	{
 		sweetAlert("Invalid equation type", "The second function should be a function of " + (type === EquationType.EQUATION_X ? "x" : "y"), "error");
 		return;
@@ -552,7 +552,7 @@ function getEquationType(equation, name)
 		sweetAlert("Invalid equation type", "The " + name + " should be a function of x or y", "error");
 		return EquationType.EQUATION_INVALID;
 	}
-	return EquationType.EQUATION_UNKNOWN;
+	return EquationType.EQUATION_NONE;
 }
 
 function parseEquation(equation, name, equationType, constant = true)
@@ -560,7 +560,7 @@ function parseEquation(equation, name, equationType, constant = true)
 	let type = getEquationType(equation, name);
 
 	equation = equation.split(/=\s*/);
-	if(type === EquationType.EQUATION_UNKNOWN || type === EquationType.EQUATION_INVALID)
+	if(type === EquationType.EQUATION_NONE || type === EquationType.EQUATION_INVALID)
 	{
 		return equation.pop();
 	}
