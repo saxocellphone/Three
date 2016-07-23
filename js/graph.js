@@ -580,7 +580,7 @@ function parseEquation(equation, name, equationType, constant = true)
 
 		try
 		{
-			let value = math.eval(math.number(equation.pop().toString()));
+			let value = math.eval(equation.pop().toString());
 			if(math.abs(value) > size)
 			{
 				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
