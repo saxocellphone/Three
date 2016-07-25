@@ -155,14 +155,14 @@ class Graph
 		{
 			if(this.type === EquationType.EQUATION_Y)
 			{
-				if(Math.abs(spline.points[i].y <= size))
+				if(math.abs(spline.points[i].y) <= size)
 				{
 					geometry.vertices.push(spline.points[i]);
 				}
 			}
 			else if(this.type === EquationType.EQUATION_X)
 			{
-				if(Math.abs(spline.points[i].x <= size))
+				if(math.abs(spline.points[i].x) <= size)
 				{
 					geometry.vertices.push(spline.points[i]);
 				}
