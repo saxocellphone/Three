@@ -131,42 +131,24 @@ class Graph
 		}
 
 		let x = -size;
-		let vector = [];
 		let counter = x;  //I'll change this later, just using a counter variable for now
+		const geometry = new THREE.Geometry();
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
-			if(this.type === EquationType.EQUATION_Y)
+			if(math.abs(equation.points[counter + size]) <= size)
 			{
-				vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
-			}
-			else if(this.type === EquationType.EQUATION_X)
-			{
-				vector[counter + size] = new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05);
+				if(this.type === EquationType.EQUATION_Y)
+				{
+					geometry.vertices.push(new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05));
+				}
+				else if(this.type === EquationType.EQUATION_X)
+				{
+					geometry.vertices.push(new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05));
+				}
 			}
 			x += step;
 			counter++;
-		}
-
-		const geometry = new THREE.Geometry();
-		const spline = new THREE.CatmullRomCurve3(vector);
-		const splinePoints = spline.getPoints(vector.length - 1);
-		for(let i = 0; i < splinePoints.length; i++)
-		{
-			if(this.type === EquationType.EQUATION_Y)
-			{
-				if(math.abs(spline.points[i].y) <= size)
-				{
-					geometry.vertices.push(spline.points[i]);
-				}
-			}
-			else if(this.type === EquationType.EQUATION_X)
-			{
-				if(math.abs(spline.points[i].x) <= size)
-				{
-					geometry.vertices.push(spline.points[i]);
-				}
-			}
 		}
 
 		const line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
