@@ -178,7 +178,6 @@ class Graph
 	drawSupplementaryLine(value, options, invert = false) // Draw the bounds and axis of rotation
 	{
 		let x = -size;
-		let counter = x;  //I'll change this later, just using a counter variable for now
 		const geometry = new THREE.Geometry();
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
@@ -206,7 +205,6 @@ class Graph
 				}
 			}
 			x += step;
-			counter++;
 		}
 
 		geometry.computeLineDistances();
