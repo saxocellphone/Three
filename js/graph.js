@@ -242,7 +242,6 @@ class Graph
 		if(intersections[0] !== undefined)
 		{
 			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
-			Graph.clear();
 			return;
 		}
 
