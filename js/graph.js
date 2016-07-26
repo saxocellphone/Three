@@ -175,45 +175,45 @@ class Graph
 		Graph.render();
 	}
 
-	drawSupplementaryLines() // Draw the bounds and axis of rotation
+	drawSupplementaryLine(value, options, invert = false) // Draw the bounds and axis of rotation
 	{
 		let x = -size;
 		let counter = x;  //I'll change this later, just using a counter variable for now
-		const bound1Geometry = new THREE.Geometry();
-		const bound2Geometry = new THREE.Geometry();
-		const rotationAxisGeometry = new THREE.Geometry();
+		const geometry = new THREE.Geometry();
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
 			if(this.type === EquationType.EQUATION_Y)
 			{
-				bound1Geometry.vertices.push(new THREE.Vector3(bound1, x.toFixed(2), 0.05));
-				bound2Geometry.vertices.push(new THREE.Vector3(bound2, x.toFixed(2), 0.05));
-				rotationAxisGeometry.vertices.push(new THREE.Vector3(x.toFixed(2), rotationAxis, 0.05));
+				if(invert)
+				{
+					geometry.vertices.push(new THREE.Vector3(x, value, 0.05));
+				}
+				else
+				{
+					geometry.vertices.push(new THREE.Vector3(value, x, 0.05));
+				}
 			}
 			else if(this.type === EquationType.EQUATION_X)
 			{
-				bound1Geometry.vertices.push(new THREE.Vector3(x.toFixed(2), bound1, 0.05));
-				bound2Geometry.vertices.push(new THREE.Vector3(x.toFixed(2), bound2, 0.05));
-				rotationAxisGeometry.vertices.push(new THREE.Vector3(rotationAxis, x.toFixed(2), 0.05));
+				if(invert)
+				{
+					geometry.vertices.push(new THREE.Vector3(value, x, 0.05));
+				}
+				else
+				{
+					geometry.vertices.push(new THREE.Vector3(x, value, 0.05));
+				}
 			}
 			x += step;
 			counter++;
 		}
 
-		bound1Geometry.computeLineDistances();
-		bound2Geometry.computeLineDistances();
-		rotationAxisGeometry.computeLineDistances();
+		geometry.computeLineDistances();
 
-		const bound1Line = new THREE.Line(bound1Geometry, new THREE.LineDashedMaterial({color: 0xFFFF00, dashSize: 1, gapSize: 1}));
-		const bound2Line = new THREE.Line(bound2Geometry, new THREE.LineDashedMaterial({color: 0xFFFF00, dashSize: 1, gapSize: 1}));
-		const rotationAxisLine = new THREE.Line(rotationAxisGeometry, new THREE.LineDashedMaterial({color: 0xFFFF00, dashSize: 1, gapSize: 1}));
-		bound1Line.name = "line";
-		bound2Line.name = "line";
-		rotationAxisLine.name = "line";
-		scene.add(bound1Line);
-		scene.add(bound2Line);
-		scene.add(rotationAxisLine);
+		const line = new THREE.Line(geometry, new THREE.LineDashedMaterial(options));
+		line.name = "line";
+		scene.add(line);
 		Graph.render();
 	}
 
@@ -242,6 +242,7 @@ class Graph
 		if(intersections[0] !== undefined)
 		{
 			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
+			this.drawSupplementaryLine(intersections[0], {color: "red", dashSize: 1, gapSize: 1});
 			return;
 		}
 
@@ -565,10 +566,12 @@ function submit() // eslint-disable-line
 
 	graph.draw(equation1);
 	graph.draw(equation2);
-	graph.drawSupplementaryLines();
 
 	if(drawSolid)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
+		graph.drawSupplementaryLine(bound1, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
+		graph.drawSupplementaryLine(bound2, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
+		graph.drawSupplementaryLine(rotationAxis, {color: 0xFFFF00, dashSize: 1, gapSize: 1}, true);
 		graph.drawShape();
 	}
 }
