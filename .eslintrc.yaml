@@ -34,6 +34,7 @@ rules:
     indent:
         - 2
         - tab
+        - SwitchCase: 1
     key-spacing: 2
     keyword-spacing:
         - 2
@@ -109,7 +110,12 @@ rules:
     quote-props:
         - 2
         - as-needed
-    quotes: 2
+    quotes:
+        - 1
+        - double
+        -
+            allowTemplateLiterals: true
+            avoidEscape: true
     semi: 2
     space-before-function-paren:
         - 2

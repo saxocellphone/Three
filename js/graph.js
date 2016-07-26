@@ -22,26 +22,25 @@ class Equation
 	getPoints()
 	{
 		let points = [];
-		const compiledEquation = math.compile(this.equation);
-		if(this.type === EquationType.EQUATION_Y)
-		{
-			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
-			{
-				points.push(compiledEquation.eval({x}));
-			}
-		}
-		else if(this.type === EquationType.EQUATION_X)
-		{
-			for(let y = -size; y <= size + 1; y += 0.01)
-			{
-				points.push(compiledEquation.eval({y})); // Add 1 to the ending size because of the origin
-			}
-		}
-		else
+		if(this.equation === undefined || this.type !== EquationType.EQUATION_Y && this.type !== EquationType.EQUATION_X)
 		{
 			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(undefined);
+			}
+		}
+		else if(this.type === EquationType.EQUATION_Y)
+		{
+			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(this.equation.eval({x}));
+			}
+		}
+		else if(this.type === EquationType.EQUATION_X)
+		{
+			for(let y = -size; y <= size + 1; y += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(this.equation.eval({y}));
 			}
 		}
 		return points;
@@ -67,11 +66,11 @@ class Equation
 
 	getIntersections(otherEquation)
 	{
-		if(this.points.every((element) => element === undefined))
+		if(this.equation === undefined)
 		{
 			this.points.fill(rotationAxis);
 		}
-		else if(otherEquation.points.every((element) => element === undefined))
+		else if(otherEquation.equation === undefined)
 		{
 			otherEquation.points.fill(rotationAxis);
 		}
@@ -125,7 +124,7 @@ class Graph
 
 	draw(equation)
 	{
-		if(equation.points.every((element) => element === undefined))
+		if(equation.equation === undefined)
 		{
 			return;
 		}
@@ -227,13 +226,13 @@ class Graph
 		}
 
 		//Switch the functions around so that the larger one is always first for consistency
-		if(!larger && this.equation2 !== undefined && Number(this.equation2.equation) !== rotationAxis)
+		if(!larger && this.equation2.equation !== undefined && Number(this.equation2.equation) !== rotationAxis)
 		{
 			[this.equation1.equation, this.equation2.equation] = [this.equation2.equation, this.equation1.equation];
 			[this.equation1.points, this.equation2.points] = [this.equation2.points, this.equation1.points];
 		}
 
-		if(this.equation2 === undefined || Number(this.equation2.equation) === rotationAxis)  //FIXME: This doesn't catch constants
+		if(this.equation2.equation === undefined || Number(this.equation2.equation) === rotationAxis)  //FIXME: This doesn't catch constants
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
@@ -587,14 +586,7 @@ function parseEquation(equation, name, equationType, constant = true)
 	equation = equation.split(/=\s*/);
 	if(type === EquationType.EQUATION_NONE || type === EquationType.EQUATION_INVALID)
 	{
-		if(constant)
-		{
-			return;
-		}
-		else
-		{
-			return equation.pop();
-		}
+		return;
 	}
 
 	if(constant)
@@ -623,7 +615,45 @@ function parseEquation(equation, name, equationType, constant = true)
 	}
 	else
 	{
-		return equation.pop();
+		let parser = math.parse(equation.pop());
+		let valid = true;
+		parser.traverse((node) =>
+		{
+			switch(node.type)
+			{
+				case "AccessorNode":
+				case "ArrayNode":
+				case "AssignmentNode":
+				case "BlockNode":
+				case "FunctionAssignmentNode": // TODO: This could actually be useful
+				case "IndexNode":
+				case "ObjectNode":
+				case "RangeNode":
+					sweetAlert("Invalid " + name, "Please make sure your equation is a valid function (detected " + node.type + ")", "error");
+					valid = false;
+					return;
+				case "SymbolNode":
+					if(node.name in math || node.name === "x" && type === EquationType.EQUATION_Y || node.name === "y" && type === EquationType.EQUATION_X)
+					{
+						break;
+					}
+					else
+					{
+						sweetAlert("Invalid " + name, "Unknown variable " + node.name, "error");
+						valid = false;
+						return;
+					}
+			}
+		});
+
+		if(valid)
+		{
+			return parser.compile();
+		}
+		else
+		{
+			return;
+		}
 	}
 }
 
