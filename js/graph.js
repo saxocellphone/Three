@@ -226,13 +226,13 @@ class Graph
 		}
 
 		//Switch the functions around so that the larger one is always first for consistency
-		if(!larger && this.equation2.equation !== undefined && Number(this.equation2.equation) !== rotationAxis)
+		if(!larger && this.equation2.equation !== undefined && this.equation2.equation.eval() !== rotationAxis)
 		{
 			[this.equation1.equation, this.equation2.equation] = [this.equation2.equation, this.equation1.equation];
 			[this.equation1.points, this.equation2.points] = [this.equation2.points, this.equation1.points];
 		}
 
-		if(this.equation2.equation === undefined || Number(this.equation2.equation) === rotationAxis)  //FIXME: This doesn't catch constants
+		if(this.equation2.equation === undefined || this.equation2.equation.eval() === rotationAxis)
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
