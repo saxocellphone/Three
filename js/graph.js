@@ -12,11 +12,37 @@ const EquationType = {
 
 class Equation
 {
-	constructor(equation, type)
+	constructor(parser, type)
 	{
-		this.equation = equation;
+		this.equation = parser ? parser.compile() : undefined;
 		this.type = type;
 		this.points = this.getPoints();
+
+		this.constant = true;
+		if(parser)
+		{
+			parser.traverse((node) =>
+			{
+				switch(node.type)
+				{
+					case "ConstantNode":
+						break;
+					case "SymbolNode":
+						if(node.name in math)
+						{
+							break;
+						}
+						else
+						{
+							this.constant = false;
+							return;
+						}
+					default:
+						this.constant = false;
+						return;
+				}
+			});
+		}
 	}
 
 	getPoints()
@@ -229,12 +255,12 @@ class Graph
 			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
 
-		if(this.equation1.equation === undefined || this.equation1.equation.eval() === rotationAxis)
+		if(this.equation1.equation === undefined || this.equation1.constant && this.equation1.equation.eval() === rotationAxis)
 		{
 			console.log("No first function or first function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation2.getCoord(i))", "Math.abs(this.equation2.getCoord(i+step))");
 		}
-		else if(this.equation2.equation === undefined || this.equation2.equation.eval() === rotationAxis)
+		else if(this.equation2.equation === undefined || this.equation2.constant && this.equation2.equation.eval() === rotationAxis)
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
@@ -495,11 +521,8 @@ function submit() // eslint-disable-line
 		return;
 	}
 
-	function1 = parseEquation(function1, "first function", type, false);
-	const equation1 = new Equation(function1, type1);
-
-	function2 = parseEquation(function2, "second function", type, false);
-	const equation2 = new Equation(function2, type2);
+	const equation1 = new Equation(parseEquation(function1, "first function", type, false), type1);
+	const equation2 = new Equation(parseEquation(function2, "second function", type, false), type2);
 
 	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
 	bound1 = document.getElementById("bound1").value.trim().length;
@@ -650,7 +673,7 @@ function parseEquation(equation, name, equationType, constant = true)
 
 		if(valid)
 		{
-			return parser.compile();
+			return parser;
 		}
 		else
 		{
