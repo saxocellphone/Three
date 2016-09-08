@@ -65,7 +65,7 @@ class Equation
 		return math.min(...this.points.slice(100 * (size + bound1), 100 * (size + bound2) + 1));
 	}
 
-	getIntersections(otherEquation)
+	getIntersectionWith(otherEquation)
 	{
 		if(this.points.every((element) => element === undefined))
 		{
@@ -76,7 +76,6 @@ class Equation
 			otherEquation.points.fill(rotationAxis);
 		}
 
-		let intersections = [];
 		let larger;
 
 		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
@@ -85,7 +84,7 @@ class Equation
 			{
 				if(larger === false)
 				{
-					intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+					return [x / 100 - size, true]; // Convert back into actual x coordinates
 				}
 				larger = true;
 			}
@@ -93,17 +92,16 @@ class Equation
 			{
 				if(larger === true)
 				{
-					intersections.push(x / 100 - size);  //Convert back into actual x coordinates
+					return [x / 100 - size, false]; // Convert back into actual x coordinates
 				}
 				larger = false;
 			}
-			else  //Obviously intersecting when the two functions are equal
+			else // Obviously intersecting when the two functions are equal
 			{
-				intersections.push(x / 100 - size);  //Convert back into actual x coordinates
-				larger = undefined;
+				return [x / 100 - size, undefined]; // Convert back into actual x coordinates
 			}
 		}
-		return [intersections, larger];
+		return [undefined, larger];
 	}
 
 	getType()
@@ -217,23 +215,27 @@ class Graph
 			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
-		const [intersections, larger] = this.equation1.getIntersections(this.equation2);
+		const [intersection, larger] = this.equation1.getIntersectionWith(this.equation2);
 
-		if(intersections[0] !== undefined)
+		if(intersection !== undefined)
 		{
-			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
-			this.drawSupplementaryLine(intersections[0], {color: "red", dashSize: 1, gapSize: 1});
+			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersection, 2) + " which cannot be between the bounds", "warning");
+			this.drawSupplementaryLine(intersection, {color: "red", dashSize: 1, gapSize: 1});
 			return;
 		}
 
-		//Switch the functions around so that the larger one is always first for consistency
-		if(!larger && this.equation2 !== undefined && Number(this.equation2.equation) !== rotationAxis)
+		// We assume in addBSP() that equation1 - equation2 will equal something non-negative
+		if(!larger)
 		{
-			[this.equation1.equation, this.equation2.equation] = [this.equation2.equation, this.equation1.equation];
-			[this.equation1.points, this.equation2.points] = [this.equation2.points, this.equation1.points];
+			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
 
-		if(this.equation2 === undefined || Number(this.equation2.equation) === rotationAxis)  //FIXME: This doesn't catch constants
+		if(this.equation1.type === EquationType.EQUATION_NONE || Number(this.equation1.equation) === rotationAxis) // FIXME: This doesn't catch constants
+		{
+			console.log("No first function or first function is equal to the axis of rotation");
+			this.addSolidWithoutHoles("Math.abs(this.equation2.getCoord(i))", "Math.abs(this.equation2.getCoord(i+step))");
+		}
+		else if(this.equation2.type === EquationType.EQUATION_NONE || Number(this.equation2.equation) === rotationAxis) // FIXME: This doesn't catch constants
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
@@ -495,10 +497,10 @@ function submit() // eslint-disable-line
 	}
 
 	function1 = parseEquation(function1, "first function", type, false);
-	const equation1 = new Equation(function1, type);
+	const equation1 = new Equation(function1, type1);
 
 	function2 = parseEquation(function2, "second function", type, false);
-	const equation2 = new Equation(function2, type);
+	const equation2 = new Equation(function2, type2);
 
 	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
 	bound1 = document.getElementById("bound1").value.trim().length;
