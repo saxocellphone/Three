@@ -521,8 +521,20 @@ function submit() // eslint-disable-line
 		return;
 	}
 
-	const equation1 = new Equation(parseEquation(function1, "first function", type, false), type1);
-	const equation2 = new Equation(parseEquation(function2, "second function", type, false), type2);
+	function1 = parseEquation(function1, "first function", type, false);
+	if(function1 === false)
+	{
+		return;
+	}
+
+	function2 = parseEquation(function2, "second function", type, false);
+	if(function2 === false)
+	{
+		return;
+	}
+
+	const equation1 = new Equation(function1, type1);
+	const equation2 = new Equation(function2, type2);
 
 	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
 	bound1 = document.getElementById("bound1").value.trim().length;
@@ -544,21 +556,21 @@ function submit() // eslint-disable-line
 	{
 		// FIXME: I am NOT proud of this nested if chain AT ALL
 		bound1 = parseEquation(document.getElementById("bound1").value, "first bound", type);
-		if(bound1 === undefined)
+		if(bound1 === false)
 		{
 			drawSolid = false;
 		}
 		else
 		{
 			bound2 = parseEquation(document.getElementById("bound2").value, "second bound", type);
-			if(bound2 === undefined)
+			if(bound2 === false)
 			{
 				drawSolid = false;
 			}
 			else
 			{
 				rotationAxis = parseEquation(document.getElementById("rotation").value, "axis of rotation", type);
-				if(rotationAxis === undefined)
+				if(rotationAxis === false)
 				{
 					drawSolid = false;
 				}
@@ -604,14 +616,25 @@ function getEquationType(equation, name)
 	return EquationType.EQUATION_NONE;
 }
 
+/**
+ * Returns:
+ * `false` if an invalid equation is passed
+ * `undefined` if an empty equation is passed
+ * The constant value if constant = true
+ * The parser for the equation if constant = false
+ */
 function parseEquation(equation, name, equationType, constant = true)
 {
-	let type = getEquationType(equation, name);
+	const type = getEquationType(equation, name);
 
 	equation = equation.split(/=\s*/);
-	if(type === EquationType.EQUATION_NONE || type === EquationType.EQUATION_INVALID)
+	if(type === EquationType.EQUATION_NONE)
 	{
-		return;
+		return undefined;
+	}
+	else if(type === EquationType.EQUATION_INVALID)
+	{
+		return false;
 	}
 
 	if(constant)
@@ -619,28 +642,28 @@ function parseEquation(equation, name, equationType, constant = true)
 		if(type !== equationType && name.includes("rotation") || type === equationType && !name.includes("rotation"))
 		{
 			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
-			return;
+			return false;
 		}
 
 		try
 		{
-			let value = math.eval(equation.pop().toString());
+			const value = math.eval(equation.pop().toString());
 			if(math.abs(value) > size)
 			{
 				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
-				return;
+				return false;
 			}
 			return value;
 		}
 		catch(error)
 		{
 			sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
-			return;
+			return false;
 		}
 	}
 	else
 	{
-		let parser = math.parse(equation.pop());
+		const parser = math.parse(equation.pop());
 		let valid = true;
 		parser.traverse((node) =>
 		{
@@ -677,7 +700,7 @@ function parseEquation(equation, name, equationType, constant = true)
 		}
 		else
 		{
-			return;
+			return false;
 		}
 	}
 }
