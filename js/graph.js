@@ -448,8 +448,9 @@ function init()
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
 	camera.position.z = 75;
 
-	renderer = new THREE.WebGLRenderer();
+	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
 	document.body.appendChild(renderer.domElement);
 
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -653,5 +654,6 @@ window.onresize = function()
 	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
 	Graph.render();
 };
