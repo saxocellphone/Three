@@ -48,7 +48,7 @@ class Equation
 	getPoints()
 	{
 		let points = [];
-		if(this.equation === undefined || this.type !== EquationType.EQUATION_Y && this.type !== EquationType.EQUATION_X)
+		if(this.equation === undefined || this.type !== EquationType.EQUATION_NONE)
 		{
 			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
 			{
