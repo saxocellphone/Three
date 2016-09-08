@@ -131,45 +131,67 @@ class Graph
 		}
 
 		let x = -size;
-		let vector = [];
 		let counter = x;  //I'll change this later, just using a counter variable for now
+		const geometry = new THREE.Geometry();
 		const step = 0.01;
 		for(let i = -size; i <= size; i += step)
 		{
-			if(this.type === EquationType.EQUATION_Y)
+			if(math.abs(equation.points[counter + size]) <= size)
 			{
-				vector[counter + size] = new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05);
-			}
-			else if(this.type === EquationType.EQUATION_X)
-			{
-				vector[counter + size] = new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05);
+				if(this.type === EquationType.EQUATION_Y)
+				{
+					geometry.vertices.push(new THREE.Vector3(x.toFixed(2), equation.points[counter + size], 0.05));
+				}
+				else if(this.type === EquationType.EQUATION_X)
+				{
+					geometry.vertices.push(new THREE.Vector3(equation.points[counter + size], x.toFixed(2), 0.05));
+				}
 			}
 			x += step;
 			counter++;
 		}
 
+		const line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
+		line.name = "line";
+		scene.add(line);
+		Graph.render();
+	}
+
+	drawSupplementaryLine(value, options, invert = false) // Draw the bounds and axis of rotation
+	{
+		let x = -size;
 		const geometry = new THREE.Geometry();
-		const spline = new THREE.CatmullRomCurve3(vector);
-		const splinePoints = spline.getPoints(vector.length - 1);
-		for(let i = 0; i < splinePoints.length; i++)
+		const step = 0.01;
+		for(let i = -size; i <= size; i += step)
 		{
 			if(this.type === EquationType.EQUATION_Y)
 			{
-				if(math.abs(spline.points[i].y) <= size)
+				if(invert)
 				{
-					geometry.vertices.push(spline.points[i]);
+					geometry.vertices.push(new THREE.Vector3(x, value, 0.05));
+				}
+				else
+				{
+					geometry.vertices.push(new THREE.Vector3(value, x, 0.05));
 				}
 			}
 			else if(this.type === EquationType.EQUATION_X)
 			{
-				if(math.abs(spline.points[i].x) <= size)
+				if(invert)
 				{
-					geometry.vertices.push(spline.points[i]);
+					geometry.vertices.push(new THREE.Vector3(value, x, 0.05));
+				}
+				else
+				{
+					geometry.vertices.push(new THREE.Vector3(x, value, 0.05));
 				}
 			}
+			x += step;
 		}
 
-		const line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
+		geometry.computeLineDistances();
+
+		const line = new THREE.Line(geometry, new THREE.LineDashedMaterial(options));
 		line.name = "line";
 		scene.add(line);
 		Graph.render();
@@ -200,7 +222,7 @@ class Graph
 		if(intersections[0] !== undefined)
 		{
 			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersections[0], 2) + " which cannot be between the bounds", "warning");
-			Graph.clear();
+			this.drawSupplementaryLine(intersections[0], {color: "red", dashSize: 1, gapSize: 1});
 			return;
 		}
 
@@ -527,6 +549,9 @@ function submit() // eslint-disable-line
 
 	if(drawSolid)  //Only create the solid if we have both of the bounds and the axis of rotation
 	{
+		graph.drawSupplementaryLine(bound1, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
+		graph.drawSupplementaryLine(bound2, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
+		graph.drawSupplementaryLine(rotationAxis, {color: 0xFFFF00, dashSize: 1, gapSize: 1}, true);
 		graph.drawShape();
 	}
 }
