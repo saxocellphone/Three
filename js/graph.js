@@ -680,7 +680,7 @@ function parseEquation(equation, name, equationType, constant = true)
 					valid = false;
 					return;
 				case "SymbolNode":
-					if(node.name in math
+					if(node.name in math && typeof math[node.name] === "number"
 					|| node.name === "x" && type === EquationType.EQUATION_Y
 					|| node.name === "y" && type === EquationType.EQUATION_X)
 					{
@@ -689,6 +689,17 @@ function parseEquation(equation, name, equationType, constant = true)
 					else
 					{
 						sweetAlert("Invalid " + name, "Unknown variable " + node.name, "error");
+						valid = false;
+						return;
+					}
+				case "FunctionNode":
+					if(node.name in math && typeof math[node.name] === "function")
+					{
+						break;
+					}
+					else
+					{
+						sweetAlert("Invalid " + name, "Unknown function " + node.name, "error");
 						valid = false;
 						return;
 					}
