@@ -681,7 +681,9 @@ function parseEquation(equation, name, equationType, constant = true)
 					valid = false;
 					return;
 				case "SymbolNode":
-					if(node.name in math || node.name === "x" && type === EquationType.EQUATION_Y || node.name === "y" && type === EquationType.EQUATION_X)
+					if(node.name in math
+					|| node.name === "x" && type === EquationType.EQUATION_Y
+					|| node.name === "y" && type === EquationType.EQUATION_X)
 					{
 						break;
 					}
@@ -694,14 +696,7 @@ function parseEquation(equation, name, equationType, constant = true)
 			}
 		});
 
-		if(valid)
-		{
-			return parser;
-		}
-		else
-		{
-			return false;
-		}
+		return valid ? parser : false;
 	}
 }
 
