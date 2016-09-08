@@ -673,7 +673,6 @@ function parseEquation(equation, name, equationType, constant = true)
 				case "ArrayNode":
 				case "AssignmentNode":
 				case "BlockNode":
-				case "FunctionAssignmentNode": // TODO: This could actually be useful
 				case "IndexNode":
 				case "ObjectNode":
 				case "RangeNode":
@@ -693,6 +692,10 @@ function parseEquation(equation, name, equationType, constant = true)
 						valid = false;
 						return;
 					}
+				case "FunctionAssignmentNode":
+					sweetAlert("Invalid " + name, "f(x) syntax is currently unsupported.  Check back later!", "warning");
+					valid = false;
+					return;
 			}
 		});
 
