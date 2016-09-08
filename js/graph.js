@@ -408,7 +408,6 @@ class Graph
 	static animate()
 	{
 		window.requestAnimationFrame(Graph.animate);
-		Graph.render();
 		controls.update();
 	}
 
@@ -483,6 +482,7 @@ function init()
 	Graph.addAxis();
 	Graph.addLights();
 	Graph.animate();
+	Graph.render();
 }
 
 function submit() // eslint-disable-line
