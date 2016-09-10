@@ -664,7 +664,17 @@ function parseEquation(equation, name, equationType, constant = true)
 	}
 	else
 	{
-		const parser = math.parse(equation.pop());
+		let parser;
+		try
+		{
+			parser = math.parse(equation.pop());
+		}
+		catch(error) // Parsing can fail if unexpected values are passed in, eg '!', '(', '@', '.', etc.
+		{
+			sweetAlert("Invalid " + name, "Please enter a valid equation", "error");
+			return false;
+		}
+
 		let valid = true;
 		parser.traverse((node) =>
 		{
