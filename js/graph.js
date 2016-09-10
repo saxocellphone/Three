@@ -12,36 +12,61 @@ const EquationType = {
 
 class Equation
 {
-	constructor(equation, type)
+	constructor(parser, type)
 	{
-		this.equation = equation;
+		this.equation = parser ? parser.compile() : undefined;
 		this.type = type;
 		this.points = this.getPoints();
+
+		this.constant = true;
+		if(parser)
+		{
+			parser.traverse((node) =>
+			{
+				switch(node.type)
+				{
+					case "ConstantNode":
+						break;
+					case "SymbolNode":
+						if(node.name in math)
+						{
+							break;
+						}
+						else
+						{
+							this.constant = false;
+							return;
+						}
+					default:
+						this.constant = false;
+						return;
+				}
+			});
+		}
 	}
 
 	getPoints()
 	{
 		let points = [];
-		const compiledEquation = math.compile(this.equation);
-		if(this.type === EquationType.EQUATION_Y)
-		{
-			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
-			{
-				points.push(compiledEquation.eval({x}));
-			}
-		}
-		else if(this.type === EquationType.EQUATION_X)
-		{
-			for(let y = -size; y <= size + 1; y += 0.01)
-			{
-				points.push(compiledEquation.eval({y})); // Add 1 to the ending size because of the origin
-			}
-		}
-		else
+		if(this.equation === undefined || this.type === EquationType.EQUATION_NONE)
 		{
 			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(undefined);
+			}
+		}
+		else if(this.type === EquationType.EQUATION_Y)
+		{
+			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(this.equation.eval({x}));
+			}
+		}
+		else if(this.type === EquationType.EQUATION_X)
+		{
+			for(let y = -size; y <= size + 1; y += 0.01) // Add 1 to the ending size because of the origin
+			{
+				points.push(this.equation.eval({y}));
 			}
 		}
 		return points;
@@ -67,11 +92,11 @@ class Equation
 
 	getIntersectionWith(otherEquation)
 	{
-		if(this.points.every((element) => element === undefined))
+		if(this.equation === undefined)
 		{
 			this.points.fill(rotationAxis);
 		}
-		else if(otherEquation.points.every((element) => element === undefined))
+		else if(otherEquation.equation === undefined)
 		{
 			otherEquation.points.fill(rotationAxis);
 		}
@@ -123,7 +148,7 @@ class Graph
 
 	draw(equation)
 	{
-		if(equation.points.every((element) => element === undefined))
+		if(equation.equation === undefined)
 		{
 			return;
 		}
@@ -230,12 +255,12 @@ class Graph
 			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
 
-		if(this.equation1.type === EquationType.EQUATION_NONE || Number(this.equation1.equation) === rotationAxis) // FIXME: This doesn't catch constants
+		if(this.equation1.equation === undefined || this.equation1.constant && this.equation1.equation.eval() === rotationAxis)
 		{
 			console.log("No first function or first function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation2.getCoord(i))", "Math.abs(this.equation2.getCoord(i+step))");
 		}
-		else if(this.equation2.type === EquationType.EQUATION_NONE || Number(this.equation2.equation) === rotationAxis) // FIXME: This doesn't catch constants
+		else if(this.equation2.equation === undefined || this.equation2.constant && this.equation2.equation.eval() === rotationAxis)
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
 			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
@@ -498,9 +523,18 @@ function submit() // eslint-disable-line
 	}
 
 	function1 = parseEquation(function1, "first function", type, false);
-	const equation1 = new Equation(function1, type1);
+	if(function1 === false)
+	{
+		return;
+	}
 
 	function2 = parseEquation(function2, "second function", type, false);
+	if(function2 === false)
+	{
+		return;
+	}
+
+	const equation1 = new Equation(function1, type1);
 	const equation2 = new Equation(function2, type2);
 
 	// We'll reassign these later to their actual values, but for now we just need to know if they're defined
@@ -523,21 +557,21 @@ function submit() // eslint-disable-line
 	{
 		// FIXME: I am NOT proud of this nested if chain AT ALL
 		bound1 = parseEquation(document.getElementById("bound1").value, "first bound", type);
-		if(bound1 === undefined)
+		if(bound1 === false)
 		{
 			drawSolid = false;
 		}
 		else
 		{
 			bound2 = parseEquation(document.getElementById("bound2").value, "second bound", type);
-			if(bound2 === undefined)
+			if(bound2 === false)
 			{
 				drawSolid = false;
 			}
 			else
 			{
 				rotationAxis = parseEquation(document.getElementById("rotation").value, "axis of rotation", type);
-				if(rotationAxis === undefined)
+				if(rotationAxis === false)
 				{
 					drawSolid = false;
 				}
@@ -583,21 +617,25 @@ function getEquationType(equation, name)
 	return EquationType.EQUATION_NONE;
 }
 
+/**
+ * Returns:
+ * `false` if an invalid equation is passed
+ * `undefined` if an empty equation is passed
+ * The constant value if constant = true
+ * The parser for the equation if constant = false
+ */
 function parseEquation(equation, name, equationType, constant = true)
 {
-	let type = getEquationType(equation, name);
+	const type = getEquationType(equation, name);
 
 	equation = equation.split(/=\s*/);
-	if(type === EquationType.EQUATION_NONE || type === EquationType.EQUATION_INVALID)
+	if(type === EquationType.EQUATION_NONE)
 	{
-		if(constant)
-		{
-			return;
-		}
-		else
-		{
-			return equation.pop();
-		}
+		return undefined;
+	}
+	else if(type === EquationType.EQUATION_INVALID)
+	{
+		return false;
 	}
 
 	if(constant)
@@ -605,28 +643,85 @@ function parseEquation(equation, name, equationType, constant = true)
 		if(type !== equationType && name.includes("rotation") || type === equationType && !name.includes("rotation"))
 		{
 			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
-			return;
+			return false;
 		}
 
 		try
 		{
-			let value = math.eval(equation.pop().toString());
+			const value = math.eval(equation.pop().toString());
 			if(math.abs(value) > size)
 			{
 				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
-				return;
+				return false;
 			}
 			return value;
 		}
 		catch(error)
 		{
 			sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
-			return;
+			return false;
 		}
 	}
 	else
 	{
-		return equation.pop();
+		let parser;
+		try
+		{
+			parser = math.parse(equation.pop());
+		}
+		catch(error) // Parsing can fail if unexpected values are passed in, eg '!', '(', '@', '.', etc.
+		{
+			sweetAlert("Invalid " + name, "Please enter a valid equation", "error");
+			return false;
+		}
+
+		let valid = true;
+		parser.traverse((node) =>
+		{
+			switch(node.type)
+			{
+				case "AccessorNode":
+				case "ArrayNode":
+				case "AssignmentNode":
+				case "BlockNode":
+				case "IndexNode":
+				case "ObjectNode":
+				case "RangeNode":
+					sweetAlert("Invalid " + name, "Please make sure your equation is a valid function (detected " + node.type + ")", "error");
+					valid = false;
+					return;
+				case "SymbolNode":
+					if(node.name in math && typeof math[node.name] === "number"
+					|| node.name === "x" && type === EquationType.EQUATION_Y
+					|| node.name === "y" && type === EquationType.EQUATION_X)
+					{
+						break;
+					}
+					else
+					{
+						sweetAlert("Invalid " + name, "Unknown variable " + node.name, "error");
+						valid = false;
+						return;
+					}
+				case "FunctionNode":
+					if(node.name in math && typeof math[node.name] === "function")
+					{
+						break;
+					}
+					else
+					{
+						sweetAlert("Invalid " + name, "Unknown function " + node.name, "error");
+						valid = false;
+						return;
+					}
+				case "FunctionAssignmentNode":
+					sweetAlert("Invalid " + name, "f(x) syntax is currently unsupported.  Check back later!", "warning");
+					valid = false;
+					return;
+			}
+		});
+
+		return valid ? parser : false;
 	}
 }
 
