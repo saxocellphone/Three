@@ -4,8 +4,10 @@
 		<title>A solids of revolution graphing calculator</title>
 
 		<link rel="shortcut icon" href="https://lh6.googleusercontent.com/-eJP7CsCRims/AAAAAAAAAAI/AAAAAAAAAOE/9fdQHCWUWQs/s32-c-k-no/photo.jpg"/>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+		<link rel="stylesheet" type="text/css" href="vendor/css/octicons.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.7.0/math.min.js"></script>
@@ -19,30 +21,74 @@
 	</head>
 
 	<body>
-		<p id="form">
-			Rotate <input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
-			and <input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
-			bounded by <input id="bound1" class="boundInput" type="text" placeholder="bound 1" name="bounds">
-			and <input id="bound2" class="boundInput" type="text" placeholder="bound 2" name="bounds">
-			around <input id="rotation" class="rotationInput" type="text" placeholder="axis of rotation" name="rotation">
-			<button type="button" onclick="submit()">Rotate!</button>
-			<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
+		<div id="modal">
+			<div id="menu">
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label for="function1" class="col-sm-3 control-label">Rotate</label>
+						<div class="col-sm-9">
+	    					<input id="function1" class="form-control" type="text" autofocus="autofocus" placeholder="function 1" name="function">
+	    				</div>
+					</div>
+					<div class="form-group">
+						<label for="function2" class="col-sm-3 control-label">and</label>
+						<div class="col-sm-9">
+	    					<input id="function2" class="form-control" type="text" placeholder="function 2" name="function">
+	    				</div>
+					</div>
+					<div class="form-group">
+						<label for="bound1" class="col-sm-3 control-label">bounded by</label>
+						<div class="col-sm-9">
+	    					<input id="bound1" class="form-control" type="text" placeholder="bound 1" name="bounds">
+	    				</div>
+					</div>
+					<div class="form-group">
+						<label for="bound2" class="col-sm-3 control-label">and</label>
+						<div class="col-sm-9">
+	    					<input id="bound2" class="form-control" type="text" placeholder="bound 2" name="bounds">
+	    				</div>
+					</div>
+					<div class="form-group">
+						<label for="rotation" class="col-sm-3 control-label">around</label>
+						<div class="col-sm-9">
+	    					<input id="rotation" class="form-control" type="text" placeholder="axis of rotation" name="bounds">
+	    				</div>
+					</div>
+					<div class="form-group form-inline">
+						<div class="col-sm-offset-3">
+							<button type="submit" class="btn btn-primary" onclick="submit()">Rotate!</button>
+							<select id="quality" class="form-control">
+								<option value="1">Low</option>
+								<option value="0.5" selected="selected">Medium</option>
+								<option value="0.25">High</option>
+								<option value="0.1">Ultra</option>
+							</select>
+							<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
+							<button type="button" class="btn btn-default" onclick="reset()">Reset</button>
+							<div class="text-muted tip">Tip: Press <kbd>Esc</kbd> to toggle this dialog</div>
+						</div>
+					</div>
+				</div>
 
-			<select id="quality">
-				<option value="0.5">Select Quality
-				<option value="1">Low
-				<option value="0.5">Medium
-				<option value="0.25">High
-				<option value="0.1">Ultra
-			</select>
+				<hr/>
 
-			<button type="button" onclick="reset()">Reset</button>
-		</p>
-
-		<p id="wip">
-			This calculator is a <a href="https://github.com/saxocellphone/Three" target="_blank"><b>work in progress</b></a> and things may not work as expected!
-			In addition, please note that some solids may take longer to graph than others.
-		</p>
+				<center><span class="text-muted footer">
+					This calculator is a <a href="https://github.com/saxocellphone/Three" target="_blank"><b>work in progress</b></a> and may not work as expected!
+					<br/>
+					In addition, please note that some solids may take longer to graph than others.
+					<br/><br/>
+					<a href="https://github.com/saxocellphone/Three"><span class="octicon octicon-pencil"></span></a>
+					with
+					<span class="octicon octicon-heart"></span>
+					by
+					<a href="https://github.com/saxocellphone">Victor</a>
+					and
+					<a href="https://github.com/50Wliu">Winston</a>
+					on
+					<a href="https://github.com/saxocellphone/Three"><span class="octicon octicon-logo-github"></span></a>.
+				</span></center>
+			</div>
+		</div>
 
 		<noscript>
 			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">

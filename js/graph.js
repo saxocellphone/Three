@@ -230,6 +230,7 @@ class Graph
 		if(bound1 === bound2)
 		{
 			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
+			toggleModal();
 			Graph.clear();
 			return;
 		}
@@ -245,6 +246,7 @@ class Graph
 		if(intersection !== undefined)
 		{
 			sweetAlert("Invalid bounds", "An intersection point was detected at approximately " + math.round(intersection, 2) + " which cannot be between the bounds", "warning");
+			toggleModal();
 			this.drawSupplementaryLine(intersection, {color: "red", dashSize: 1, gapSize: 1});
 			return;
 		}
@@ -283,6 +285,7 @@ class Graph
 				else
 				{
 					sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
+					toggleModal();
 					Graph.clear();
 					return;
 				}
@@ -462,19 +465,15 @@ function init()
 		return;
 	}
 
-	const formID = document.getElementById("form");
-	const wipID = document.getElementById("wip");
-	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	const totalHeight = formHeight + wipHeight;
+	window.addEventListener("keyup", onKeyUp, false);
 
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - totalHeight), 1, 1000);
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.z = 75;
 
 	renderer = new THREE.WebGLRenderer({antialias: true});
-	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	document.body.appendChild(renderer.domElement);
 
@@ -519,6 +518,7 @@ function submit() // eslint-disable-line
 	if(type1 !== type2 && type1 !== EquationType.EQUATION_NONE && type2 !== EquationType.EQUATION_NONE)
 	{
 		sweetAlert("Invalid equation type", "The second function should be a function of " + (type === EquationType.EQUATION_X ? "x" : "y"), "error");
+		toggleModal();
 		return;
 	}
 
@@ -551,6 +551,7 @@ function submit() // eslint-disable-line
 	{
 		const name = !bound1 ? "first bound" : !bound2 ? "second bound" : "axis of rotation";
 		sweetAlert("Missing " + name, "Please specify the " + name, "warning");
+		toggleModal();
 		drawSolid = false;
 	}
 	else
@@ -607,11 +608,13 @@ function getEquationType(equation, name)
 	else if(equation.length > 2)
 	{
 		sweetAlert("Malformed equation", "The " + name + " cannot have more than one equals sign", "error");
+		toggleModal();
 		return EquationType.EQUATION_INVALID;
 	}
 	else if(equation[0].trim() !== "")
 	{
 		sweetAlert("Invalid equation type", "The " + name + " should be a function of x or y", "error");
+		toggleModal();
 		return EquationType.EQUATION_INVALID;
 	}
 	return EquationType.EQUATION_NONE;
@@ -643,6 +646,7 @@ function parseEquation(equation, name, equationType, constant = true)
 		if(type !== equationType && name.includes("rotation") || type === equationType && !name.includes("rotation"))
 		{
 			sweetAlert("Incorrect equation type", "The " + name + " should be a function of " + (type === EquationType.EQUATION_X ? "y" : "x"), "error");
+			toggleModal();
 			return false;
 		}
 
@@ -652,6 +656,7 @@ function parseEquation(equation, name, equationType, constant = true)
 			if(math.abs(value) > size)
 			{
 				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
+				toggleModal();
 				return false;
 			}
 			return value;
@@ -659,6 +664,7 @@ function parseEquation(equation, name, equationType, constant = true)
 		catch(error)
 		{
 			sweetAlert("Invalid " + name, "Please enter a valid number for the " + name, "warning");
+			toggleModal();
 			return false;
 		}
 	}
@@ -672,6 +678,7 @@ function parseEquation(equation, name, equationType, constant = true)
 		catch(error) // Parsing can fail if unexpected values are passed in, eg '!', '(', '@', '.', etc.
 		{
 			sweetAlert("Invalid " + name, "Please enter a valid equation", "error");
+			toggleModal();
 			return false;
 		}
 
@@ -688,6 +695,7 @@ function parseEquation(equation, name, equationType, constant = true)
 				case "ObjectNode":
 				case "RangeNode":
 					sweetAlert("Invalid " + name, "Please make sure your equation is a valid function (detected " + node.type + ")", "error");
+					toggleModal();
 					valid = false;
 					return;
 				case "SymbolNode":
@@ -700,6 +708,7 @@ function parseEquation(equation, name, equationType, constant = true)
 					else
 					{
 						sweetAlert("Invalid " + name, "Unknown variable " + node.name, "error");
+						toggleModal();
 						valid = false;
 						return;
 					}
@@ -711,17 +720,39 @@ function parseEquation(equation, name, equationType, constant = true)
 					else
 					{
 						sweetAlert("Invalid " + name, "Unknown function " + node.name, "error");
+						toggleModal();
 						valid = false;
 						return;
 					}
 				case "FunctionAssignmentNode":
 					sweetAlert("Invalid " + name, "f(x) syntax is currently unsupported.  Check back later!", "warning");
+					toggleModal();
 					valid = false;
 					return;
 			}
 		});
 
 		return valid ? parser : false;
+	}
+}
+
+function toggleModal()
+{
+	if(document.getElementById("modal").style.display === "none")
+	{
+		document.getElementById("modal").style.display = "block";
+	}
+	else
+	{
+		document.getElementById("modal").style.display = "none";
+	}
+}
+
+function onKeyUp(event)
+{
+	if(event.keyCode === 27)  //Escape
+	{
+		toggleModal();
 	}
 }
 
@@ -740,15 +771,9 @@ function reset()  //eslint-disable-line
 
 window.onresize = function()
 {
-	const formID = document.getElementById("form");
-	const wipID = document.getElementById("wip");
-	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
-	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
-	const totalHeight = formHeight + wipHeight;
-
-	camera.aspect = window.innerWidth / (window.innerHeight - totalHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight - totalHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	Graph.render();
 };

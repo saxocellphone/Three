@@ -1,27 +1,56 @@
 body
 {
-	font-family: 'Helvetica Neue', 'Helvetica', 'Ubuntu', 'Verdana', 'Arial', 'Roboto', 'Open Sans', sans-serif;
-	font-size: 14px;
 	margin: 0;
 	overflow: hidden;
 }
 
-p
+a:hover, a:focus
 {
-	margin-left: 8px;
+	text-decoration: none;
 }
 
-.functionInput
+hr
 {
-	width: 67px;
+	margin-top: 0;
+	margin-bottom: 15px;
 }
 
-.boundInput
+#modal
 {
-	width: 55px;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 10;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: default;
 }
 
-.rotationInput
+#menu
 {
-	width: 100px;
+	width: 550px;
+	position: relative;
+	margin: 10% auto;
+	padding: 15px;
+	border-radius: 10px;
+	background-color: white;
+}
+
+.tip
+{
+	padding-top: 10px;
+}
+
+.control-label
+{
+	padding-right: 3px;
+}
+
+.col-sm-9
+{
+	padding-left: 0;
 }
