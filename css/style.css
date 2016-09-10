@@ -25,3 +25,9 @@ p
 {
 	width: 100px;
 }
+
+#examples
+{
+	float: right;
+	margin-right: 8px;
+}
