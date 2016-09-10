@@ -128,31 +128,6 @@ class Equation
 		return undefined;
 	}
 
-	getLargerEquation(otherEquation)
-	{
-		if(this.equation === undefined)
-		{
-			return otherEquation;
-		}
-		else if(otherEquation.equation === undefined)
-		{
-			return this;
-		}
-
-		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
-		{
-			if(math.abs(this.points[x] - rotationAxis) > math.abs(otherEquation.points[x] - rotationAxis))
-			{
-				return this;
-			}
-			else if(math.abs(this.points[x] - rotationAxis) < math.abs(otherEquation.points[x] - rotationAxis))
-			{
-				return otherEquation;
-			}
-		}
-		return this; // Hopefully we never reach this point
-	}
-
 	getType()
 	{
 		return this.type;
@@ -273,7 +248,7 @@ class Graph
 			return;
 		}
 
-		if(this.equation1.getLargerEquation(this.equation2) === this.equation2) // We assume in addBSP() that equation1 is the 'larger' equation
+		if(this.getFartherEquation() === this.equation2) // We assume in addBSP() that equation1 is farther away from the rotation axis than equation2
 		{
 			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
@@ -410,6 +385,31 @@ class Graph
 				this.group.add(plane);
 			}
 		}
+	}
+
+	getFartherEquation() // Returns the equation that is farther away from the rotation axis
+	{
+		if(this.equation1.equation === undefined)
+		{
+			return this.equation2;
+		}
+		else if(this.equation2.equation === undefined)
+		{
+			return this.equation1;
+		}
+
+		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
+		{
+			if(math.abs(this.equation1.points[x] - rotationAxis) > math.abs(this.equation2.points[x] - rotationAxis))
+			{
+				return this.equation1;
+			}
+			else if(math.abs(this.equation1.points[x] - rotationAxis) < math.abs(this.equation2.points[x] - rotationAxis))
+			{
+				return this.equation2;
+			}
+		}
+		return this.equation1; // Hopefully we never reach this point
 	}
 
 	static clear()
