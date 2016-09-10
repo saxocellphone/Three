@@ -229,7 +229,6 @@ class Graph
 		if(bound1 === bound2)
 		{
 			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
-			Graph.clear();
 			return;
 		}
 
@@ -281,7 +280,7 @@ class Graph
 				else
 				{
 					sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
-					Graph.clear();
+					this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
 					return;
 				}
 			}
