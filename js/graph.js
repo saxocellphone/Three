@@ -102,14 +102,13 @@ class Equation
 		}
 
 		let larger;
-
 		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
 		{
 			if(this.points[x] > otherEquation.points[x])
 			{
 				if(larger === false)
 				{
-					return [x / 100 - size, true]; // Convert back into actual x coordinates
+					return x / 100 - size; // Convert back into actual x coordinates
 				}
 				larger = true;
 			}
@@ -117,16 +116,41 @@ class Equation
 			{
 				if(larger === true)
 				{
-					return [x / 100 - size, false]; // Convert back into actual x coordinates
+					return x / 100 - size; // Convert back into actual x coordinates
 				}
 				larger = false;
 			}
 			else // Obviously intersecting when the two functions are equal
 			{
-				return [x / 100 - size, undefined]; // Convert back into actual x coordinates
+				return x / 100 - size; // Convert back into actual x coordinates
 			}
 		}
-		return [undefined, larger];
+		return undefined;
+	}
+
+	getLargerEquation(otherEquation)
+	{
+		if(this.equation === undefined)
+		{
+			return otherEquation;
+		}
+		else if(otherEquation.equation === undefined)
+		{
+			return this;
+		}
+
+		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
+		{
+			if(math.abs(this.points[x] - rotationAxis) > math.abs(otherEquation.points[x] - rotationAxis))
+			{
+				return this;
+			}
+			else if(math.abs(this.points[x] - rotationAxis) < math.abs(otherEquation.points[x] - rotationAxis))
+			{
+				return otherEquation;
+			}
+		}
+		return this; // Hopefully we never reach this point
 	}
 
 	getType()
@@ -225,7 +249,7 @@ class Graph
 		this.group.name = "solid";
 
 		let boundY1 = this.equation1.getCoord(bound1);
-		let boundY2 = this.equation2.getCoord(bound2);
+		let boundY2 = this.equation1.getCoord(bound2);
 
 		if(bound1 === bound2)
 		{
@@ -240,7 +264,7 @@ class Graph
 			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
-		const [intersection, larger] = this.equation1.getIntersectionWith(this.equation2);
+		const intersection = this.equation1.getIntersectionWith(this.equation2);
 
 		if(intersection !== undefined)
 		{
@@ -249,8 +273,7 @@ class Graph
 			return;
 		}
 
-		// We assume in addBSP() that equation1 - equation2 will equal something non-negative
-		if(!larger)
+		if(this.equation1.getLargerEquation(this.equation2) === this.equation2) // We assume in addBSP() that equation1 is the 'larger' equation
 		{
 			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
