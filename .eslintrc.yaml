@@ -34,6 +34,7 @@ rules:
     indent:
         - 2
         - tab
+        - SwitchCase: 1
     key-spacing: 2
     keyword-spacing:
         - 2
@@ -42,9 +43,13 @@ rules:
             overrides:
                 case:
                     after: true
+                const:
+                    after: true
                 return:
                     after: true
                 throw:
+                    after: true
+                var:
                     after: true
     new-cap: 1
     new-parens: 2
@@ -72,9 +77,10 @@ rules:
         - smart-tabs
     no-multi-spaces: 2
     no-multi-str: 1
-    no-multiple-empty-lines: 2
+    no-multiple-empty-lines:
+        - 2
+        - max: 1
     no-native-reassign: 2
-    no-negated-condition: 1
     no-new-func: 2
     no-new-wrappers: 1
     no-new: 2
@@ -104,7 +110,12 @@ rules:
     quote-props:
         - 2
         - as-needed
-    quotes: 2
+    quotes:
+        - 1
+        - double
+        -
+            allowTemplateLiterals: true
+            avoidEscape: true
     semi: 2
     space-before-function-paren:
         - 2
