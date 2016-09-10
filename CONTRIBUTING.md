@@ -10,4 +10,5 @@ When making a PR please make sure that the following test cases work as expected
 | `y=x` | `y=x^2` | `x=0` | `x=1` | `y=0` |
 | `y=x^2` | `y=x` | `x=0` | `x=1` | `y=0` |
 | `(undefined)` | `y=-x^2` | `x=-3` | `x=3` | `y=3` |
-| `y=-x^2` | `(undefined)` | `x=-3` | `x=3` | `y=3`|
+| `y=-x^2` | `(undefined)` | `x=-3` | `x=3` | `y=3` |
+| `y=x^2-2x` | `y=x` | `x=0` | `x=3` | `y=4` |
