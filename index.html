@@ -2,25 +2,29 @@
 <html>
 	<head>
 		<title>A solids of revolution graphing calculator</title>
+
 		<link rel="shortcut icon" href="https://lh6.googleusercontent.com/-eJP7CsCRims/AAAAAAAAAAI/AAAAAAAAAOE/9fdQHCWUWQs/s32-c-k-no/photo.jpg"/>
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.7.0/math.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 		<script src="vendor/js/Detector.js"></script>
 		<script src="vendor/js/ThreeCSG.js"></script>
 		<script src="vendor/js/TrackballControls.js"></script>
-		<meta charset="UTF-8">
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 
 	<body>
 		<p id="form">
-			Rotate y=<input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
-			and y=<input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
-			bounded by x=<input id="bound1" class="boundInput" type="text" placeholder="bound 1" name="bounds">
-			and x=<input id="bound2" class="boundInput" type="text" placeholder="bound 2" name="bounds">
-			around y=<input id="rotation" class="rotationInput" type="text" placeholder="axis of rotation" name="rotation">
+			Rotate <input id="function1" class="functionInput" type="text" autofocus="autofocus" placeholder="function 1" name="function">
+			and <input id="function2" class="functionInput" type="text" placeholder="function 2" name="function">
+			bounded by <input id="bound1" class="boundInput" type="text" placeholder="bound 1" name="bounds">
+			and <input id="bound2" class="boundInput" type="text" placeholder="bound 2" name="bounds">
+			around <input id="rotation" class="rotationInput" type="text" placeholder="axis of rotation" name="rotation">
 			<button type="button" onclick="submit()">Rotate!</button>
 			<!-- <input id="rotate" type="range" onchange="rotate()" min="0" max="360" value="360" step="30"/> -->
 
