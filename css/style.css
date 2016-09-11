@@ -26,8 +26,65 @@ p
 	width: 100px;
 }
 
-#examples
+#example-button
 {
 	float: right;
 	margin-right: 8px;
+}
+
+#modal
+{
+	display: none;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 10;
+	justify-content: center;
+	align-items: center;
+	cursor: default;
+}
+
+#examples
+{
+	position: relative;
+	margin: 10% auto;
+	padding: 15px;
+	border-radius: 10px;
+	background-color: white;
+}
+
+table
+{
+	border-spacing: 20px 2px;
+}
+
+th
+{
+	text-align: left;
+}
+
+/* Many of the following styles taken from Bootstrap: https://github.com/twbs/bootstrap/blob/v3.3.7/less/close.less */
+
+.close
+{
+	float: right;
+	margin-top: -10px;
+	border-color: transparent;
+	background-color: transparent;
+	font-size: 21px;
+	font-weight: bold;
+	color: black;
+	text-shadow: 0 1px 0 white;
+	opacity: 0.2;
+	padding: 0;
+	border: 0;
+}
+
+.close:hover, .close.focus
+{
+	cursor: pointer;
+	opacity: 0.5;
 }

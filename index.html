@@ -13,6 +13,7 @@
 		<script src="vendor/js/Detector.js"></script>
 		<script src="vendor/js/ThreeCSG.js"></script>
 		<script src="vendor/js/TrackballControls.js"></script>
+		<script src="js/examples.js"></script>
 
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,13 +39,61 @@
 
 			<button type="button" onclick="reset()">Reset</button>
 
-			<button id="examples" type="button" onclick="examples()">Show examples</button>
+			<button id="example-button" type="button" onclick="showExamples()">Show examples</button>
 		</p>
 
 		<p id="wip">
 			This calculator is a <a href="https://github.com/saxocellphone/Three" target="_blank"><b>work in progress</b></a> and things may not work as expected!
 			In addition, please note that some solids may take longer to graph than others.
 		</p>
+
+		<div id="modal">
+			<div id="examples">
+				<button type="button" class="close" onclick="hideExamples()">&times;</button>
+				<table>
+					<colgroup span="4"></colgroup>
+					<tr>
+						<th>Function 1</th>
+						<th>Function 2</th>
+						<th>Bound 1</th>
+						<th>Bound 2</th>
+						<th>Axis of rotation</th>
+					</tr>
+					<tr>
+						<td><code>y=x</code></td>
+						<td><code>y=x^2</code></td>
+						<td><code>x=1</code></td>
+						<td><code>x=5</code></td>
+						<td><code>y=0</code></td>
+						<td><button type="button" onclick="tryMe(0)">Try me!</button></td>
+					</tr>
+					<tr>
+						<td><code>y=3</code></td>
+						<td><code>y=-x^2</code></td>
+						<td><code>x=-3</code></td>
+						<td><code>x=3</code></td>
+						<td><code>y=4</code></td>
+						<td><button type="button" onclick="tryMe(1)">Try me!</button></td>
+					</tr>
+					<tr>
+						<td><code>x=y</code></td>
+						<td><code>x=sqrt(y)</code></td>
+						<td><code>y=1</code></td>
+						<td><code>y=5</code></td>
+						<td><code>x=1</code></td>
+						<td><button type="button" onclick="tryMe(2)">Try me!</button></td>
+					</tr>
+					<tr>
+						<td><code>y=sin(x)</code></td>
+						<td>(blank)</td>
+						<td><code>x=0</code></td>
+						<td><code>x=pi</code></td>
+						<td><code>y=0</code></td>
+						<td><button type="button" onclick="tryMe(3)">Try me!</button></td>
+					</tr>
+				</table>
+			</div>
+		</div>
 
 		<noscript>
 			<div id="javascript-error-message" style="font-family: monospace; font-size: 13px; font-weight: normal; text-align: center; background: none repeat scroll 0% 0% rgb(255, 255, 255); color: rgb(0, 0, 0); padding: 1.5em; width: 400px; margin: 5em auto 0px;">
