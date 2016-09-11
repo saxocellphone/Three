@@ -28,6 +28,7 @@ function tryMe(index) // eslint-disable-line
 			document.getElementById("bound2").value = "x=5";
 			document.getElementById("rotation").value = "y=0";
 			hideExamples();
+			document.getElementById("rotate-button").click();
 			break;
 		case 1:
 			document.getElementById("function1").value = "y=3";
@@ -36,6 +37,7 @@ function tryMe(index) // eslint-disable-line
 			document.getElementById("bound2").value = "x=3";
 			document.getElementById("rotation").value = "y=4";
 			hideExamples();
+			document.getElementById("rotate-button").click();
 			break;
 		case 2:
 			document.getElementById("function1").value = "x=y";
@@ -44,6 +46,7 @@ function tryMe(index) // eslint-disable-line
 			document.getElementById("bound2").value = "y=5";
 			document.getElementById("rotation").value = "x=1";
 			hideExamples();
+			document.getElementById("rotate-button").click();
 			break;
 		case 3:
 			document.getElementById("function1").value = "y=sin(x)";
@@ -52,6 +55,7 @@ function tryMe(index) // eslint-disable-line
 			document.getElementById("bound2").value = "x=pi";
 			document.getElementById("rotation").value = "y=0";
 			hideExamples();
+			document.getElementById("rotate-button").click();
 			break;
 	}
 }
