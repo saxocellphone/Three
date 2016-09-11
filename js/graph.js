@@ -102,14 +102,13 @@ class Equation
 		}
 
 		let larger;
-
 		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
 		{
 			if(this.points[x] > otherEquation.points[x])
 			{
 				if(larger === false)
 				{
-					return [x / 100 - size, true]; // Convert back into actual x coordinates
+					return x / 100 - size; // Convert back into actual x coordinates
 				}
 				larger = true;
 			}
@@ -117,16 +116,16 @@ class Equation
 			{
 				if(larger === true)
 				{
-					return [x / 100 - size, false]; // Convert back into actual x coordinates
+					return x / 100 - size; // Convert back into actual x coordinates
 				}
 				larger = false;
 			}
 			else // Obviously intersecting when the two functions are equal
 			{
-				return [x / 100 - size, undefined]; // Convert back into actual x coordinates
+				return x / 100 - size; // Convert back into actual x coordinates
 			}
 		}
-		return [undefined, larger];
+		return undefined;
 	}
 
 	getType()
@@ -225,12 +224,11 @@ class Graph
 		this.group.name = "solid";
 
 		let boundY1 = this.equation1.getCoord(bound1);
-		let boundY2 = this.equation2.getCoord(bound2);
+		let boundY2 = this.equation1.getCoord(bound2);
 
 		if(bound1 === bound2)
 		{
 			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
-			Graph.clear();
 			return;
 		}
 
@@ -240,7 +238,7 @@ class Graph
 			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
-		const [intersection, larger] = this.equation1.getIntersectionWith(this.equation2);
+		const intersection = this.equation1.getIntersectionWith(this.equation2);
 
 		if(intersection !== undefined)
 		{
@@ -249,8 +247,7 @@ class Graph
 			return;
 		}
 
-		// We assume in addBSP() that equation1 - equation2 will equal something non-negative
-		if(!larger)
+		if(this.getFartherEquation() === this.equation2) // We assume in addBSP() that equation1 is farther away from the rotation axis than equation2
 		{
 			[this.equation1, this.equation2] = [this.equation2, this.equation1];
 		}
@@ -283,7 +280,7 @@ class Graph
 				else
 				{
 					sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
-					Graph.clear();
+					this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
 					return;
 				}
 			}
@@ -387,6 +384,31 @@ class Graph
 				this.group.add(plane);
 			}
 		}
+	}
+
+	getFartherEquation() // Returns the equation that is farther away from the rotation axis
+	{
+		if(this.equation1.equation === undefined)
+		{
+			return this.equation2;
+		}
+		else if(this.equation2.equation === undefined)
+		{
+			return this.equation1;
+		}
+
+		for(let x = math.round(100 * (size + bound1)); x < 100 * (size + bound2); x++)
+		{
+			if(math.abs(this.equation1.points[x] - rotationAxis) > math.abs(this.equation2.points[x] - rotationAxis))
+			{
+				return this.equation1;
+			}
+			else if(math.abs(this.equation1.points[x] - rotationAxis) < math.abs(this.equation2.points[x] - rotationAxis))
+			{
+				return this.equation2;
+			}
+		}
+		return this.equation1; // Hopefully we never reach this point
 	}
 
 	static clear()
