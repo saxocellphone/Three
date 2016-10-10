@@ -223,19 +223,9 @@ class Graph
 	{
 		this.group.name = "solid";
 
-		let boundY1 = this.equation1.getCoord(bound1);
-		let boundY2 = this.equation1.getCoord(bound2);
-
-		if(bound1 === bound2)
-		{
-			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
-			return;
-		}
-
 		if(bound1 > bound2)  //Switch the bounds around so that the for loop works
 		{
 			[bound1, bound2] = [bound2, bound1];
-			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
 		const intersection = this.equation1.getIntersectionWith(this.equation2);
@@ -266,43 +256,19 @@ class Graph
 		{
 			console.log("Maximums: " + this.equation1.getMax() + " and " + this.equation2.getMax());
 			console.log("Minimums: " + this.equation1.getMin() + " and " + this.equation2.getMin());
-			if(boundY1 !== boundY2)
+			if(rotationAxis >= this.equation1.getMax() && rotationAxis >= this.equation2.getMax()
+			|| rotationAxis <= this.equation1.getMin() && rotationAxis <= this.equation2.getMin())
 			{
-				console.log("\tboundY1 and boundY2 are not equal");
-				if(rotationAxis >= this.equation1.getMax() && rotationAxis >= this.equation2.getMax()
-				|| rotationAxis <= this.equation1.getMin() && rotationAxis <= this.equation2.getMin())
-				{
-					this.addBSP("Math.abs(rotationAxis-this.equation2.getCoord(i))",
-					            "Math.abs(rotationAxis-this.equation2.getCoord(i+step))",
-					            "Math.abs(rotationAxis-this.equation1.getCoord(i))",
-					            "Math.abs(rotationAxis-this.equation1.getCoord(i+step))");
-				}
-				else
-				{
-					sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
-					this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
-					return;
-				}
+				this.addBSP("Math.abs(rotationAxis-this.equation2.getCoord(i))",
+				            "Math.abs(rotationAxis-this.equation2.getCoord(i+step))",
+				            "Math.abs(rotationAxis-this.equation1.getCoord(i))",
+				            "Math.abs(rotationAxis-this.equation1.getCoord(i+step))");
 			}
-			else if(boundY1 === boundY2)
+			else
 			{
-				//Not complete yet (this is just for cylinders)
-				console.log("\t\tBoundY1 is equal to boundY2 and bound1 does not equal bound2");
-				if(rotationAxis > boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is greater than boundY1");
-					this.addBSP("Math.abs(rotationAxis-this.equation1.getCoord(i))", "Math.abs(rotationAxis-this.equation1.getCoord(i+step))", "Math.abs(rotationAxis)", "Math.abs(rotationAxis)");
-				}
-				else if(rotationAxis < boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is less than boundY1");
-					this.addBSP("Math.abs(rotationAxis)", "Math.abs(rotationAxis)", "Math.abs(rotationAxis)+this.equation1.getCoord(i)", "Math.abs(rotationAxis)+this.equation1.getCoord(i+step)");
-				}
-				else if(rotationAxis === boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is equal to boundY1");
-					this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
-				}
+				sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
+				Graph.clear();
+				return;
 			}
 		}
 		scene.add(this.group);
@@ -599,6 +565,12 @@ function submit() // eslint-disable-line
 				}
 			}
 		}
+	}
+
+	if(bound1 === bound2)
+	{
+		sweetAlert("Bounds cannot be equal", "The two bounds must have different values", "warning");
+		drawSolid = false;
 	}
 
 	let graph = new Graph(equation1, equation2, quality, type);
