@@ -223,13 +223,6 @@ class Graph
 	{
 		this.group.name = "solid";
 
-		if(bound1 === bound2)
-		{
-			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
-			Graph.clear();
-			return;
-		}
-
 		if(bound1 > bound2)  //Switch the bounds around so that the for loop works
 		{
 			[bound1, bound2] = [bound2, bound1];
@@ -572,6 +565,12 @@ function submit() // eslint-disable-line
 				}
 			}
 		}
+	}
+
+	if(bound1 === bound2)
+	{
+		sweetAlert("Bounds cannot be equal", "The two bounds must have different values", "warning");
+		drawSolid = false;
 	}
 
 	let graph = new Graph(equation1, equation2, quality, type);
