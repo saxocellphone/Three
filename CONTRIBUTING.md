@@ -15,3 +15,4 @@ When making a PR please make sure that the following test cases work as expected
 | `y=x^2-2x` | `y=x` | `x=0` | `x=3` | `y=4` |
 | `x=y` | `x=sqrt(y)` | `y=1` | `y=5` | `x=0` |
 | `x=y` | `x=sqrt(y)` | `y=1` | `y=5` | `x=10` |
+| `x=y` | `x=y^2` | `(undefined)` | `(undefined)` | `(undefined)`
