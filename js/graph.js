@@ -567,7 +567,7 @@ function submit() // eslint-disable-line
 		}
 	}
 
-	if(bound1 === bound2)
+	if(drawSolid && bound1 === bound2)
 	{
 		sweetAlert("Bounds cannot be equal", "The two bounds must have different values", "warning");
 		drawSolid = false;
