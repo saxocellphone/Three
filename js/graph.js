@@ -45,32 +45,35 @@ class Equation
 		}
 	}
 
+	// FIXME: Change back to let when compound assignments can be optimized
+	/* eslint-disable operator-assignment */
 	getPoints()
 	{
 		let points = [];
 		if(this.equation === undefined || this.type === EquationType.EQUATION_NONE)
 		{
-			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			for(let x = -size; x <= size + 1; x = x + 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(undefined);
 			}
 		}
 		else if(this.type === EquationType.EQUATION_Y)
 		{
-			for(let x = -size; x <= size + 1; x += 0.01) // Add 1 to the ending size because of the origin
+			for(let x = -size; x <= size + 1; x = x + 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(this.equation.eval({x}));
 			}
 		}
 		else if(this.type === EquationType.EQUATION_X)
 		{
-			for(let y = -size; y <= size + 1; y += 0.01) // Add 1 to the ending size because of the origin
+			for(let y = -size; y <= size + 1; y = y + 0.01) // Add 1 to the ending size because of the origin
 			{
 				points.push(this.equation.eval({y}));
 			}
 		}
 		return points;
 	}
+	/* eslint-enable operator-assignment */
 
 	getCoord(point)
 	{
@@ -152,11 +155,13 @@ class Graph
 			return;
 		}
 
-		let x = -size;
-		let counter = x;  //I'll change this later, just using a counter variable for now
-		const geometry = new THREE.Geometry();
-		const step = 0.01;
-		for(let i = -size; i <= size; i += step)
+		// FIXME: Change x and counter back to let when compound assignments can be optimized
+		// FIXME: Change geometry and step back to const when they can be optimized
+		var x = -size;
+		var counter = x;  //I'll change this later, just using a counter variable for now
+		var geometry = new THREE.Geometry();
+		var step = 0.01;
+		for(var i = -size; i <= size; i += step)
 		{
 			if(math.abs(equation.points[counter + size]) <= size)
 			{
@@ -173,7 +178,8 @@ class Graph
 			counter++;
 		}
 
-		const line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
+		// FIXME: Change back to const when it can be optimized
+		var line = new THREE.Line(geometry, new THREE.LineBasicMaterial());
 		line.name = "line";
 		scene.add(line);
 		Graph.render();
@@ -181,10 +187,12 @@ class Graph
 
 	drawSupplementaryLine(value, options, invert = false) // Draw the bounds and axis of rotation
 	{
-		let x = -size;
-		const geometry = new THREE.Geometry();
-		const step = 0.01;
-		for(let i = -size; i <= size; i += step)
+		// FIXME: Change back to let when compound assignments can be optimized
+		// FIXME: Change geometry and step back to const when they can be optimized
+		var x = -size;
+		var geometry = new THREE.Geometry();
+		var step = 0.01;
+		for(var i = -size; i <= size; i += step)
 		{
 			if(this.type === EquationType.EQUATION_Y)
 			{
@@ -213,7 +221,8 @@ class Graph
 
 		geometry.computeLineDistances();
 
-		const line = new THREE.Line(geometry, new THREE.LineDashedMaterial(options));
+		// FIXME: Change back to const when it can be optimized
+		var line = new THREE.Line(geometry, new THREE.LineDashedMaterial(options));
 		line.name = "line";
 		scene.add(line);
 		Graph.render();
@@ -478,7 +487,7 @@ function init()
 	Graph.animate();
 }
 
-function submit() // eslint-disable-line
+function submit() // eslint-disable-line no-unused-vars
 {
 	Graph.clear();
 
