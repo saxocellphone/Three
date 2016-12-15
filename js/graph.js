@@ -288,8 +288,8 @@ class Graph
 					step = bound2 - i;
 				}
 
-				const smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
-				                                                     smallGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				const smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     smallGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
 				                                                     step, 50);
 				if(this.type === EquationType.EQUATION_Y)
 				{
@@ -300,8 +300,8 @@ class Graph
 					smallCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
 
-				const largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
-				                                                     bigGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				const largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     bigGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
 				                                                     step, 360);
 				if(this.type === EquationType.EQUATION_Y)
 				{
@@ -337,8 +337,8 @@ class Graph
 					step = bound2 - i;
 				}
 
-				const geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step)}),
-				                                            rightRadiusEquation.eval({y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step)}),
+				const geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step)}),
+				                                            rightRadiusEquation.eval({y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step)}),
 				                                            step, 100);
 				if(this.type === EquationType.EQUATION_Y)
 				{
