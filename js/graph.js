@@ -223,19 +223,9 @@ class Graph
 	{
 		this.group.name = "solid";
 
-		let boundY1 = this.equation1.getCoord(bound1);
-		let boundY2 = this.equation1.getCoord(bound2);
-
-		if(bound1 === bound2)
-		{
-			sweetAlert("Oh noes!", "We're still working on creating the solid when the bounds are equal.\nSorry about that :(", "warning");
-			return;
-		}
-
 		if(bound1 > bound2)  //Switch the bounds around so that the for loop works
 		{
 			[bound1, bound2] = [bound2, bound1];
-			[boundY1, boundY2] = [boundY2, boundY1];
 		}
 
 		const intersection = this.equation1.getIntersectionWith(this.equation2);
@@ -266,40 +256,16 @@ class Graph
 		{
 			console.log("Maximums: " + this.equation1.getMax() + " and " + this.equation2.getMax());
 			console.log("Minimums: " + this.equation1.getMin() + " and " + this.equation2.getMin());
-			if(boundY1 !== boundY2)
+			if(rotationAxis >= this.equation1.getMax() && rotationAxis >= this.equation2.getMax()
+			|| rotationAxis <= this.equation1.getMin() && rotationAxis <= this.equation2.getMin())
 			{
-				console.log("\tboundY1 and boundY2 are not equal");
-				if(rotationAxis >= this.equation1.getMax() && rotationAxis >= this.equation2.getMax()
-				|| rotationAxis <= this.equation1.getMin() && rotationAxis <= this.equation2.getMin())
-				{
-					this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
-				}
-				else
-				{
-					sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
-					this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
-					return;
-				}
+				this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
 			}
-			else if(boundY1 === boundY2)
+			else
 			{
-				//Not complete yet (this is just for cylinders)
-				console.log("\t\tBoundY1 is equal to boundY2 and bound1 does not equal bound2");
-				if(rotationAxis > boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is greater than boundY1");
-					this.addBSP("abs(axis - y1)", "abs(axis - y1step)", "abs(axis)", "abs(axis)");
-				}
-				else if(rotationAxis < boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is less than boundY1");
-					this.addBSP("abs(axis)", "abs(axis)", "abs(axis) + y1", "abs(axis) + y1step");
-				}
-				else if(rotationAxis === boundY1)
-				{
-					console.log("\t\t\tAxis of rotation is equal to boundY1");
-					this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
-				}
+				sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
+				this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
+				return;
 			}
 		}
 		scene.add(this.group);
@@ -322,29 +288,29 @@ class Graph
 					step = bound2 - i;
 				}
 
-				const smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: axisOfRotation, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
-				                                                     smallGeoR2Equation.eval({axis: axisOfRotation, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				const smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				                                                     smallGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
 				                                                     step, 50);
 				if(this.type === EquationType.EQUATION_Y)
- 				{
- 					smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
- 				}
- 				else if(this.type === EquationType.EQUATION_X)
- 				{
- 					smallCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
- 				}
+				{
+					smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
+				}
+				else if(this.type === EquationType.EQUATION_X)
+				{
+					smallCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
+				}
 
-				const largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: axisOfRotation, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
-				                                                     bigGeoR2Equation.eval({axis: axisOfRotation, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				const largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
+				                                                     bigGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getY(i), y1step: this.equation1.getY(i + step), y2: this.equation2.getY(i), y2step: this.equation2.getY(i + step)}),
 				                                                     step, 360);
 				if(this.type === EquationType.EQUATION_Y)
- 				{
- 					largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
- 				}
- 				else if(this.type === EquationType.EQUATION_X)
- 				{
- 					largeCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
- 				}
+				{
+					largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
+				}
+				else if(this.type === EquationType.EQUATION_X)
+				{
+					largeCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
+				}
 
 				const smallCylinderBSP = new ThreeBSP(smallCylinderGeom);
 				const largeCylinderBSP = new ThreeBSP(largeCylinderGeom);
@@ -603,6 +569,12 @@ function submit() // eslint-disable-line
 				}
 			}
 		}
+	}
+
+	if(drawSolid && bound1 === bound2)
+	{
+		sweetAlert("Bounds cannot be equal", "The two bounds must have different values", "warning");
+		drawSolid = false;
 	}
 
 	let graph = new Graph(equation1, equation2, quality, type);
