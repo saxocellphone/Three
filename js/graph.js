@@ -291,12 +291,6 @@ class Graph
 		{
 			if(this.equation1.getCoord(i) <= size)
 			{
-				if(!eval(smallGeoR1) || !eval(smallGeoR2))  //Hacky bugfix woo
-				{
-					smallGeoR1 += "+0.01";
-					smallGeoR2 += "+0.01";
-				}
-
 				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
 					step = bound2 - i;
