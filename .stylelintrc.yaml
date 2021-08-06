@@ -50,8 +50,6 @@ rules:
     number-no-trailing-zeros: true
     property-case: lower
     property-no-unknown: true
-    rule-nested-empty-line-before: never
-    rule-non-nested-empty-line-before: always
     rule-empty-line-before:
     - always
     - except:
