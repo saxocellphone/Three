@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - gh-pages
+  pull_request:
+    branches:
+    - gh-pages
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node
+        run: nvm install node
+
+      - name: Install html-proofer
+        run: gem install html-proofer
+
+      - name: Install eslint
+        run: npm install -g eslint
+
+      - name: Install stylelint
+        run: npm install -g stylelint
+
+      - name: Run html-proofer
+        run: htmlproofer --check-html --check-favicon
+
+      - name: Run eslint
+        run: eslint js/**
+
+      - name: Run stylelint
+        run: stylelint css/**
