@@ -6,14 +6,12 @@ rules:
     block-closing-brace-newline-after: always
     block-closing-brace-newline-before: always
     block-no-empty: true
-    block-no-single-line: true
     block-opening-brace-newline-after: always
     block-opening-brace-newline-before: always
     color-hex-case: upper
     color-hex-length: long
     color-named: always-where-possible
     color-no-invalid-hex: true
-    custom-property-no-outside-root: true
     declaration-bang-space-after: never
     declaration-bang-space-before: always
     declaration-block-no-duplicate-properties: true
@@ -52,9 +50,12 @@ rules:
     number-no-trailing-zeros: true
     property-case: lower
     property-no-unknown: true
-    root-no-standard-properties: true
     rule-nested-empty-line-before: never
     rule-non-nested-empty-line-before: always
+    rule-empty-line-before:
+    - always
+    - except:
+        - first-nested
     selector-combinator-space-after: always
     selector-combinator-space-before: always
     selector-list-comma-newline-after: always-multi-line
