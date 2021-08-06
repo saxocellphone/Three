@@ -158,7 +158,7 @@ class Graph
 		// FIXME: Change x and counter back to let when compound assignments can be optimized
 		// FIXME: Change geometry and step back to const when they can be optimized
 		var x = -size;
-		var counter = x;  //I'll change this later, just using a counter variable for now
+		var counter = x; // I'll change this later, just using a counter variable for now
 		var geometry = new THREE.Geometry();
 		var step = 0.01;
 		for(var i = -size; i <= size; i += step)
@@ -232,7 +232,7 @@ class Graph
 	{
 		this.group.name = "solid";
 
-		if(bound1 > bound2)  //Switch the bounds around so that the for loop works
+		if(bound1 > bound2) // Switch the bounds around so that the for loop works
 		{
 			[bound1, bound2] = [bound2, bound1];
 		}
@@ -291,7 +291,7 @@ class Graph
 		{
 			if(this.equation1.getCoord(i) <= size)
 			{
-				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
+				if(i + step > bound2) // Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
 					step = bound2 - i;
 				}
@@ -334,7 +334,7 @@ class Graph
 		{
 			if(this.equation1.getCoord(i) <= size)
 			{
-				if(i + step > bound2)  //Prevent the solid from extending beyond the second bound if it can't be divided by the quality
+				if(i + step > bound2) // Prevent the solid from extending beyond the second bound if it can't be divided by the quality
 				{
 					step = bound2 - i;
 				}
@@ -447,7 +447,7 @@ init();
 
 function init()
 {
-	if(!Detector.webgl)  //No WebGL D:
+	if(!Detector.webgl) // No WebGL D:
 	{
 		Detector.addGetWebGLMessage();
 		return;
@@ -455,7 +455,7 @@ function init()
 
 	const formID = document.getElementById("form");
 	const wipID = document.getElementById("wip");
-	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop); // Bottom is already covered by wip's top margin
 	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
 	const totalHeight = formHeight + wipHeight;
 
@@ -581,7 +581,7 @@ function submit() // eslint-disable-line no-unused-vars
 	graph.draw(equation1);
 	graph.draw(equation2);
 
-	if(drawSolid)  //Only create the solid if we have both of the bounds and the axis of rotation
+	if(drawSolid) // Only create the solid if we have both of the bounds and the axis of rotation
 	{
 		graph.drawSupplementaryLine(bound1, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
 		graph.drawSupplementaryLine(bound2, {color: 0xFFFF00, dashSize: 1, gapSize: 1});
@@ -755,7 +755,7 @@ window.onresize = function()
 {
 	const formID = document.getElementById("form");
 	const wipID = document.getElementById("wip");
-	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop);  //Bottom is already covered by wip's top margin
+	const formHeight = formID.clientHeight + parseInt(window.getComputedStyle(formID).marginTop); // Bottom is already covered by wip's top margin
 	const wipHeight = wipID.clientHeight + parseInt(window.getComputedStyle(wipID).marginTop) + parseInt(window.getComputedStyle(wipID).marginBottom);
 	const totalHeight = formHeight + wipHeight;
 
