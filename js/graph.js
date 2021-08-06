@@ -645,7 +645,15 @@ function parseEquation(equation, name, equationType, constant = true)
 
 		try
 		{
-			const value = math.eval(equation.pop().toString());
+			equation = equation.pop().toString();
+
+			// math.js doesn't support bars for absolute value
+			// but we can manually do the conversion ourselves.
+			// Note that this doesn't take into account nested
+			// absolute values.
+			// https://github.com/josdejong/mathjs/issues/1307
+			equation = equation.replace(/\|([^|]*?)\|/, "abs($1)");
+			const value = math.eval(equation);
 			if(math.abs(value) > size)
 			{
 				sweetAlert("Invalid " + name, "The " + name + " must be within " + -size + " to " + size + ", inclusive", "warning");
@@ -664,7 +672,15 @@ function parseEquation(equation, name, equationType, constant = true)
 		let parser;
 		try
 		{
-			parser = math.parse(equation.pop());
+			equation = equation.pop();
+
+			// math.js doesn't support bars for absolute value,
+			// but we can manually do the conversion ourselves.
+			// Note that this doesn't take into account nested
+			// absolute values.
+			// https://github.com/josdejong/mathjs/issues/1307
+			equation = equation.replace(/\|([^|]*?)\|/, "abs($1)");
+			parser = math.parse(equation);
 		}
 		catch(error) // Parsing can fail if unexpected values are passed in, eg '!', '(', '@', '.', etc.
 		{
