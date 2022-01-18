@@ -254,12 +254,12 @@ class Graph
 		if(this.equation1.equation === undefined || this.equation1.constant && this.equation1.equation.eval() === rotationAxis)
 		{
 			console.log("No first function or first function is equal to the axis of rotation");
-			this.addSolidWithoutHoles("Math.abs(this.equation2.getCoord(i))", "Math.abs(this.equation2.getCoord(i+step))");
+			this.addSolidWithoutHoles("abs(y2)", "abs(y2step)");
 		}
 		else if(this.equation2.equation === undefined || this.equation2.constant && this.equation2.equation.eval() === rotationAxis)
 		{
 			console.log("No second function or second function is equal to the axis of rotation");
-			this.addSolidWithoutHoles("Math.abs(this.equation1.getCoord(i))", "Math.abs(this.equation1.getCoord(i+step))");
+			this.addSolidWithoutHoles("abs(y1)", "abs(y1step)");
 		}
 		else
 		{
@@ -268,15 +268,12 @@ class Graph
 			if(rotationAxis >= this.equation1.getMax() && rotationAxis >= this.equation2.getMax()
 			|| rotationAxis <= this.equation1.getMin() && rotationAxis <= this.equation2.getMin())
 			{
-				this.addBSP("Math.abs(rotationAxis-this.equation2.getCoord(i))",
-				            "Math.abs(rotationAxis-this.equation2.getCoord(i+step))",
-				            "Math.abs(rotationAxis-this.equation1.getCoord(i))",
-				            "Math.abs(rotationAxis-this.equation1.getCoord(i+step))");
+				this.addBSP("abs(axis - y2)", "abs(axis - y2step)", "abs(axis - y1)", "abs(axis - y1step)");
 			}
 			else
 			{
 				sweetAlert("Oh noes!", "Axis of rotation cannot be between the functions", "warning");
-				Graph.clear();
+				this.drawSupplementaryLine(rotationAxis, {color: "red", dashSize: 1, gapSize: 1}, true);
 				return;
 			}
 		}
@@ -286,6 +283,10 @@ class Graph
 
 	addBSP(smallGeoR1, smallGeoR2, bigGeoR1, bigGeoR2)
 	{
+		const smallGeoR1Equation = math.compile(smallGeoR1);
+		const smallGeoR2Equation = math.compile(smallGeoR2);
+		const bigGeoR1Equation = math.compile(bigGeoR1);
+		const bigGeoR2Equation = math.compile(bigGeoR2);
 		let step = this.quality;
 		for(let i = bound1; i < bound2; i += step)
 		{
@@ -296,7 +297,9 @@ class Graph
 					step = bound2 - i;
 				}
 
-				const smallCylinderGeom = new THREE.CylinderGeometry(eval(smallGeoR1), eval(smallGeoR2), step, 50);
+				const smallCylinderGeom = new THREE.CylinderGeometry(smallGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     smallGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     step, 50);
 				if(this.type === EquationType.EQUATION_Y)
 				{
 					smallCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
@@ -306,7 +309,9 @@ class Graph
 					smallCylinderGeom.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
 
-				const largeCylinderGeom = new THREE.CylinderGeometry(eval(bigGeoR1), eval(bigGeoR2), step, 360);
+				const largeCylinderGeom = new THREE.CylinderGeometry(bigGeoR1Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     bigGeoR2Equation.eval({axis: rotationAxis, y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step), y2: this.equation2.getCoord(i), y2step: this.equation2.getCoord(i + step)}),
+				                                                     step, 360);
 				if(this.type === EquationType.EQUATION_Y)
 				{
 					largeCylinderGeom.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
@@ -329,6 +334,8 @@ class Graph
 
 	addSolidWithoutHoles(leftRadius, rightRadius)
 	{
+		const leftRadiusEquation = math.compile(leftRadius);
+		const rightRadiusEquation = math.compile(rightRadius);
 		let step = this.quality;
 		for(let i = bound1; i < bound2; i += step)
 		{
@@ -339,7 +346,9 @@ class Graph
 					step = bound2 - i;
 				}
 
-				const geometry = new THREE.CylinderGeometry(eval(leftRadius), eval(rightRadius), step, 100);
+				const geometry = new THREE.CylinderGeometry(leftRadiusEquation.eval({y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step)}),
+				                                            rightRadiusEquation.eval({y1: this.equation1.getCoord(i), y1step: this.equation1.getCoord(i + step)}),
+				                                            step, 100);
 				if(this.type === EquationType.EQUATION_Y)
 				{
 					geometry.rotateZ(Math.PI / 2).translate(i + step / 2, rotationAxis, 0);
@@ -348,6 +357,7 @@ class Graph
 				{
 					geometry.rotateZ(Math.PI).translate(rotationAxis, i + step / 2, 0);
 				}
+
 				const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xFFFF00/*, transparent: true, opacity: 0.5*/}));
 				geometry.dispose();
 				this.group.add(plane);
